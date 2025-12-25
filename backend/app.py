@@ -22,11 +22,7 @@ import google.generativeai as genai
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
-<<<<<<< HEAD
     from config_kelion import PAYPAL_CLIENT_ID, PAYPAL_SECRET, SECRET_KEY, DB_NAME, SMTP_EMAIL, SMTP_PASSWORD, SMTP_SERVER, SMTP_PORT, ALLOWED_ORIGINS, DOMAIN
-=======
-    from config_kelion import PAYPAL_CLIENT_ID, PAYPAL_SECRET, SECRET_KEY, DB_NAME, SMTP_EMAIL, SMTP_PASSWORD, SMTP_SERVER, SMTP_PORT, ALLOWED_ORIGINS
->>>>>>> d873775 (GENEZA NEXUS KELION v12 - Production Ready - Single Avatar Edition)
 except ImportError:
     print("ERROR: config_kelion.py not found in backend folder!")
     sys.exit(1)
@@ -158,11 +154,7 @@ def send_confirmation_email(to_email, username, first_name, subscription, expiry
                 <p><strong>Valabil până la:</strong> {expiry_date}</p>
                 <hr style="border-color: #00f3ff; opacity: 0.3;">
                 <p style="text-align: center;">
-<<<<<<< HEAD
                     <a href="https://{DOMAIN}/" style="display: inline-block; background: linear-gradient(135deg, #bc13fe, #00f3ff); color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accesează NEXUS</a>
-=======
-                    <a href="http://127.0.0.1:8000/" style="display: inline-block; background: linear-gradient(135deg, #bc13fe, #00f3ff); color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accesează NEXUS</a>
->>>>>>> d873775 (GENEZA NEXUS KELION v12 - Production Ready - Single Avatar Edition)
                 </p>
                 <p style="font-size: 12px; color: #888; text-align: center; margin-top: 20px;">Acest email a fost trimis automat. Nu răspunde la acest mesaj.</p>
             </div>
@@ -214,7 +206,6 @@ def register():
         
     # Verify PayPal if not demo
     # TODO: Re-enable for production (see REMINDER_BEFORE_ONLINE.txt)
-<<<<<<< HEAD
     # *** BETA MODE - FREE ACCESS CONFIGURATION ***
     # Automatic switch: Free until Jan 1st, 2026 (System Time)
     # After this date, payment is strictly required.
@@ -224,30 +215,22 @@ def register():
     # Logic: If we are BEFORE the deadline, Beta Mode is Active (True)
     BETA_MODE = CURRENT_TIME < BETA_DEADLINE
     
+    paypal_id = data.get('paypal_subscription_id')
+    
     if subscription != 'demo' and not BETA_MODE:
         # --- PAYMENT REQUIRED MODE (Normal Operation) ---
         if not paypal_id:
             return jsonify({"success": False, "error": "Full System Active. Subscription payment required."}), 402
-=======
-    paypal_id = data.get('paypal_subscription_id')
-    LOCAL_TEST_MODE = True  # Set to False before going online!
-    
-    if subscription != 'demo' and not LOCAL_TEST_MODE:
-        if not paypal_id:
-            return jsonify({"success": False, "error": "Payment evidence required"}), 402
->>>>>>> d873775 (GENEZA NEXUS KELION v12 - Production Ready - Single Avatar Edition)
         
         valid, pp_data = verify_paypal_subscription(paypal_id)
         if not valid:
             return jsonify({"success": False, "error": f"Payment verification failed: {pp_data}"}), 402
-<<<<<<< HEAD
     else:
         # --- BETA MODE (Free Access) ---
         print(f"⚠️ BETA MODE ACTIVE (Valid until {BETA_DEADLINE}): skipping payment for {email}")
         if not paypal_id:
              paypal_id = "BETA_GENESIS_USER"
-=======
->>>>>>> d873775 (GENEZA NEXUS KELION v12 - Production Ready - Single Avatar Edition)
+
 
     username = email.split('@')[0]
     if User.query.filter_by(username=username).first():
