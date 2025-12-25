@@ -1,0 +1,122 @@
+var allProducts = [
+  {
+    "id": 1,
+    "name": "Space Explorer Dog - Edition 1",
+    "category": "Coloring",
+    "price": "$4.99",
+    "image": "assets/images/products/product_1.jpg",
+    "views": 319,
+    "sales": 6,
+    "is_free": false,
+    "generated_at": "2025-12-17T07:27:10.062426",
+    "theme": "Space Explorer Dog"
+  },
+  {
+    "id": 2,
+    "name": "Underwater Mermaid Adventure - Edition 2",
+    "category": "Stories",
+    "price": "$5.99",
+    "image": "assets/images/products/product_2.svg",
+    "views": 480,
+    "sales": 40,
+    "is_free": false,
+    "generated_at": "2025-12-17T07:27:40.728675",
+    "theme": "Underwater Mermaid Adventure"
+  },
+  {
+    "id": 3,
+    "name": "Dinosaur Park Fun - Edition 3",
+    "category": "Games",
+    "price": "$4.99",
+    "image": "assets/images/products/product_3.svg",
+    "views": 153,
+    "sales": 42,
+    "is_free": false,
+    "generated_at": "2025-12-17T07:28:11.390498",
+    "theme": "Dinosaur Park Fun"
+  },
+  {
+    "id": 4,
+    "name": "Magic Unicorn Rainbow - Edition 4",
+    "category": "Coloring",
+    "price": "$4.99",
+    "image": "assets/images/products/product_4.svg",
+    "views": 57,
+    "sales": 8,
+    "is_free": false,
+    "generated_at": "2025-12-17T07:28:42.178643",
+    "theme": "Magic Unicorn Rainbow"
+  },
+  {
+    "id": 5,
+    "name": "Robot Factory Adventure - Edition 5",
+    "category": "Worksheets",
+    "price": "$6.99",
+    "image": "assets/images/products/product_5.svg",
+    "views": 170,
+    "sales": 37,
+    "is_free": false,
+    "generated_at": "2025-12-17T07:29:12.846932",
+    "theme": "Robot Factory Adventure"
+  },
+  {
+    "id": 6,
+    "name": "Magic Robot #6",
+    "category": "Stories",
+    "price": "\u00a34.99",
+    "image": "assets/images/products/product_6.svg",
+    "views": 21,
+    "sales": 9,
+    "is_free": false,
+    "generated_at": "2025-12-18T12:55:19.927436",
+    "theme": "Magic Robot"
+  },
+  {
+    "id": 7,
+    "name": "Magic Cat #7",
+    "category": "Games",
+    "price": "\u00a36.99",
+    "image": "assets/images/products/product_7.svg",
+    "views": 75,
+    "sales": 4,
+    "is_free": false,
+    "generated_at": "2025-12-18T12:55:43.194092",
+    "theme": "Magic Cat"
+  },
+  {
+    "id": 8,
+    "name": "Magic Space #8",
+    "category": "Games",
+    "price": "\u00a36.99",
+    "image": "assets/images/products/product_8.svg",
+    "views": 27,
+    "sales": 3,
+    "is_free": false,
+    "generated_at": "2025-12-18T12:55:44.418418",
+    "theme": "Magic Space"
+  },
+  {
+    "id": 9,
+    "name": "Space Explorer Dog #9",
+    "category": "Coloring",
+    "price": "\u00a34.99",
+    "image": "assets/images/products/product_9.svg",
+    "views": 49,
+    "sales": 9,
+    "is_free": false,
+    "generated_at": "2025-12-18T12:55:45.544405",
+    "theme": "Space Explorer Dog"
+  },
+  {
+    "id": 10,
+    "name": "Underwater Mermaid Adventure #10",
+    "category": "Stories",
+    "price": "\u00a35.99",
+    "image": "assets/images/products/product_10.svg",
+    "views": 19,
+    "sales": 9,
+    "is_free": false,
+    "generated_at": "2025-12-18T12:55:46.673154",
+    "theme": "Underwater Mermaid Adventure"
+  }
+];

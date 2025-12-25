@@ -1,0 +1,2662 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GENEZA KELION - AI HUMANOID SYSTEM</title>
+    <!-- NEXUS VIEWPORT SYSTEM (AUTO-ZOOM) - DISABLED to keep fixed positions -->
+    <!-- <script src="js/nexus_viewport.js"></script> -->
+    <!-- PAYPAL SDK (LOADED DYNAMICALLY BELOW) -->
+    <script id="paypal-sdk"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* KELION CORE STYLES v2.0 - INLINE FOR GUARANTEED LOADING */
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --dark-bg: #050505;
+            --neon-glow-power: 15px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--dark-bg);
+            color: var(--neon-cyan);
+            font-family: 'Rajdhani', sans-serif;
+            background-image: url('/assets/humanoid_male.png?v=fixed');
+            background-repeat: no-repeat;
+            background-position: center 15%;
+            background-size: cover;
+            transition: background-image 0.5s ease-in-out;
+            position: relative;
+            animation: subtleMove 8s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        /* ANIMATED OVERLAY FOR BREATHING EFFECT */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 40%, rgba(0, 243, 255, 0.1) 0%, transparent 50%);
+            animation: breathe 4s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* AVATAR BACKGROUNDS WITH ANIMATION */
+        body.avatar-male {
+            background-image: url('/assets/humanoid_male.png?v=fixed');
+            animation: subtleMove 8s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        body.avatar-male::before {
+            background: radial-gradient(circle at 50% 40%, rgba(0, 243, 255, 0.15) 0%, transparent 50%);
+        }
+
+        /* BREATHING ANIMATION */
+        @keyframes breathe {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
+        }
+
+        @keyframes subtleMove {
+
+            0%,
+            100% {
+                background-position: center 20%;
+            }
+
+            25% {
+                background-position: 50.5% 20.5%;
+            }
+
+            50% {
+                background-position: center 20%;
+            }
+
+            75% {
+                background-position: 49.5% 19.5%;
+            }
+        }
+
+        drum,
+        .footer-nexus {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: rgba(0, 243, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            z-index: 1000;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* GLOW PULSE ANIMATION */
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                filter: brightness(1) contrast(1) drop-shadow(0 0 5px var(--neon-cyan));
+            }
+
+            50% {
+                filter: brightness(1.05) contrast(1.02) drop-shadow(0 0 var(--neon-glow-power) var(--neon-cyan));
+            }
+        }
+
+        /* CONTROL BAR */
+        #control-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 480px;
+            min-width: unset;
+            background: rgba(0, 10, 15, 0.9);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 10px 20px;
+            display: none;
+            /* Hidden by default - shown only for logged-in users */
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            z-index: 9999;
+        }
+
+        #control-bar.visible {
+            display: flex;
+        }
+
+        /* CONTROL PANEL - M/F (BOTTOM LEFT) */
+        #centered-control-panel {
+            position: fixed !important;
+            bottom: 30px !important;
+            left: 30px !important;
+            transform: none !important;
+            z-index: 9999 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 15px !important;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+        }
+
+        /* GENDER SWITCHER */
+        .gender-switch-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .avatar-label {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            opacity: 0.9;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+        }
+
+        .bistable-switch {
+            display: flex;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        .switch-option {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+
+        .switch-option:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .opt-text {
+            font-weight: bold;
+            font-size: 1.4rem;
+            line-height: 1;
+            color: #555;
+        }
+
+        .opt-light {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #333;
+            margin-top: 5px;
+            box-shadow: inset 0 0 2px #000;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        /* ACTIVE STATES - GENERIC */
+        .switch-option.active {
+            background: rgba(0, 243, 255, 0.15);
+        }
+
+        .switch-option.active .opt-text {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .switch-option.active .opt-light {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* ACTIVE STATE - MALE */
+        #switch-male.active {
+            background: rgba(0, 243, 255, 0.15);
+        }
+
+        /* ACTIVE STATE - FEMALE */
+        #switch-female.active {
+            background: rgba(255, 0, 255, 0.15);
+        }
+
+        #switch-female.active .opt-text {
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        #switch-female.active .opt-light {
+            background: var(--neon-pink);
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        /* CHAT INPUT BAR - BOTTOM RIGHT */
+        #chat-input-bar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 10, 20, 0.9);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 30px;
+            padding: 8px 15px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            z-index: 9999;
+        }
+
+        #chat-input-bar.visible {
+            display: flex;
+        }
+
+        #chatInput {
+            width: 350px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            padding: 10px 15px;
+            outline: none;
+        }
+
+        #chatInput::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        #chatInput:focus {
+            outline: none;
+        }
+
+        /* ACTION BUTTONS */
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 20px;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .mic-btn {
+            padding: 10px 12px;
+            border-radius: 50%;
+        }
+
+        .mic-btn.recording {
+            background: rgba(255, 0, 0, 0.2) !important;
+            border-color: #ff0000 !important;
+            color: #ff0000 !important;
+            box-shadow: 0 0 15px #ff0000 !important;
+            animation: micPulse 1s infinite alternate;
+        }
+
+        .visual-btn {
+            padding: 10px 14px;
+            border-radius: 50%;
+            border-color: #555;
+            color: #aaa;
+        }
+
+        .visual-btn:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .visual-btn.scanning {
+            background: rgba(0, 243, 255, 0.2) !important;
+            border-color: var(--neon-cyan) !important;
+            color: var(--neon-cyan) !important;
+            animation: micPulse 1s infinite alternate;
+        }
+
+        .mic-btn.recording {
+            background: rgba(255, 0, 0, 0.2) !important;
+            border-color: #ff0000 !important;
+            color: #ff0000 !important;
+            box-shadow: 0 0 15px #ff0000 !important;
+            animation: micPulse 1s infinite alternate;
+        }
+
+        @keyframes micPulse {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        /* STATUS DISPLAY - TOP CENTER */
+        #status-display {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-cyan);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-shadow: 0 0 8px var(--neon-cyan);
+            z-index: 1000;
+        }
+
+        /* LOGIN BUTTON (TOP RIGHT) */
+        #login-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #login-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        #login-btn.logged-in {
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        #login-btn.logged-in:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        /* REGISTER BUTTON - HIDDEN (use link inside login modal instead) */
+        #register-btn {
+            display: none;
+            position: fixed;
+            top: 65px;
+            right: 20px;
+            background: rgba(255, 0, 255, 0.05);
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 10px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        #history-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 8px 15px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            z-index: 1000;
+            transition: all 0.3s;
+            display: none;
+            /* Shown via JS when logged in */
+        }
+
+        #history-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        #history-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            height: 70vh;
+            background: rgba(10, 20, 30, 0.95);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .history-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+        }
+
+        .history-close-btn {
+            background: none;
+            border: none;
+            color: #ff4444;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .history-close-btn:hover {
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        #history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid var(--neon-cyan);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        .history-date {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .history-preview {
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        #user-info-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 20, 30, 0.8);
+            border-left: 3px solid var(--neon-cyan);
+            padding: 15px;
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            display: none;
+            z-index: 900;
+            min-width: 150px;
+            box-shadow: -10px 0 20px rgba(0, 243, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .user-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .user-plan {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #register-btn:hover {
+            background: var(--neon-pink);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        /* LOGIN MODAL */
+        #login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #login-modal.active {
+            display: flex;
+        }
+
+        .login-box {
+            background: rgba(10, 20, 30, 0.95);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 20px;
+            /* Reduced padding */
+            width: 380px;
+            /* Slightly reduced width */
+            max-width: 95%;
+            max-height: 90vh;
+            /* Prevent overflow on small screens */
+            overflow-y: auto;
+            /* Enable scroll if needed */
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+        }
+
+        .login-box h2 {
+            margin: 0 0 15px 0;
+            /* Reduced margin */
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            font-size: 1.5rem;
+            /* Reduced font size */
+        }
+
+        .login-box .input-group {
+            margin-bottom: 12px;
+            /* Reduced margin */
+        }
+
+        .login-box label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--neon-cyan);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 8px 12px;
+            /* Reduced padding */
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .login-box .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            /* Reduced margin */
+        }
+
+        .login-box button {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--neon-cyan);
+            background: transparent;
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .login-box button:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .login-box .cancel-btn {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        .login-box .cancel-btn:hover {
+            background: #ff4444;
+            color: #fff;
+            box-shadow: 0 0 15px #ff4444;
+        }
+
+        .login-error {
+            color: #ff4444;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .login-error.active {
+            display: block;
+        }
+
+        /* REGISTER MODAL (uses same styles as login-modal) */
+        #register-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #register-modal.active {
+            display: flex;
+        }
+
+        /* FORGOT PASSWORD MODAL */
+        #forgot-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #forgot-modal.active {
+            display: flex;
+        }
+
+        /* USER INFO PANEL */
+        #user-info-panel {
+            position: fixed;
+            top: 70px;
+            /* Below login button */
+            right: 20px;
+            text-align: right;
+            font-family: 'Rajdhani', sans-serif;
+            color: #fff;
+            z-index: 1000;
+            display: none;
+            pointer-events: none;
+        }
+
+        #user-info-panel .user-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+            margin-bottom: 2px;
+        }
+
+        #user-info-panel .user-plan {
+            font-size: 0.9rem;
+            color: #aaa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* BIOMATRIX PANEL */
+        #biomatrix-panel {
+            position: fixed;
+            top: 20px;
+            right: 180px;
+            background: rgba(0, 10, 15, 0.85);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Rajdhani', sans-serif;
+            color: #fff;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+
+        .bio-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bio-stat-label {
+            font-size: 0.6rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bio-stat-bar {
+            width: 4px;
+            height: 30px;
+            background: #222;
+            position: relative;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .bio-stat-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: var(--neon-cyan);
+            transition: height 0.3s ease;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        #nexus-credits-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 15px;
+            font-weight: bold;
+            color: #fff;
+            min-width: 80px;
+            font-size: 1.1rem;
+        }
+
+        @keyframes pulseNC {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+                color: #00ff00;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* MARKETPLACE MODAL */
+        #market-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 5000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(15px);
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        #market-modal.active {
+            display: flex;
+        }
+
+        .market-box {
+            background: #000;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 20px;
+            width: 800px;
+            max-height: 80vh;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .market-header h2 {
+            font-family: 'Orbitron';
+            color: var(--neon-cyan);
+            margin: 0;
+            letter-spacing: 5px;
+        }
+
+        .market-balance {
+            font-family: 'Orbitron';
+            color: #fff;
+            font-size: 1.2rem;
+        }
+
+        .market-items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .market-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .market-item:hover {
+            background: rgba(0, 243, 255, 0.05);
+            border-color: var(--neon-cyan);
+            transform: translateY(-5px);
+        }
+
+        .market-item.owned {
+            opacity: 0.8;
+            border-color: #555;
+            filter: grayscale(0.5);
+        }
+
+        .item-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .item-name {
+            font-family: 'Orbitron';
+            font-size: 1.2rem;
+            color: #fff;
+        }
+
+        .item-desc {
+            color: #888;
+            font-size: 0.85rem;
+            height: 40px;
+        }
+
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .item-price {
+            font-weight: bold;
+            color: var(--neon-cyan);
+        }
+
+        .buy-btn {
+            background: var(--neon-cyan);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .buy-btn:hover:not(:disabled) {
+            box-shadow: 0 0 15px var(--neon-cyan);
+            transform: scale(1.05);
+        }
+
+        .buy-btn:disabled {
+            background: #333;
+            color: #777;
+            cursor: not-allowed;
+        }
+
+        .market-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--neon-cyan);
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        /* CYBER SKIN EFFECT */
+        body.cyber-skin #kelion-body {
+            filter: drop-shadow(0 0 15px var(--neon-cyan)) brightness(1.2);
+        }
+
+        body.cyber-skin canvas#bg-equipment-canvas {
+            opacity: 0.8;
+        }
+
+        body.cyber-skin::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, transparent 0%, rgba(0, 243, 255, 0.1) 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body id="kelion-body" class="avatar-male">
+
+    <!-- BACKGROUND EQUIPMENT ANIMATION (BEHIND AVATAR) -->
+    <canvas id="bg-equipment-canvas"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;"></canvas>
+
+    <!-- STATUS DISPLAY -->
+    <div id="status-display">
+        AVATAR: <span id="current-avatar">MALE</span> | SISTEM: ONLINE
+    </div>
+
+    <!-- HISTORY BUTTON (TOP LEFT) -->
+    <button id="history-btn" style="display: none;">📜 HISTORY</button>
+
+    <!-- HISTORY PANEL -->
+    <div id="history-panel" style="display: none;">
+        <div class="history-header">
+            <span>📜 ISTORICUL CONVERSAȚIILOR</span>
+            <button id="close-history" class="history-close-btn">×</button>
+        </div>
+        <div id="history-list"></div>
+    </div>
+
+    <!-- DEMO TIMER (RIGHT SIDE UNDER LOGIN) -->
+    <div id="demo-timer"
+        style="display: none; position: fixed; top: 70px; right: 20px; font-family: 'Orbitron', sans-serif; font-size: 1rem; color: #ffea00; border: 1px solid #ffea00; padding: 8px 12px; border-radius: 4px; background: rgba(0,0,0,0.8); z-index: 1001; box-shadow: 0 0 10px rgba(255, 234, 0, 0.3); text-align: center;">
+        TIMP DEMO<br><span id="timer-val" style="font-size: 1.2rem; font-weight: bold;">20:00</span>
+    </div>
+
+    <!-- ENTRY BUTTONS (TOP RIGHT) -->
+    <button id="register-btn">CREATE ACCOUNT</button>
+    <button id="login-btn">LOGIN</button>
+
+    <!-- CORE FOOTER -->
+    <div class="footer-nexus">KELION SYSTEM CORE v10.0 // GENEZA NEXUS HUMANOID PROJECT</div>
+    <div id="user-info-panel">
+        <div id="panel-username" class="user-name"></div>
+        <div id="panel-plan" class="user-plan"></div>
+    </div>
+
+    <!-- BIOMATRIX PANEL (SENSORY DATA) -->
+    <div id="biomatrix-panel">
+        <div class="bio-stat" title="Dopamine (Motivation/Reward)">
+            <div class="bio-stat-label">DOP</div>
+            <div class="bio-stat-bar">
+                <div id="bio-dop" class="bio-stat-fill"></div>
+            </div>
+        </div>
+        <div class="bio-stat" title="Serotonin (Mood/Stability)">
+            <div class="bio-stat-label">SER</div>
+            <div class="bio-stat-bar">
+                <div id="bio-ser" class="bio-stat-fill" style="background: #00ff41; box-shadow: 0 0 8px #00ff41;"></div>
+            </div>
+        </div>
+        <div class="bio-stat" title="Norepinephrine (Focus/Stress)">
+            <div class="bio-stat-label">NOR</div>
+            <div class="bio-stat-bar">
+                <div id="bio-nor" class="bio-stat-fill" style="background: #ffea00; box-shadow: 0 0 8px #ffea00;"></div>
+            </div>
+        </div>
+        <div class="bio-stat" title="Energy Level">
+            <div class="bio-stat-label">NRG</div>
+            <div class="bio-stat-bar">
+                <div id="bio-nrg" class="bio-stat-fill" style="background: #ff00ff; box-shadow: 0 0 8px #ff00ff;"></div>
+            </div>
+        </div>
+
+        <div id="nexus-credits-display" title="Nexus Credits (NC)">
+            💰 0 <span style="font-size: 0.6rem; color: #888;">NC</span>
+        </div>
+    </div>
+
+    <!-- CHAT LOG CONTAINER -->
+    <div id="chat-log-container" style="display: none;">
+        <div class="chat-header">
+            <span class="chat-title">💬 CONVERSAȚIE</span>
+            <button id="close-chat" class="chat-close-btn">×</button>
+        </div>
+        <div id="chat-log"></div>
+    </div>
+
+    <style>
+        /* CHAT LOG STYLES */
+        #chat-log-container {
+            position: fixed;
+            bottom: 110px;
+            /* Above control bar (30px + ~80px height) */
+            left: 30px;
+            width: 480px;
+            max-height: 350px;
+            background: rgba(0, 10, 20, 0.95);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            z-index: 9998;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(0, 243, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .chat-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
+            letter-spacing: 2px;
+        }
+
+        .chat-close-btn {
+            background: transparent;
+            border: none;
+            color: #ff4444;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+        }
+
+        .chat-close-btn:hover {
+            color: #ff6666;
+        }
+
+        #chat-log {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            max-height: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            padding: 10px 14px;
+            border-radius: 12px;
+            max-width: 85%;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            background: rgba(0, 243, 255, 0.15);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.robot {
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid rgba(255, 0, 255, 0.3);
+            color: #fff;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-message.robot::before {
+            content: '🤖 ';
+        }
+
+        .chat-message.user::before {
+            content: '👤 ';
+        }
+
+        .chat-message.typing {
+            background: rgba(100, 100, 100, 0.2);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            color: #888;
+        }
+
+        .chat-message.typing::after {
+            content: '...';
+            animation: typingDots 1s infinite;
+        }
+
+        @keyframes typingDots {
+
+            0%,
+            20% {
+                content: '.';
+            }
+
+            40% {
+                content: '..';
+            }
+
+            60%,
+            100% {
+                content: '...';
+            }
+        }
+
+        /* Scrollbar styling */
+        #chat-log::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chat-log::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        #chat-log::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 3px;
+        }
+
+        body.avatar-female #chat-log-container {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
+        }
+
+        body.avatar-female .chat-header {
+            background: rgba(255, 0, 255, 0.1);
+            border-color: rgba(255, 0, 255, 0.3);
+        }
+
+        body.avatar-female .chat-title {
+            color: var(--neon-pink);
+        }
+
+        body.avatar-female .chat-message.user {
+            background: rgba(255, 0, 255, 0.15);
+            border-color: rgba(255, 0, 255, 0.4);
+        }
+    </style>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal">
+        <div class="login-box">
+            <h2>AUTENTIFICARE KELION</h2>
+            <div
+                style="margin-bottom: 15px; font-size: 0.8rem; color: #888; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; border: 1px dashed var(--neon-cyan);">
+                <div style="font-weight: bold; color: var(--neon-cyan); margin-bottom: 5px; text-align: center;">ACCES
+                    DEMO</div>
+                <div style="display: flex; justify-content: center; gap: 20px;">
+                    <span>User: <b style="color:#fff">demo</b></span> <span>Pass: <b style="color:#fff">demo</b></span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="username">Nume utilizator</label>
+                <input type="text" id="username" placeholder="Introdu utilizator" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="password">Parolă</label>
+                <input type="password" id="password" placeholder="Introdu parola" autocomplete="current-password">
+            </div>
+            <div class="btn-group">
+                <button id="login-submit-btn">LOGIN</button>
+                <button id="login-cancel-btn" class="cancel-btn">CANCEL</button>
+            </div>
+            <div id="login-error" class="login-error">Date incorecte. Încearcă din nou.</div>
+            <div style="margin-top: 20px; text-align: center; font-size: 0.85rem;">
+                <a href="#" id="forgot-password-link"
+                    style="color: var(--neon-cyan); text-decoration: none; margin-right: 15px;">Ai uitat parola?</a>
+                <span style="color: #666;">|</span>
+                <a href="#" id="register-link"
+                    style="color: var(--neon-pink); text-decoration: none; margin-left: 15px;">Create Account</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgot-modal">
+        <div class="login-box">
+            <h2>RESETARE PAROLĂ</h2>
+            <p style="font-size: 0.8rem; color: var(--neon-cyan); margin-bottom: 15px;">
+                Introdu user și cheia de securitate
+            </p>
+            <div class="input-group">
+                <label for="forgot-username">Nume Utilizator</label>
+                <input type="text" id="forgot-username" placeholder="Numele tău" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="security-key">Cheie Securitate</label>
+                <input type="text" id="security-key" placeholder="Cheia ta" autocomplete="off">
+                <small style="color: #888; font-size: 0.75rem;">Cheia primită la înregistrare</small>
+            </div>
+            <div class="input-group">
+                <label for="new-password">Parolă Nouă</label>
+                <input type="password" id="new-password" placeholder="Min 8 caractere" autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <label for="confirm-new-password">Confirmă Parola</label>
+                <input type="password" id="confirm-new-password" placeholder="Repetă parola"
+                    autocomplete="new-password">
+            </div>
+            <div class="btn-group">
+                <button id="reset-submit-btn">RESET PASSWORD</button>
+                <button id="reset-cancel-btn" class="cancel-btn">CANCEL</button>
+            </div>
+            <div id="reset-error" class="login-error"></div>
+        </div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div id="register-modal">
+        <div class="login-box">
+            <h2>ÎNREGISTRARE CONT NOU</h2>
+            <p style="font-size: 0.8rem; color: var(--neon-cyan); margin-bottom: 15px;">
+                Contul tău funcționează pe AMBELE avatare
+            </p>
+            <div class="input-group">
+                <label for="reg-username">Nume Utilizator</label>
+                <input type="text" id="reg-username" placeholder="Alege un nume" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="reg-email">Email</label>
+                <input type="email" id="reg-email" placeholder="email@exemplu.com" autocomplete="email">
+            </div>
+            <div class="input-group">
+                <label for="reg-password">Parolă</label>
+                <input type="password" id="reg-password" placeholder="Min 8 caractere" autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <label for="reg-confirm">Confirmă Parola</label>
+                <input type="password" id="reg-confirm" placeholder="Repetă parola" autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <label for="reg-avatar">Avatar Preferat</label>
+                <select id="reg-avatar"
+                    style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); border-radius: 4px; font-family: 'Rajdhani', sans-serif;">
+                    <option value="male">Masculin (KELION)</option>
+                    <option value="female">Feminin (VEONA)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="reg-plan">Plan Abonament</label>
+                <select id="reg-plan"
+                    style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); border-radius: 4px; font-family: 'Rajdhani', sans-serif;">
+                    <option value="basic">1 Lună - £10.00</option>
+                    <option value="premium">3 Luni - £21.00 (Reducere 30%)</option>
+                    <option value="enterprise">1 An - £36.00 (Reducere 70%)</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button id="register-submit-btn">CREATE ACCOUNT</button>
+                <button id="register-cancel-btn" class="cancel-btn">CANCEL</button>
+            </div>
+            <div id="register-error" class="login-error"></div>
+            <div style="font-size: 0.75rem; color: #888; margin-top: 10px; text-align: center;">
+                Notă: Acesta este un demo. În producție, plata e prin PayPal.
+            </div>
+
+            <!-- OTP CONTAINER -->
+            <div id="otp-verification-container"
+                style="display: none; animation: fadeIn 0.3s ease; margin-top:20px; border-top:1px solid #333; padding-top:20px;">
+                <h3 style="color: var(--neon-cyan); margin-bottom: 20px; font-size:1.1rem;">VERIFICĂ EMAIL</h3>
+                <p style="color: #aaa; margin-bottom: 20px; font-size:0.9rem;">
+                    Codul de verificare a fost trimis la:<br>
+                    <span id="otp-email-target"
+                        style="color: #fff; font-weight: bold; border-bottom:1px solid #444;"></span>
+                </p>
+                <input type="text" id="otp-code-input" maxlength="6" placeholder="______"
+                    style="width: 200px; text-align: center; font-size: 24px; letter-spacing: 12px; padding: 10px; background: rgba(0,0,0,0.5); border: 2px solid var(--neon-cyan); color: #fff; margin-bottom: 25px; border-radius: 8px; outline:none;">
+                <div class="btn-group" style="justify-content:center;">
+                    <button onclick="verifyOTP()"
+                        style="background: var(--neon-cyan); color: #000; font-weight:bold; width:auto; padding:10px 20px;">VERIFY
+                        CODE</button>
+                    <button onclick="cancelOTP()" class="cancel-btn"
+                        style="width:auto; padding:10px 20px;">BACK</button>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.8rem; color: #555;">(Check backend logs for code)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="payment-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; justify-content: center; align-items: center;">
+        <div class="login-box" style="text-align: center; max-width: 450px;">
+            <h2 style="color: #00f3ff; margin-bottom: 10px;">CHECKOUT SECURIZAT</h2>
+
+            <!-- TRUST INDICATORS -->
+            <div
+                style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; opacity: 0.8;">
+                <div
+                    style="display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: #00ff00; border: 1px solid #00ff00; padding: 2px 6px; border-radius: 4px;">
+                    <span>🔒</span> ENCRIPTARE SSL
+                </div>
+                <div style="font-size: 0.7rem; color: #aaa;">PLĂȚI SIGURE</div>
+            </div>
+
+            <div id="payment-summary"
+                style="margin-bottom: 20px; font-family: 'Rajdhani', sans-serif; color: #fff; font-size: 1.1rem; border-bottom: 1px solid rgba(0,243,255,0.3); padding-bottom: 15px;">
+                Se încarcă detaliile comenzii...
+            </div>
+
+            <!-- PAYPAL SMART BUTTONS CONTAINER -->
+            <div id="paypal-button-container" style="margin-top: 20px; min-height: 150px;">
+                <!-- Buttons rendered by JS SDK -->
+            </div>
+
+            <div style="font-size: 0.8rem; color: #888; margin-bottom: 15px;">
+                Procesat securizat prin PayPal. Datele cardului nu sunt stocate pe acest server.
+            </div>
+
+            <!-- LEGAL CHECKBOX (MANDATORY) -->
+            <div
+                style="margin-top: 15px; text-align: left; font-size: 0.75rem; color: #aaa; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
+                <label style="display: flex; align-items: start; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="terms-checkbox" style="width: auto; margin-top: 3px;">
+                    <span>
+                        Sunt de acord cu <span
+                            style="color: var(--neon-cyan); text-decoration: underline; cursor: pointer;">Termenii și
+                            Condițiile</span>,
+                        <span style="color: var(--neon-cyan); text-decoration: underline; cursor: pointer;">Politica de
+                            Confidențialitate</span>, și reînnoirea automată.
+                        Înțeleg că taxele de abonament nu sunt rambursabile după 14 zile.
+                    </span>
+                </label>
+            </div>
+
+            <div id="payment-processing"
+                style="display: none; margin-top: 20px; color: #00f3ff; font-family: 'Orbitron', sans-serif;">
+                <div style="font-size: 2rem; animation: pulse 1s infinite;">⚡</div>
+                <div>SE PROCESEAZĂ TRANZACȚIA...</div>
+                <div style="font-size: 0.8rem; color: #888;">Nu închide această fereastră</div>
+            </div>
+
+            <button id="payment-cancel" class="cancel-btn" style="margin-top: 20px; width: 100%;">CANCEL ORDER</button>
+        </div>
+    </div>
+
+    <!-- MARKETPLACE MODAL -->
+    <div id="market-modal">
+        <div class="market-box">
+            <button class="market-close-btn" onclick="NexusMarketplace.close()">×</button>
+            <div class="market-header">
+                <h2>NEXUS MARKETPLACE</h2>
+                <div class="market-balance">💰 <span id="market-user-credits">0</span> NC</div>
+            </div>
+            <div id="market-items-grid" class="market-items-grid">
+                <!-- Items populated by JS -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- M/F SWITCH - BOTTOM LEFT + MODULE CONTROLS -->
+    <div id="centered-control-panel">
+        <!-- VISION MODULE TOGGLE -->
+        <div class="gender-switch-container">
+            <div class="avatar-label">VISION</div>
+            <div class="bistable-switch" id="vision-toggle">
+                <div id="vision-on" class="switch-option">
+                    <span class="opt-text">ON</span>
+                    <div class="opt-light"></div>
+                </div>
+                <div id="vision-off" class="switch-option active">
+                    <span class="opt-text">OFF</span>
+                    <div class="opt-light"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TTS PROVIDER TOGGLE -->
+        <div class="gender-switch-container">
+            <div class="avatar-label">TTS</div>
+            <div class="bistable-switch" id="tts-toggle">
+                <div id="tts-openai" class="switch-option active" title="OpenAI Speed">
+                    <span class="opt-text">O</span>
+                    <div class="opt-light"></div>
+                </div>
+                <div id="tts-eleven" class="switch-option" title="ElevenLabs Quality">
+                    <span class="opt-text">E</span>
+                    <div class="opt-light"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MARKETPLACE BUTTON -->
+        <div class="gender-switch-container">
+            <div class="avatar-label">STORE</div>
+            <button id="market-open-btn" onclick="NexusMarketplace.open()"
+                style="background: rgba(0, 243, 255, 0.1); border: 1px solid var(--neon-cyan); color: #fff; border-radius: 6px; padding: 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);">🛒
+                SHOP</button>
+        </div>
+
+        <!-- MAINFRAME BUTTON (ADMIN) -->
+        <div class="gender-switch-container">
+            <div class="avatar-label">ADMIN</div>
+            <button id="mainframe-open-btn" onclick="NexusMainframe.open()"
+                style="background: rgba(0, 255, 65, 0.1); border: 1px solid #00ff41; color: #00ff41; border-radius: 6px; padding: 10px; cursor: pointer; font-family: 'Orbitron'; font-size: 0.8rem; box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);">🖥️
+                ROOT</button>
+        </div>
+    </div>
+
+    <!-- CHAT INPUT BAR - BOTTOM RIGHT -->
+    <div id="chat-input-bar">
+        <button id="visualBtn" class="action-btn visual-btn" title="AI Vision Scan">👁️</button>
+        <input type="text" id="chatInput" placeholder="Scrie un mesaj..." autocomplete="off">
+        <button id="sendBtn" class="action-btn">SEND</button>
+        <button id="micBtn" class="action-btn mic-btn">🎤</button>
+    </div>
+
+    <!-- Hidden Vision Elements -->
+    <video id="nexus-eye" style="display:none;" autoplay></video>
+    <canvas id="nexus-vision-canvas" style="display:none;"></canvas>
+
+    <!-- VISION SYSTEM & BRAIN ASSETS -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script src="js/nexus_vision.js"></script>
+    <script src="js/nexus_knowledge.js"></script>
+    <script src="js/nexus_memory_vector.js"></script>
+    <script src="js/nexus_neural_engine.js"></script>
+    <script src="js/nexus_cortex.js"></script>
+    <script src="js/nexus_sensory.js"></script>
+    <script src="js/nexus_particles.js"></script>
+    <script src="js/nexus_audio.js"></script>
+
+    <!-- VOICE SYSTEM -->
+    <script src="js/kelion_voice.js"></script>
+    <script src="js/nexus_bio_matrix.js"></script>
+
+    <!-- GAMIFICATION & ECONOMY -->
+    <script src="js/nexus_achievements.js"></script>
+    <script src="js/nexus_economy.js"></script>
+    <script src="js/nexus_marketplace.js"></script>
+    <script src="js/nexus_mainframe.js"></script>
+
+    <style>
+        /* Speaking animation */
+        body.speaking::after {
+            content: '';
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--neon-cyan);
+            border-radius: 50%;
+            animation: speakPulse 0.8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes speakPulse {
+
+            0%,
+            100% {
+                transform: translateX(-50%) scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.3);
+                opacity: 0.5;
+            }
+        }
+
+        body.avatar-female.speaking::after {
+            border-color: var(--neon-pink);
+        }
+    </style>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // KELION CORE SYSTEM v10.0 - CONSOLIDATED & STABLE
+        // ═══════════════════════════════════════════════════════════
+
+        // 1. GLOBAL CONFIG & STATE
+        let SYSTEM_CONFIG = {
+            API_URL: window.location.origin.includes(':3000') ? 'http://localhost:8000' :
+                (window.location.origin === 'null' ? 'http://localhost:8000' : window.location.origin),
+            PAYPAL_CLIENT_ID: ''
+        };
+
+        let USERS_DB = {};
+        let currentGender = 'male';
+        let pendingRegistrationData = null;
+
+        // VOICE SYSTEM (OpenAI TTS) - Handled via js/kelion_voice.js
+
+
+        // 2. CORE SYSTEM FUNCTIONS
+        async function initSystem() {
+            try {
+                console.log('🔄 Kelion: Initializing API connection...');
+                const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/config`);
+                const data = await res.json();
+                SYSTEM_CONFIG.PAYPAL_CLIENT_ID = data.paypal_client_id;
+                SYSTEM_CONFIG.API_URL = data.api_url;
+
+                const script = document.getElementById('paypal-sdk');
+                if (script) {
+                    script.src = `https://www.paypal.com/sdk/js?client-id=${data.paypal_client_id}&currency=GBP`;
+                    console.log('💳 PayPal SDK Integrated.');
+                }
+            } catch (e) {
+                console.warn("⚠️ Standalone Mode (Backend Reachable: No)");
+            }
+        }
+
+        window.switchAvatar = function (gender, force = false) {
+            // Block switching if logged in (unless forced by AI)
+            const currentUser = sessionStorage.getItem('kelion_current_user');
+            const lockedGender = localStorage.getItem('kelion_avatar_gender');
+
+            if (!force && currentUser && lockedGender && lockedGender !== gender) {
+                alert(`Avatar locked while logged in.\n\nYou are logged in as ${currentUser.toUpperCase()} with ${lockedGender === 'male' ? 'KELION' : 'VEONA'}.\n\nPlease LOGOUT first to switch avatar.`);
+                return; // Don't allow switch
+            }
+
+            currentGender = gender;
+            const avatarName = gender === 'male' ? 'KELION' : 'VEONA';
+            const body = document.body;
+            body.classList.remove('avatar-male', 'avatar-female');
+            body.classList.add(gender === 'male' ? 'avatar-male' : 'avatar-female');
+
+            document.getElementById('switch-male')?.classList.toggle('active', gender === 'male');
+            document.getElementById('switch-female')?.classList.toggle('active', gender === 'female');
+
+            const statusText = document.getElementById('current-avatar');
+            if (statusText) {
+                statusText.textContent = avatarName;
+                statusText.style.color = gender === 'male' ? '#00f3ff' : '#ff00ff';
+            }
+
+            localStorage.setItem('kelion_avatar_gender', gender);
+            if (window.kelionVoice) window.kelionVoice.setGender(gender);
+            updateStatusDisplay(!!sessionStorage.getItem('kelion_current_user'), sessionStorage.getItem('kelion_current_user'), sessionStorage.getItem('kelion_user_subscription'));
+        }
+
+        let demoTimerInterval = null;
+
+        async function sendHeartbeat() {
+            try {
+                const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/demo/heartbeat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'demo' })
+                });
+                const data = await res.json();
+                if (data.expired) { // Check expired flag from heartbeat
+                    handleDemoExpiry();
+                }
+            } catch (e) { console.warn("Heartbeat failed", e); }
+        }
+
+        function startDemoTimer() {
+            const timerEl = document.getElementById('demo-timer');
+            const timerVal = document.getElementById('timer-val');
+            if (!timerEl || !timerVal) return;
+
+            timerEl.style.display = 'block';
+
+            // Get remaining seconds from storage (synced at login)
+            let remaining = parseInt(localStorage.getItem('demo_remaining_seconds'));
+            if (!remaining || isNaN(remaining)) remaining = 1200; // safety fallback
+
+            if (demoTimerInterval) clearInterval(demoTimerInterval);
+
+            function update() {
+                remaining--;
+                localStorage.setItem('demo_remaining_seconds', remaining);
+
+                if (remaining <= 0) {
+                    clearInterval(demoTimerInterval);
+                    timerVal.textContent = "00:00";
+                    handleDemoExpiry();
+                    return;
+                }
+
+                const m = Math.floor(remaining / 60);
+                const s = remaining % 60;
+                timerVal.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                // Heartbeat every 10s to sync with server
+                if (remaining % 10 === 0) {
+                    sendHeartbeat();
+                }
+            }
+
+            update();
+            demoTimerInterval = setInterval(update, 1000);
+        }
+
+        function stopDemoTimer() {
+            if (demoTimerInterval) clearInterval(demoTimerInterval);
+            const el = document.getElementById('demo-timer');
+            if (el) el.style.display = 'none';
+        }
+
+        function handleDemoExpiry() {
+            alert("Timpul Demo a expirat! Dacă ți-a plăcut aplicația, te invităm să alegi un abonament.");
+
+            // Cleanup and logout
+            localStorage.removeItem('demo_remaining_seconds');
+            localStorage.setItem('open_register_on_load', 'true');
+
+            window.logout();
+        }
+
+        function updateStatusDisplay(isLoggedIn, username = '', subscription = '') {
+            const statusDisplay = document.getElementById('status-display');
+            const infoPanel = document.getElementById('user-info-panel');
+            const chatInputBar = document.getElementById('chat-input-bar');
+            const switchMale = document.getElementById('switch-male');
+            const switchFemale = document.getElementById('switch-female');
+
+            // Demo Timer Logic
+            if (isLoggedIn && username === 'demo') {
+                startDemoTimer();
+            } else {
+                stopDemoTimer();
+            }
+
+            if (!statusDisplay) return;
+
+            const avatarName = currentGender === 'male' ? 'KELION' : 'VEONA';
+            const avatarColor = currentGender === 'male' ? '#00f3ff' : '#ff00ff';
+
+            // Switch LED always shows selected avatar
+            if (currentGender === 'male') {
+                if (switchMale) switchMale.classList.add('active');
+                if (switchFemale) switchFemale.classList.remove('active');
+            } else {
+                if (switchFemale) switchFemale.classList.add('active');
+                if (switchMale) switchMale.classList.remove('active');
+            }
+
+            // HISTORY BUTTON LOGIC
+            const historyBtn = document.getElementById('history-btn');
+            if (historyBtn) {
+                historyBtn.style.display = isLoggedIn ? 'block' : 'none';
+            }
+
+            if (isLoggedIn) {
+                statusDisplay.style.fontSize = '1.2rem';
+                statusDisplay.style.padding = '12px 25px';
+                statusDisplay.innerHTML = `${username.toUpperCase()} [${(subscription || 'BASIC').toUpperCase()}] | ${avatarName} | SYSTEM: <span style="color:#00ff00">ONLINE</span>`;
+
+                if (infoPanel) {
+                    const uEl = document.getElementById('panel-username');
+                    const pEl = document.getElementById('panel-plan');
+                    if (uEl) uEl.textContent = username.toUpperCase();
+                    if (pEl) pEl.textContent = (subscription || 'BASIC').toUpperCase() + ' PLAN';
+                    infoPanel.style.display = 'block';
+                }
+                // Show chat input bar for logged-in users
+                if (chatInputBar) {
+                    chatInputBar.classList.add('visible');
+                }
+            } else {
+                statusDisplay.style.fontSize = '1.4rem';
+                statusDisplay.style.padding = '15px 30px';
+                statusDisplay.innerHTML = `AVATAR: <span style="color:${avatarColor}">${avatarName}</span> | SYSTEM: <span style="color:#ff4444">OFFLINE</span>`;
+                if (infoPanel) infoPanel.style.display = 'none';
+
+                // Hide chat input bar for non-logged users
+                if (chatInputBar) {
+                    chatInputBar.classList.remove('visible');
+                }
+            }
+        }
+
+        // 4. HISTORY PANEL ACTIONS
+        window.openHistoryPanel = async () => {
+            document.getElementById('history-panel').style.display = 'flex';
+            await loadHistory();
+        };
+
+        window.closeHistoryPanel = () => {
+            document.getElementById('history-panel').style.display = 'none';
+        };
+
+        async function loadHistory() {
+            const historyList = document.getElementById('history-list');
+            const token = sessionStorage.getItem('kelion_token');
+            const user = sessionStorage.getItem('kelion_current_user');
+
+            if (!token || !user) return;
+
+            historyList.innerHTML = '<div style="color:#888; text-align:center;">Se încarcă istoricul...</div>';
+
+            try {
+                const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/history?username=${user}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success && data.history && data.history.length > 0) {
+                    historyList.innerHTML = '';
+                    data.history.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'history-item';
+                        div.innerHTML = `
+                             <div class="history-date">${item.date}</div>
+                             <div class="history-preview">User: ${item.user_msg}<br><span style="color:${item.gender === 'male' ? 'var(--neon-cyan)' : 'var(--neon-pink)'}">AI: ${item.ai_msg}</span></div>
+                         `;
+                        historyList.appendChild(div);
+                    });
+                } else {
+                    historyList.innerHTML = '<div style="color:#888; text-align:center;">Nu există istoric activ.</div>';
+                }
+            } catch (e) {
+                console.error(e);
+                historyList.innerHTML = '<div style="color:red; text-align:center;">Eroare la încărcarea istoricului.</div>';
+            }
+        }
+
+        function updateLoginButton(isLoggedIn, username = '') {
+            const loginBtn = document.getElementById('login-btn');
+            const regBtn = document.getElementById('register-btn');
+            if (!loginBtn) return;
+            loginBtn.textContent = isLoggedIn ? `LOG OFF (${username.toUpperCase()})` : 'LOGIN';
+            loginBtn.classList.toggle('logged-in', isLoggedIn);
+            if (regBtn) regBtn.style.display = isLoggedIn ? 'none' : 'block';
+        }
+
+        window.logout = function () {
+            // Disable voice on logout
+            if (window.kelionVoice) {
+                window.kelionVoice.speak('Goodbye! See you soon.');
+                setTimeout(() => window.kelionVoice.disable(), 2000);
+            }
+            const keys = ['kelion_token', 'kelion_current_user', 'kelion_user_role', 'kelion_user_subscription', 'kelion_login_time'];
+            keys.forEach(k => {
+                sessionStorage.removeItem(k);
+                localStorage.removeItem(k); // Clear legacy as well just in case
+            });
+            setTimeout(() => location.reload(), 2200);
+        };
+
+        // 3. MODAL & UI ACTIONS
+        window.openLoginModal = () => document.getElementById('login-modal')?.classList.add('active');
+        window.closeLoginModal = () => document.getElementById('login-modal')?.classList.remove('active');
+        window.openRegisterModal = () => { closeLoginModal(); document.getElementById('register-modal')?.classList.add('active'); };
+        window.closeRegisterModal = () => document.getElementById('register-modal')?.classList.remove('active');
+
+        async function handleLogin() {
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value;
+            const err = document.getElementById('login-error');
+            if (!u || !p) return;
+
+            try {
+                const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    // Close modal immediately
+                    closeLoginModal();
+
+                    // Save demo limit
+                    if (data.username === 'demo' && data.demo_remaining !== undefined) {
+                        localStorage.setItem('demo_remaining_seconds', data.demo_remaining);
+                    }
+
+                    sessionStorage.setItem('kelion_token', data.token);
+                    sessionStorage.setItem('kelion_current_user', u);
+                    sessionStorage.setItem('kelion_user_role', data.role);
+                    sessionStorage.setItem('kelion_user_subscription', data.subscription);
+
+                    updateStatusDisplay(true, u, data.subscription);
+
+                    // Update Login Button immediately
+                    updateLoginButton(true, u);
+
+                    // Show chat and greet in English
+                    const chatLogContainer = document.getElementById('chat-log-container');
+                    if (chatLogContainer) chatLogContainer.style.display = 'flex';
+                    if (window.addMessageToChat) {
+                        const g = localStorage.getItem('kelion_avatar_gender') || 'male';
+                        const n = g === 'male' ? 'KELION' : 'VEONA';
+                        window.addMessageToChat('robot', `Welcome, ${u.toUpperCase()}! I am ${n}. How can I help you today?`);
+                    }
+                    if (window.kelionVoice) {
+                        window.kelionVoice.enable();
+                        const gender = localStorage.getItem('kelion_avatar_gender') || 'male';
+                        window.kelionVoice.setGender(gender);
+                        const avatarName = gender === 'male' ? 'KELION' : 'VEONA';
+
+                        // Time-based greeting
+                        // Time-based greeting (Romanian)
+                        // Time-based greeting (English)
+
+                        const hour = new Date().getHours();
+                        let greeting = 'Good evening';
+                        if (hour >= 5 && hour < 12) greeting = 'Good morning';
+                        else if (hour >= 12 && hour < 18) greeting = 'Good afternoon';
+
+                        // 1. Speak Greeting
+                        window.kelionVoice.speak(`${greeting}! I am ${avatarName}.`, {
+                            onEnd: () => {
+                                // 2. Wait 1s
+                                setTimeout(() => {
+                                    // 3. Speak Question
+                                    window.kelionVoice.speak("How can I help you today?", {
+                                        onEnd: () => {
+                                            // 4. Wait 2s then ACTIVATE MIC
+                                            setTimeout(() => {
+                                                document.getElementById('chatInput').focus();
+                                                const micBtn = document.getElementById('micBtn');
+                                                if (micBtn && !micBtn.classList.contains('recording')) {
+                                                    console.log("Auto-activating mic for greeting...");
+                                                    micBtn.click();
+                                                }
+                                            }, 2000);
+                                        }
+                                    });
+                                }, 1000);
+                            }
+                        });
+                    }
+
+                    // Removed reload to preserve flow
+                    // setTimeout(() => location.reload(), 2500);
+                } else { err.textContent = data.error; err.style.display = 'block'; }
+            } catch (e) { err.textContent = 'Server Offline'; err.style.display = 'block'; }
+        }
+
+        window.startOTP = async function (email) {
+            document.getElementById('otp-verification-container').style.display = 'block';
+            document.getElementById('otp-email-target').innerText = email;
+            document.querySelectorAll('#register-modal .input-group, #register-modal .btn-group').forEach(el => el.style.display = 'none');
+            await fetch(`${SYSTEM_CONFIG.API_URL}/api/send-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+        };
+
+        window.verifyOTP = async function () {
+            const code = document.getElementById('otp-code-input').value;
+            const email = document.getElementById('otp-email-target').innerText;
+            const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/verify-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code })
+            });
+            const data = await res.json();
+            if (data.success) openPaymentModal(pendingRegistrationData);
+            else alert("Cod invalid.");
+        };
+
+        window.cancelOTP = () => location.reload();
+
+        function openPaymentModal(userData) {
+            let price = userData.plan === 'enterprise' ? '36.00' : (userData.plan === 'premium' ? '21.00' : '10.00');
+            document.getElementById('payment-summary').innerHTML = `<div style="font-size: 1.4rem;">PLAN ${userData.plan.toUpperCase()}</div><div style="font-size: 2rem; color: #00f3ff;">£${price}</div>`;
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = '';
+            paypal.Buttons({
+                createOrder: (data, actions) => actions.order.create({ purchase_units: [{ description: `KELION AI - ${userData.plan}`, amount: { value: price } }] }),
+                onApprove: (data, actions) => actions.order.capture().then(async (details) => {
+                    const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...userData, paypal_order_id: details.id })
+                    });
+                    const r = await res.json();
+                    if (r.success) { alert("Cont activat!"); location.reload(); }
+                })
+            }).render('#paypal-button-container');
+            document.getElementById('register-modal').classList.remove('active');
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
+
+        // 4. ADMIN & UTILS
+        window.openAdminConsole = async function () {
+            document.getElementById('admin-modal').style.display = 'flex';
+            const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/users`, { headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('kelion_token') } });
+            const users = await res.json();
+            let h = '<table style="width:100%; text-align:left; border-collapse:collapse;"><tr><th>UTILIZATOR</th><th>PLAN</th><th>STATUS</th></tr>';
+            for (let u in users) { h += `<tr style="border-bottom:1px solid #222;"><td style="padding:8px;">${u}</td><td>${users[u].subscription}</td><td>${users[u].account_status}</td></tr>`; }
+            document.getElementById('admin-table-container').innerHTML = h + '</table>';
+        }
+
+        // 5. BOOTSTRAP
+        document.addEventListener('DOMContentLoaded', () => {
+            initSystem();
+
+            // Check for demo expiry flag
+            if (localStorage.getItem('open_register_on_load')) {
+                localStorage.removeItem('open_register_on_load');
+                setTimeout(() => openRegisterModal(), 500); // Small delay
+            }
+
+            switchAvatar(localStorage.getItem('kelion_avatar_gender') || 'male');
+
+            const currentUser = sessionStorage.getItem('kelion_current_user');
+            if (currentUser) {
+                updateLoginButton(true, currentUser);
+                updateStatusDisplay(true, currentUser, sessionStorage.getItem('kelion_user_subscription'));
+            }
+
+            // Bindings
+            document.getElementById('switch-male')?.addEventListener('click', () => switchAvatar('male'));
+            document.getElementById('switch-female')?.addEventListener('click', () => switchAvatar('female'));
+
+            // --- MODULE TOGGLES ---
+            document.getElementById('vision-on')?.addEventListener('click', () => {
+                document.getElementById('vision-on').classList.add('active');
+                document.getElementById('vision-off').classList.remove('active');
+                if (window.NexusVision) window.NexusVision.startEyes();
+            });
+            document.getElementById('vision-off')?.addEventListener('click', () => {
+                document.getElementById('vision-off').classList.add('active');
+                document.getElementById('vision-on').classList.remove('active');
+                if (window.NexusVision) window.NexusVision.stopEyes();
+            });
+
+            document.getElementById('tts-openai')?.addEventListener('click', () => {
+                document.getElementById('tts-openai').classList.add('active');
+                document.getElementById('tts-eleven').classList.remove('active');
+                localStorage.setItem('kelion_tts_provider', 'openai');
+            });
+            document.getElementById('tts-eleven')?.addEventListener('click', () => {
+                document.getElementById('tts-eleven').classList.add('active');
+                document.getElementById('tts-openai').classList.remove('active');
+                localStorage.setItem('kelion_tts_provider', 'eleven');
+            });
+
+            // Initialize TTS Provider UI
+            const savedProvider = localStorage.getItem('kelion_tts_provider') || 'openai';
+            if (savedProvider === 'eleven') {
+                document.getElementById('tts-eleven')?.classList.add('active');
+                document.getElementById('tts-openai')?.classList.remove('active');
+            } else {
+                document.getElementById('tts-openai')?.classList.add('active');
+                document.getElementById('tts-eleven')?.classList.remove('active');
+            }
+            document.getElementById('login-btn')?.addEventListener('click', () => { if (sessionStorage.getItem('kelion_current_user')) window.logout(); else openLoginModal(); });
+            document.getElementById('register-btn')?.addEventListener('click', openRegisterModal);
+            document.getElementById('login-submit-btn')?.addEventListener('click', handleLogin);
+            document.getElementById('login-cancel-btn')?.addEventListener('click', closeLoginModal);
+
+            // Enter key triggers login
+            document.getElementById('username')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+            document.getElementById('password')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+
+            document.getElementById('register-link')?.addEventListener('click', (e) => { e.preventDefault(); openRegisterModal(); });
+            document.getElementById('register-submit-btn')?.addEventListener('click', () => {
+                const u = document.getElementById('reg-username').value.trim();
+                const em = document.getElementById('reg-email').value.trim();
+                const p = document.getElementById('reg-password').value;
+                const c = document.getElementById('reg-confirm').value;
+                if (!u || !em || !p || p !== c) { alert("Verifică datele"); return; }
+                pendingRegistrationData = { username: u, email: em, password: p, plan: document.getElementById('reg-plan').value };
+                window.startOTP(em);
+            });
+            document.getElementById('register-cancel-btn')?.addEventListener('click', closeRegisterModal);
+            document.getElementById('admin-db-btn')?.addEventListener('click', openAdminConsole);
+
+            setInterval(() => {
+                const b = document.getElementById('admin-db-btn');
+                if (b) b.style.display = (sessionStorage.getItem('kelion_user_role') === 'admin') ? 'block' : 'none';
+            }, 1000);
+
+            initBackgroundParticles();
+
+            // --- SPEECH RECOGNITION (MIC BUTTON) ---
+            const micBtn = document.getElementById('micBtn');
+            const chatInput = document.getElementById('chatInput');
+            let isListening = false;
+            let recognition = null;
+            let voiceSubmitTimer = null;
+
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'ro-RO'; // Default
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    micBtn.classList.add('recording');
+                    chatInput.placeholder = "Listening (Click Mic to Send)...";
+                };
+
+                recognition.onresult = (event) => {
+                    if (voiceSubmitTimer) clearTimeout(voiceSubmitTimer); // Clear any old timer just in case
+
+                    // Handle continuous input
+                    const transcript = Array.from(event.results)
+                        .map(result => result[0].transcript)
+                        .join('');
+
+                    chatInput.value = transcript;
+                    chatInput.focus();
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error', event.error);
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    micBtn.classList.remove('recording');
+                    chatInput.placeholder = "Enter command or chat...";
+                };
+
+                micBtn?.addEventListener('click', () => {
+                    if (isListening) {
+                        // Manual Stop & Send
+                        recognition.stop();
+                        sendMessage('voice');
+                    } else {
+                        recognition.start();
+                    }
+                });
+            } else {
+                micBtn.style.display = 'none';
+                console.warn("Speech Recognition not supported in this browser.");
+            }
+
+            // --- CHAT SYSTEM ---
+            const chatLogContainer = document.getElementById('chat-log-container');
+            const chatLog = document.getElementById('chat-log');
+            const sendBtn = document.getElementById('sendBtn');
+            const closeChat = document.getElementById('close-chat');
+
+            // Show chat log when user is logged in
+            if (currentUser) {
+                chatLogContainer.style.display = 'flex';
+                // Add welcome message
+                addMessageToChat('robot', `Welcome, ${currentUser.toUpperCase()}! I am ${currentGender === 'male' ? 'KELION' : 'VEONA'}. How can I help you today?`);
+            }
+
+            // Close chat button
+            closeChat?.addEventListener('click', () => {
+                chatLogContainer.style.display = 'none';
+            });
+
+            let conversationLanguage = 'en'; // Default
+
+            // Send message function
+            async function sendMessage(source = 'text') {
+                if (voiceSubmitTimer) clearTimeout(voiceSubmitTimer);
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                // Stop mic immediately to prevent interference
+                if (recognition && isListening) {
+                    recognition.stop();
+                }
+
+                if (window.NexusAchievements) {
+                    window.NexusAchievements.track('queries');
+                    if (source === 'voice') window.NexusAchievements.track('voice_uses');
+                }
+
+                // 1. DYNAMIC LANGUAGE DETECTION (User Input)
+                // Check for Romanian specific characters or common words
+                const roPatterns = /[ăîâșțĂÎÂȘȚ]|(\b(te|pentru|sunt|este|acesta|acea|și|care|sau|dar|când|unde|cum|de|la|în|pe|cu|din|ce|nu|da|bine|salut|bună|mulțumesc|te rog)\b)/i;
+                const enPatterns = /\b(the|and|is|are|this|that|what|where|how|when|why|who|help|hello|hi|thanks|searching)\b/i;
+
+                if (roPatterns.test(message)) {
+                    conversationLanguage = 'ro';
+                    if (recognition) recognition.lang = 'ro-RO';
+                } else if (enPatterns.test(message)) {
+                    conversationLanguage = 'en';
+                    if (recognition) recognition.lang = 'en-US';
+                }
+                // If ambiguous, keep previous language
+
+                chatLogContainer.style.display = 'flex';
+                addMessageToChat('user', message);
+                chatInput.value = '';
+                if (window.NexusAudio) window.NexusAudio.beep('info');
+
+                // 2. Localized "Waiting" Message based on newly detected language
+                const searchMsg = conversationLanguage === 'ro' ? 'Acordă-mi un moment să caut.' : 'Give me a moment to search.';
+                const typingMsg = conversationLanguage === 'ro' ? 'Caut...' : 'Searching...';
+
+                const typingId = addTypingIndicator();
+                const typingEl = document.getElementById(typingId);
+                if (typingEl) typingEl.textContent = typingMsg;
+
+                // --- KNOWLEDGE BASE CHECK (RO) ---
+                if (window.NexusKnowledge) {
+                    const knowledgeRes = await window.NexusKnowledge.processRequest(message);
+                    if (knowledgeRes) {
+                        removeTypingIndicator(typingId);
+                        addMessageToChat('robot', knowledgeRes);
+                        if (window.NexusAchievements) window.NexusAchievements.unlock('knowledge_seeker');
+                        if (window.NexusCortex) window.NexusCortex.triggerThought('WIKI_FETCH');
+                        if (window.kelionVoice) window.kelionVoice.speak(knowledgeRes);
+                        return;
+                    }
+                }
+
+                // --- MEMORY RETRIEVAL (RAG) ---
+                let contextualMessage = message;
+                if (window.NexusMemoryVector) {
+                    const memories = window.NexusMemoryVector.retrieve(message);
+                    if (memories.length > 0) {
+                        console.log("🧠 LTM: Injecting Context:", memories);
+                        contextualMessage = `[PAST MEMORIES: ${memories.join(' | ')}] User Query: ${message}`;
+                        if (window.NexusAchievements) window.NexusAchievements.unlock('memory_link');
+                        if (window.NexusCortex) window.NexusCortex.triggerThought('LTM_ACCESS');
+                    }
+                }
+
+                try {
+                    const response = await fetch(`${SYSTEM_CONFIG.API_URL}/api/chat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: contextualMessage,
+                            username: sessionStorage.getItem('kelion_current_user') || 'Utilizator',
+                            gender: localStorage.getItem('kelion_avatar_gender') || 'male'
+                        })
+                    });
+
+                    const data = await response.json();
+                    removeTypingIndicator(typingId);
+
+                    if (data.success) {
+                        if (window.NexusCortex) window.NexusCortex.triggerThought('GPT_CORE');
+                        if (window.NexusParticles) window.NexusParticles.pulse();
+                        if (window.NexusAudio) window.NexusAudio.beaming();
+                        // --- SMART UI ACTION PARSING ---
+                        const handleActionTags = (text) => {
+                            const actionMatch = text.match(/\[\[ACTION:(.+?)\]\]/);
+                            if (actionMatch) {
+                                const action = actionMatch[1];
+                                console.log(`🤖 AI Command: ${action}`);
+                                setTimeout(() => {
+                                    if (action === 'OPEN_HISTORY') window.openHistoryPanel?.();
+                                    if (action === 'LOGOUT') window.logout?.();
+                                    if (action === 'OPEN_ADMIN') {
+                                        if (sessionStorage.getItem('kelion_user_role') === 'admin') window.openAdminConsole?.();
+                                        else addMessageToChat('robot', 'Administrative access denied.');
+                                    }
+                                    if (action === 'AVATAR_SWITCH') {
+                                        const current = localStorage.getItem('kelion_avatar_gender') || 'male';
+                                        window.switchAvatar?.(current === 'male' ? 'female' : 'male', true);
+                                    }
+                                    if (action === 'SCAN') handleVisionScan();
+                                    if (action === 'VISION_ON') document.getElementById('vision-on')?.click();
+                                    if (action === 'VISION_OFF') document.getElementById('vision-off')?.click();
+                                    if (action === 'MARKET') window.NexusMarketplace?.open();
+                                    if (action === 'OPEN_MAINFRAME') window.NexusMainframe?.open();
+                                }, 500);
+                                return text.replace(/\[\[ACTION:.+?\]\]/, '').trim();
+                            }
+                            return text;
+                        };
+
+                        const cleanedResponse = handleActionTags(data.response);
+                        addMessageToChat('robot', cleanedResponse);
+
+                        const lowerResp = cleanedResponse.toLowerCase();
+                        if (roPatterns.test(lowerResp)) conversationLanguage = 'ro';
+                        else if (enPatterns.test(lowerResp)) conversationLanguage = 'en';
+
+                        // --- PHILOSOPHY CHECK ---
+                        const philWords = ['sensul vieții', 'conștiință', 'univers', 'existență', 'meaning of life', 'consciousness', 'existence', 'philosophy'];
+                        if (philWords.some(w => lowerResp.includes(w)) || philWords.some(w => message.toLowerCase().includes(w))) {
+                            if (window.NexusAchievements) window.NexusAchievements.unlock('deep_thinker');
+                        }
+
+                        if (window.NexusBioMatrix) {
+                            window.NexusBioMatrix.stimulate('work');
+                            const positiveWords = ['great', 'excellent', 'happy', 'yes', 'perfect', 'bine', 'excelent'];
+                            const friendlyWords = ['love', 'friend', 'care', 'help', 'prieten', 'dragă'];
+                            if (positiveWords.some(w => lowerResp.includes(w))) window.NexusBioMatrix.stimulate('reward');
+                            if (friendlyWords.some(w => lowerResp.includes(w))) window.NexusBioMatrix.stimulate('affection');
+                        }
+
+                        // --- MEMORY ASSIMILATION ---
+                        if (window.NexusMemoryVector && cleanedResponse.length > 20 && cleanedResponse.length < 300) {
+                            // Store facts or important statements
+                            const triggers = ['amintesc', 'detectez', 'identific', 'rețin', 'remember', 'detected', 'fact', 'recomand'];
+                            if (triggers.some(t => lowerResp.includes(t))) {
+                                window.NexusMemoryVector.store(cleanedResponse);
+                            }
+                        }
+
+                        // Speak cleaned response
+                        if (window.kelionVoice && window.kelionVoice.isEnabled) {
+                            if (window.NexusParticles) window.NexusParticles.pulse();
+                            window.kelionVoice.speak(cleanedResponse, {
+                                onEnd: () => {
+                                    if (source === 'voice' && recognition) {
+                                        console.log("🎤 Turn-taking: Re-activating microphone...");
+                                        setTimeout(() => recognition.start(), 500);
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        addMessageToChat('robot', 'Error: ' + data.response);
+                        if (window.NexusAudio) window.NexusAudio.beep('error');
+                    }
+                } catch (error) {
+                    removeTypingIndicator(typingId);
+                    addMessageToChat('robot', 'Connection Offline.');
+                    if (window.NexusAudio) window.NexusAudio.beep('error');
+                    console.error('Chat error:', error);
+                }
+            }
+
+            // --- AI VISION SCANNER ---
+            async function handleVisionScan() {
+                const visualBtn = document.getElementById('visualBtn');
+                const video = document.getElementById('nexus-eye');
+                const canvas = document.getElementById('nexus-vision-canvas');
+
+                if (visualBtn.classList.contains('scanning')) return; // Already scanning
+
+                if (window.NexusAchievements) window.NexusAchievements.track('scans');
+
+                visualBtn.classList.add('scanning');
+                addMessageToChat('robot', conversationLanguage === 'ro' ? 'Inițializez senzorii optici...' : 'Initializing optical sensors...');
+
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = stream;
+                    await new Promise(resolve => video.onloadedmetadata = resolve);
+
+                    // Brief delay to "see" better
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0);
+
+                    const base64Image = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+
+                    // Stop camera immediately
+                    stream.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
+
+                    const typingId = addTypingIndicator();
+                    const typingEl = document.getElementById(typingId);
+                    if (typingEl) typingEl.textContent = conversationLanguage === 'ro' ? 'Analizez viziunea...' : 'Analyzing vision...';
+
+                    const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/vision/analyze`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: base64Image })
+                    });
+
+                    const data = await res.json();
+                    removeTypingIndicator(typingId);
+                    visualBtn.classList.remove('scanning');
+
+                    if (data.success) {
+                        addMessageToChat('robot', data.analysis);
+                        if (window.kelionVoice && window.kelionVoice.isEnabled) {
+                            window.kelionVoice.speak(data.analysis);
+                        }
+                    } else {
+                        addMessageToChat('robot', 'Vision Error: ' + (data.error || 'Unknown'));
+                    }
+
+                } catch (err) {
+                    visualBtn.classList.remove('scanning');
+                    console.error("Vision Error:", err);
+                    addMessageToChat('robot', conversationLanguage === 'ro' ? 'Accesul la camera foto a fost refuzat.' : 'Camera access denied.');
+                }
+            }
+
+            document.getElementById('visualBtn')?.addEventListener('click', handleVisionScan);
+
+            function addMessageToChat(type, text) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `chat-message ${type}`;
+                msgDiv.textContent = text;
+                chatLog.appendChild(msgDiv);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }
+            window.addMessageToChat = addMessageToChat;
+
+            function addTypingIndicator() {
+                const id = 'typing-' + Date.now();
+                const typingDiv = document.createElement('div');
+                typingDiv.id = id;
+                typingDiv.className = 'chat-message robot typing';
+                typingDiv.textContent = 'Scriu';
+                chatLog.appendChild(typingDiv);
+                chatLog.scrollTop = chatLog.scrollHeight;
+                return id;
+            }
+
+            function removeTypingIndicator(id) {
+                const el = document.getElementById(id);
+                if (el) el.remove();
+            }
+
+            // Send button click
+            sendBtn?.addEventListener('click', sendMessage);
+
+            // Enter key in chat input
+            chatInput?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // HISTORY EVENT LISTENERS
+            const historyBtn = document.getElementById('history-btn');
+            const historyCloseBtn = document.getElementById('close-history');
+
+            if (historyBtn) {
+                historyBtn.addEventListener('click', () => window.openHistoryPanel());
+            }
+
+            if (historyCloseBtn) {
+                historyCloseBtn.addEventListener('click', () => window.closeHistoryPanel());
+            }
+
+            console.log('🚀 Kelion v10.0 Online');
+
+            // --- BIOMATRIX UI UPDATE ---
+            setInterval(() => {
+                if (window.NexusBioMatrix) {
+                    const bio = window.NexusBioMatrix;
+                    document.getElementById('bio-dop').style.height = (bio.chemistry.dopamine * 100) + '%';
+                    document.getElementById('bio-ser').style.height = (bio.chemistry.serotonin * 100) + '%';
+                    document.getElementById('bio-nor').style.height = (bio.chemistry.norepinephrine * 100) + '%';
+                    document.getElementById('bio-nrg').style.height = bio.energy.current + '%';
+
+                    // Visual warning if tired
+                    const panel = document.getElementById('biomatrix-panel');
+                    if (bio.energy.current < 20) panel.style.borderColor = '#ff4444';
+                    else panel.style.borderColor = 'var(--neon-cyan)';
+                }
+            }, 1000);
+        });
+
+        function initBackgroundParticles() {
+            const canvas = document.getElementById('bg-equipment-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const ps = [];
+            for (let i = 0; i < 40; i++) ps.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, s: Math.random() * 2 + 1, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5 });
+            function anim() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ps.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0; if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${currentGender === 'male' ? '0,243,255' : '255,0,255'}, 0.3)`; ctx.fill();
+                });
+                requestAnimationFrame(anim);
+            }
+            anim();
+        }
+    </script>
+
+    <!-- DRAG & DROP SYSTEM -->
+    <script>
+        // Draggable UI Elements System
+        (function () {
+            const draggableElements = [
+                { id: 'status-display', name: 'Status' },
+                { id: 'centered-control-panel', name: 'Controls' },
+                { id: 'chat-log-container', name: 'Chat' }
+            ];
+
+            // Load saved positions
+            function loadPositions() {
+                draggableElements.forEach(item => {
+                    const el = document.getElementById(item.id);
+                    if (!el) return;
+
+                    const saved = localStorage.getItem(`kelion_pos_${item.id}`);
+                    if (saved) {
+                        const pos = JSON.parse(saved);
+                        el.style.position = 'fixed';
+                        el.style.left = pos.left + 'px';
+                        el.style.top = pos.top + 'px';
+                        el.style.bottom = 'auto';
+                        el.style.right = 'auto';
+                        el.style.transform = 'none';
+                        console.log(`📍 Loaded: ${item.id} at ${pos.left}px, ${pos.top}px`);
+                    }
+                });
+            }
+
+            // Save position
+            function savePosition(id, left, top) {
+                localStorage.setItem(`kelion_pos_${id}`, JSON.stringify({ left: left, top: top }));
+            }
+
+            // Make element draggable
+            function makeDraggable(el) {
+                let isDragging = false;
+                let offsetX = 0;
+                let offsetY = 0;
+
+                // Add drag handle indicator
+                el.style.cursor = 'grab';
+                el.title = 'Click și trage pentru a muta';
+
+                el.addEventListener('mousedown', (e) => {
+                    // Don't drag if clicking on input, button, etc.
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT') {
+                        return;
+                    }
+
+                    isDragging = true;
+
+                    // Remove any transforms that might interfere
+                    el.style.transform = 'none';
+                    el.style.bottom = 'auto';
+                    el.style.right = 'auto';
+
+                    // Get current position
+                    const rect = el.getBoundingClientRect();
+
+                    // Set position to fixed pixels
+                    el.style.position = 'fixed';
+                    el.style.left = rect.left + 'px';
+                    el.style.top = rect.top + 'px';
+
+                    // Calculate offset from mouse to element corner
+                    offsetX = e.clientX - rect.left;
+                    offsetY = e.clientY - rect.top;
+
+                    el.style.cursor = 'grabbing';
+                    el.style.opacity = '0.85';
+                    el.style.zIndex = '99999';
+
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+
+                    // Calculate new position
+                    let newLeft = e.clientX - offsetX;
+                    let newTop = e.clientY - offsetY;
+
+                    // Keep within viewport
+                    const maxX = window.innerWidth - el.offsetWidth;
+                    const maxY = window.innerHeight - el.offsetHeight;
+
+                    newLeft = Math.max(0, Math.min(newLeft, maxX));
+                    newTop = Math.max(0, Math.min(newTop, maxY));
+
+                    el.style.left = newLeft + 'px';
+                    el.style.top = newTop + 'px';
+                });
+
+                document.addEventListener('mouseup', () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+
+                    el.style.cursor = 'grab';
+                    el.style.opacity = '1';
+                    el.style.zIndex = '';
+
+                    // Save position as numbers
+                    const left = parseInt(el.style.left);
+                    const top = parseInt(el.style.top);
+                    savePosition(el.id, left, top);
+
+                    console.log(`📍 Saved: ${el.id} at ${left}px, ${top}px`);
+                });
+            }
+
+            // Initialize on DOM ready
+            document.addEventListener('DOMContentLoaded', () => {
+                // Clear any old saved positions to start fresh
+                draggableElements.forEach(item => {
+                    localStorage.removeItem(`kelion_pos_${item.id}`);
+                });
+
+                // Don't auto-load positions - keep CSS defaults
+                // loadPositions();
+
+                draggableElements.forEach(item => {
+                    const el = document.getElementById(item.id);
+                    if (el) {
+                        makeDraggable(el);
+                    }
+                });
+
+                console.log('🎯 Drag & Drop System Active (CSS positions preserved)');
+            });
+
+            // Reset positions button (double-click on status to reset)
+            document.addEventListener('dblclick', (e) => {
+                if (e.target.id === 'status-display' || e.target.closest('#status-display')) {
+                    if (confirm('Resetează pozițiile la default?')) {
+                        draggableElements.forEach(item => {
+                            localStorage.removeItem(`kelion_pos_${item.id}`);
+                        });
+                        location.reload();
+                    }
+                }
+            });
+        })();
+    </script>
+
+    <style>
+        /* Draggable elements styling */
+        #status-display:hover,
+        #centered-control-panel:hover,
+        #chat-log-container:hover {
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5), inset 0 0 0 2px rgba(0, 243, 255, 0.3);
+        }
+
+        #status-display::after,
+        #centered-control-panel::after {
+            content: '⋮⋮';
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+        }
+    </style>
+</body>
+
+</html>

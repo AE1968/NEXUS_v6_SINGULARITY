@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Gender Switch</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #0ff;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease;
+        }
+
+        body.avatar-male {
+            background-image: url('frontend/assets/humanoid_male.png');
+        }
+
+        body.avatar-female {
+            background-image: url('frontend/assets/humanoid_female.png');
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #0ff;
+            border-radius: 10px;
+        }
+
+        .switch-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .switch-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid #666;
+            background: rgba(255, 255, 255, 0.1);
+            color: #999;
+            transition: all 0.3s;
+        }
+
+        .switch-btn.active {
+            border-color: #0ff;
+            color: #0ff;
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+        }
+
+        .switch-btn.female.active {
+            border-color: #f0f;
+            color: #f0f;
+            background: rgba(255, 0, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+
+        .status {
+            text-align: center;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+            background: #666;
+            box-shadow: 0 0 5px #666;
+        }
+
+        .indicator.active-male {
+            background: #0ff;
+            box-shadow: 0 0 10px #0ff;
+        }
+
+        .indicator.active-female {
+            background: #f0f;
+            box-shadow: 0 0 10px #f0f;
+        }
+    </style>
+</head>
+
+<body class="avatar-male">
+    <div class="controls">
+        <div class="switch-container">
+            <button id="btnMale" class="switch-btn active">M (Male)</button>
+            <button id="btnFemale" class="switch-btn female">F (Female)</button>
+        </div>
+        <div class="status">
+            Current Avatar: <span id="currentGender">MALE</span>
+            <span id="indicator" class="indicator active-male"></span>
+        </div>
+        <div class="status" style="margin-top: 15px; font-size: 14px; color: #888;">
+            Press 'm' or 'f' on keyboard to switch
+        </div>
+    </div>
+
+    <script>
+        let currentGender = 'male';
+
+        function switchGender(gender) {
+            console.log('Switching to:', gender);
+            currentGender = gender;
+
+            const body = document.body;
+            const btnMale = document.getElementById('btnMale');
+            const btnFemale = document.getElementById('btnFemale');
+            const statusText = document.getElementById('currentGender');
+            const indicator = document.getElementById('indicator');
+
+            // Remove all classes
+            body.classList.remove('avatar-male', 'avatar-female');
+            btnMale.classList.remove('active');
+            btnFemale.classList.remove('active');
+            indicator.classList.remove('active-male', 'active-female');
+
+            if (gender === 'male') {
+                body.classList.add('avatar-male');
+                btnMale.classList.add('active');
+                indicator.classList.add('active-male');
+                statusText.textContent = 'MALE';
+                statusText.style.color = '#0ff';
+            } else {
+                body.classList.add('avatar-female');
+                btnFemale.classList.add('active');
+                indicator.classList.add('active-female');
+                statusText.textContent = 'FEMALE';
+                statusText.style.color = '#f0f';
+            }
+
+            // Save to localStorage
+            localStorage.setItem('test_gender', gender);
+
+            console.log('Body classes:', body.className);
+            console.log('Background image:', window.getComputedStyle(body).backgroundImage);
+        }
+
+        // Event listeners
+        document.getElementById('btnMale').addEventListener('click', () => switchGender('male'));
+        document.getElementById('btnFemale').addEventListener('click', () => switchGender('female'));
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'm') switchGender('male');
+            if (e.key.toLowerCase() === 'f') switchGender('female');
+        });
+
+        // Initialize from localStorage
+        const saved = localStorage.getItem('test_gender') || 'male';
+        switchGender(saved);
+
+        console.log('Test page loaded. Current gender:', currentGender);
+    </script>
+</body>
+
+</html>

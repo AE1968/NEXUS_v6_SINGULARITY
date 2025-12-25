@@ -1,0 +1,204 @@
+/* NEXUS CORE STYLES v2.0 */
+
+/* 1. GLOBAL RESETS */
+:root {
+  --neon-cyan: #00f3ff;
+  --neon-pink: #ff00ff;
+  --neon-amber: #ffcc00;
+  --dark-bg: #050505;
+  --glass-bg: rgba(10, 20, 30, 0.6);
+  --glass-border: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--dark-bg);
+  color: var(--neon-cyan);
+  font-family: 'Rajdhani', sans-serif;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  transition: background-image 0.5s ease-in-out;
+}
+
+/* AVATAR BACKGROUNDS */
+body.avatar-male {
+  background-image: url('../assets/humanoid_male.png');
+  /* Ensure this path is correct relative to css file */
+}
+
+body.avatar-female {
+  background-image: url('../assets/humanoid_female.png');
+}
+
+/* Fallback if no class */
+body {
+  background-image: url('../assets/humanoid_male.png');
+}
+
+
+/* 2. HUD LAYOUT REMOVED */
+
+
+
+/* 3. CONTROL BAR (BOTTOM) */
+#control-bar {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  /* Compact width */
+  min-width: 600px;
+  background: rgba(0, 10, 15, 0.9);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 12px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+  z-index: 9999;
+}
+
+/* GENDER SWITCHER */
+.gender-switch-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.avatar-label {
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+.bistable-switch {
+  display: flex;
+  border: 1px solid var(--neon-cyan);
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #000;
+}
+
+.switch-option {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.switch-option:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.opt-text {
+  font-weight: bold;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.opt-light {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+  margin-top: 4px;
+  box-shadow: inset 0 0 2px #000;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+/* ACTIVE STATE - MALE */
+#switch-male.active {
+  background: rgba(0, 243, 255, 0.15);
+}
+
+#switch-male.active .opt-text {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan);
+}
+
+#switch-male.active .opt-light {
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px var(--neon-cyan);
+}
+
+/* ACTIVE STATE - FEMALE */
+#switch-female.active {
+  background: rgba(255, 0, 255, 0.15);
+}
+
+#switch-female.active .opt-text {
+  color: var(--neon-pink);
+  text-shadow: 0 0 8px var(--neon-pink);
+}
+
+#switch-female.active .opt-light {
+  background: var(--neon-pink);
+  box-shadow: 0 0 8px var(--neon-pink);
+}
+
+/* INPUT */
+.input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+#chatInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(0, 243, 255, 0.3);
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  padding: 10px;
+  transition: border-color 0.3s;
+}
+
+#chatInput:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+}
+
+/* BUTTONS */
+.action-btn {
+  background: transparent;
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  padding: 8px 20px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 4px;
+}
+
+.action-btn:hover {
+  background: var(--neon-cyan);
+  color: #000;
+  box-shadow: 0 0 15px var(--neon-cyan);
+}
+
+.mic-btn {
+  border-color: #555;
+  color: #aaa;
+}
+
+.mic-btn:hover {
+  border-color: #fff;
+  background: #333;
+  color: #fff;
+  box-shadow: none;
+}

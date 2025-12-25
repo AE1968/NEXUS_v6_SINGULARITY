@@ -1,0 +1,338 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   PLĂȚI CU CARD PRIN PAYPAL BUSINESS - DOCUMENTAȚIE       ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 22:36
+💳 SISTEM: PayPal Business (PayPal + Card)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 IMPORTANT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ TOATE plățile (PayPal + Card) merg către PayPal Business
+✅ PayPal procesează AMBELE tipuri de plăți
+✅ Utilizatorii pot plăti cu card FĂRĂ cont PayPal
+✅ Banii ajung în ACELAȘI cont PayPal Business
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💳 OPȚIUNI DE PLATĂ:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OPȚIUNEA 1: PayPal Account
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- User are cont PayPal
+- Login cu PayPal
+- Plată din balanță PayPal sau card salvat
+- ✅ Banii ajung în PayPal Business
+
+OPȚIUNEA 2: Card (Debit/Credit)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- User NU are cont PayPal
+- Introduce datele cardului direct
+- PayPal procesează plata
+- ✅ Banii ajung în PayPal Business
+
+Carduri acceptate:
+- Visa
+- Mastercard
+- American Express
+- Discover
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 IMPLEMENTARE PAYPAL SDK:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HTML - Include PayPal SDK:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&vault=true&intent=subscription&disable-funding=credit"></script>
+
+Parametri importanți:
+- client-id: ID-ul tău PayPal Business
+- vault=true: Salvează metoda de plată pentru abonamente
+- intent=subscription: Pentru abonamente recurente
+- disable-funding=credit: Opțional, ascunde opțiuni nedorite
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JAVASCRIPT - PayPal Buttons (PayPal + Card):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function initPayPalSubscription(planId, planName, planPrice) {
+    paypal.Buttons({
+        style: {
+            shape: 'rect',
+            color: 'gold',
+            layout: 'vertical',
+            label: 'subscribe'
+        },
+        
+        // Create subscription
+        createSubscription: function(data, actions) {
+            return actions.subscription.create({
+                'plan_id': planId,  // Your PayPal Plan ID
+                'application_context': {
+                    'brand_name': 'NEXUS HUMANOID',
+                    'locale': 'ro-RO',
+                    'shipping_preference': 'NO_SHIPPING',
+                    'user_action': 'SUBSCRIBE_NOW',
+                    'return_url': 'https://your-domain.com/success',
+                    'cancel_url': 'https://your-domain.com/cancel'
+                }
+            });
+        },
+        
+        // On approval (both PayPal and Card)
+        onApprove: function(data, actions) {
+            console.log('✅ Subscription approved!');
+            console.log('Subscription ID:', data.subscriptionID);
+            
+            // Save to your database
+            saveSubscription({
+                username: currentRegistration.username,
+                email: currentRegistration.email,
+                subscriptionId: data.subscriptionID,
+                planId: planId,
+                planName: planName,
+                planPrice: planPrice,
+                status: 'active',
+                paymentMethod: 'paypal',  // PayPal handles both
+                startDate: new Date().toISOString()
+            });
+            
+            // Activate account
+            activateUserAccount(currentRegistration.username);
+            
+            // Show success message
+            showSuccessMessage('Account activated! You can now login.');
+            
+            // Redirect to login
+            setTimeout(() => {
+                closeRegisterModal();
+                openLoginModal();
+            }, 2000);
+        },
+        
+        // On error
+        onError: function(err) {
+            console.error('❌ PayPal error:', err);
+            showError('Payment failed. Please try again or contact support.');
+        },
+        
+        // On cancel
+        onCancel: function(data) {
+            console.log('⚠️ Payment cancelled by user');
+            showWarning('Payment cancelled. Your account was not activated.');
+        }
+        
+    }).render('#paypal-button-container');
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 PLAN IDs (Creează în PayPal Dashboard):
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const PAYPAL_PLANS = {
+    'basic': {
+        planId: 'P-XXXXXXXXXXXXX',  // Înlocuiește cu ID-ul real
+        name: 'Basic Plan',
+        price: '€9.99',
+        interval: 'MONTH'
+    },
+    'premium': {
+        planId: 'P-YYYYYYYYYYYYYYY',  // Înlocuiește cu ID-ul real
+        name: 'Premium Plan',
+        price: '€19.99',
+        interval: 'MONTH'
+    },
+    'enterprise': {
+        planId: 'P-ZZZZZZZZZZZZZZZ',  // Înlocuiește cu ID-ul real
+        name: 'Enterprise Plan',
+        price: '€49.99',
+        interval: 'MONTH'
+    }
+};
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 UI - Payment Section:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<div class="payment-section">
+    <h3>Complete Payment</h3>
+    
+    <div class="plan-summary">
+        <h4>Selected Plan: <span id="selected-plan-name">PREMIUM</span></h4>
+        <p class="price">€<span id="selected-plan-price">19.99</span>/month</p>
+    </div>
+    
+    <div class="payment-info">
+        <p>✅ Pay with PayPal account</p>
+        <p>✅ Pay with Debit/Credit Card</p>
+        <p>🔒 Secure payment via PayPal</p>
+        <p>💳 All payments go to PayPal Business</p>
+    </div>
+    
+    <!-- PayPal Button Container -->
+    <div id="paypal-button-container"></div>
+    
+    <p class="terms">
+        By subscribing, you agree to our 
+        <a href="/terms">Terms of Service</a> and 
+        <a href="/privacy">Privacy Policy</a>.
+        You can cancel anytime.
+    </p>
+</div>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 FLUX COMPLET:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. User click "REGISTER"
+2. Completează formular (username, email, password)
+3. Selectează plan (Basic/Premium/Enterprise)
+4. Vede butonul PayPal
+5. Click pe buton PayPal:
+   
+   OPȚIUNEA A: Are cont PayPal
+   - Login PayPal
+   - Confirmă abonament
+   - ✅ Plată procesată
+   
+   OPȚIUNEA B: NU are cont PayPal
+   - Click "Pay with Debit or Credit Card"
+   - Introduce date card (număr, expirare, CVV)
+   - ✅ Plată procesată prin PayPal
+   
+6. PayPal confirmă plata
+7. Webhook notifică serverul tău
+8. Cont activat automat
+9. User poate face login
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💰 UNDE AJUNG BANII:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TOATE plățile ajung în:
+📧 Contul tău PayPal Business
+💳 Indiferent dacă user plătește cu:
+   - Cont PayPal
+   - Card Visa
+   - Card Mastercard
+   - Card American Express
+
+PayPal procesează TOTUL și îți transferă banii în cont.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 SECURITATE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ PayPal gestionează TOATE datele cardurilor
+✅ Tu NU stochezi date de card (PCI DSS compliant)
+✅ PayPal verifică fraudele automat
+✅ 3D Secure pentru carduri europene
+✅ Protecție cumpărător/vânzător
+✅ SSL/HTTPS obligatoriu
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 PAȘI PENTRU SETUP:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. CREEAZĂ CONT PAYPAL BUSINESS
+   https://www.paypal.com/ro/business
+
+2. VERIFICĂ CONTUL
+   - Adaugă cont bancar
+   - Verifică identitatea
+   - Activează primirea plăților
+
+3. OBȚINE CREDENȚIALE API
+   - Mergi la Developer Dashboard
+   - https://developer.paypal.com/dashboard/
+   - Creează App
+   - Copiază Client ID și Secret
+
+4. CREEAZĂ PLAN-URI DE ABONAMENT
+   - Mergi la PayPal Dashboard
+   - Products & Services → Subscriptions
+   - Create Plan pentru fiecare tier:
+     * Basic - €9.99/month
+     * Premium - €19.99/month
+     * Enterprise - €49.99/month
+   - Copiază Plan IDs
+
+5. CONFIGUREAZĂ WEBHOOK
+   - În Developer Dashboard
+   - Webhooks → Create Webhook
+   - URL: https://your-domain.com/api/paypal/webhook
+   - Events: 
+     * BILLING.SUBSCRIPTION.ACTIVATED
+     * BILLING.SUBSCRIPTION.CANCELLED
+     * BILLING.SUBSCRIPTION.SUSPENDED
+     * PAYMENT.SALE.COMPLETED
+
+6. TESTEAZĂ ÎN SANDBOX
+   - Folosește credențiale Sandbox
+   - Testează cu carduri test PayPal
+   - Verifică webhook-uri
+
+7. ACTIVEAZĂ PRODUCTION
+   - Schimbă la credențiale Live
+   - Testează cu plăți reale mici
+   - Monitorizează tranzacțiile
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 AVANTAJE PAYPAL:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ O singură integrare pentru PayPal + Card
+✅ NU trebuie să gestionezi date de card
+✅ Protecție împotriva fraudelor
+✅ Suport pentru abonamente recurente
+✅ Webhook-uri pentru notificări automate
+✅ Dashboard pentru monitorizare
+✅ Retragere ușoară în cont bancar
+✅ Suport clienți PayPal
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ REZUMAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 TOATE plățile (PayPal + Card) → PayPal Business
+💳 User poate plăti cu card FĂRĂ cont PayPal
+🔒 PayPal gestionează securitatea
+💰 Banii ajung în contul tău PayPal Business
+✅ O singură integrare pentru ambele metode
+
+GATA DE IMPLEMENTARE! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: v3.1 - PAYPAL UNIFIED PAYMENT
+📅 DATA: 2025-12-21 22:36
+💳 STATUS: DOCUMENTAT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <title>NEXUS CONTROL PANEL</title>
+    <style>
+        body {
+            background-color: #050505;
+            color: #0ff;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 20px;
+            margin: 0;
+            border-right: 5px solid #0ff;
+            height: 100vh;
+            width: 300px;
+            /* Fix width for side monitor */
+            overflow: hidden;
+        }
+
+        h2 {
+            text-align: center;
+            border-bottom: 2px solid #0ff;
+            padding-bottom: 15px;
+            text-shadow: 0 0 10px #0ff;
+        }
+
+        .module-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .module-item {
+            background: #111;
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .module-item:hover {
+            border-color: #fff;
+        }
+
+        .module-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .status {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #330000;
+            /* Dark Red */
+            box-shadow: 0 0 5px #f00;
+            border: 1px solid #f00;
+        }
+
+        /* STATUS STATES */
+        .active .status {
+            background: #00ff00;
+            box-shadow: 0 0 15px #0f0;
+            border-color: #0f0;
+            animation: blink 2s infinite;
+        }
+
+        .pending .status {
+            background: #ffcc00;
+            box-shadow: 0 0 10px #ff0;
+            border-color: #ff0;
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .btn-implement {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            background: #003333;
+            color: #0ff;
+            border: 1px solid #0ff;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .btn-implement:hover {
+            background: #0ff;
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>🛠️ NEXUS VARIABLES</h2>
+
+    <ul class="module-list">
+
+        <!-- VARIABLE 1 -->
+        <li class="module-item active" id="mod_avatar">
+            <span class="module-name">NEXUS_MODULE_AVATAR</span>
+            <div class="status-dot on"></div>
+        </li>
+        <!-- VARIABLE 2 -->
+        <li class="module-item" id="mod_voice">
+            <span class="module-name">NEXUS_MODULE_VOICE</span>
+            <div class="status"></div>
+        </li>
+        <!-- VARIABLE 3 -->
+        <li class="module-item" id="mod_backend">
+            <span class="module-name">NEXUS_MODULE_BACKEND</span>
+            <div class="status"></div>
+        </li>
+        <!-- VARIABLE 4 -->
+        <li class="module-item" id="mod_brain">
+            <span class="module-name">NEXUS_MODULE_BRAIN</span>
+            <div class="status"></div>
+        </li>
+        <!-- VARIABLE 5 -->
+        <li class="module-item" id="mod_vision">
+            <span class="module-name">NEXUS_MODULE_VISION</span>
+            <div class="status"></div>
+        </li>
+        <!-- VARIABLE 6 -->
+        <li class="module-item" id="mod_agents">
+            <span class="module-name">NEXUS_MODULE_AGENTS</span>
+            <div class="status"></div>
+        </li>
+    </ul>
+
+    <div style="margin-top: 20px; color: #888; font-size: 10px; text-align: center; font-family: monospace;">
+        // WAITING FOR BODY INJECTION...
+    </div>
+
+    <script>
+        // Simple script to toggle visual status for demo
+        function setStatus(id, state) {
+            const el = document.getElementById(id);
+            if (state === 'active') el.classList.add('active');
+            else if (state === 'pending') el.classList.add('pending');
+        }
+        // Example: setStatus('mod_voice', 'active');
+    </script>
+</body>
+
+</html>

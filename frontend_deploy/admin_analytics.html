@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KELION Admin - Analytics & Traffic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00f3ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(0, 243, 255, 0.1);
+            border: 2px solid #00f3ff;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            text-shadow: 0 0 20px #00f3ff;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ff0050 0%, #ff4d94 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            transition: transform 0.2s;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0, 243, 255, 0.05);
+            border: 2px solid #00f3ff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            text-shadow: 0 0 15px #00f3ff;
+        }
+
+        .chart-container {
+            background: rgba(0, 243, 255, 0.05);
+            border: 2px solid #00f3ff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00f3ff;
+        }
+
+        .live-traffic {
+            background: rgba(0, 243, 255, 0.05);
+            border: 2px solid #00f3ff;
+            border-radius: 15px;
+            padding: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .traffic-item {
+            background: rgba(0, 243, 255, 0.03);
+            border-left: 3px solid #00f3ff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .traffic-item:hover {
+            background: rgba(0, 243, 255, 0.08);
+        }
+
+        .traffic-time {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .traffic-page {
+            color: #00f3ff;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .traffic-meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .refresh-btn {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #00f3ff 0%, #00a8cc 100%);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #888;
+        }
+
+        /* Scrollbar styling */
+        .live-traffic::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .live-traffic::-webkit-scrollbar-track {
+            background: rgba(0, 243, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .live-traffic::-webkit-scrollbar-thumb {
+            background: #00f3ff;
+            border-radius: 5px;
+        }
+
+        .chart-bar {
+            height: 30px;
+            background: linear-gradient(90deg, #00f3ff 0%, #00a8cc 100%);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            color: #000;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 KELION Analytics Dashboard</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Page Views</h3>
+                <div class="value" id="total-views">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Unique Sessions</h3>
+                <div class="value" id="unique-sessions">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Last 24h Views</h3>
+                <div class="value" id="views-24h">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Last 24h Sessions</h3>
+                <div class="value" id="sessions-24h">-</div>
+            </div>
+        </div>
+
+        <!-- Device & Browser Stats -->
+        <div class="chart-container">
+            <h2 class="chart-title">📱 Device & Browser Breakdown (24h)</h2>
+            <div id="device-browser-charts"></div>
+        </div>
+
+        <!-- Top Pages -->
+        <div class="chart-container">
+            <h2 class="chart-title">🔥 Top Pages (Last 7 Days)</h2>
+            <div id="top-pages"></div>
+        </div>
+
+        <!-- Live Traffic -->
+        <div class="chart-container">
+            <h2 class="chart-title">🔴 Live Traffic (Last 100 Views)</h2>
+            <button class="refresh-btn" onclick="loadLiveTraffic()">🔄 Refresh</button>
+            <div class="live-traffic" id="live-traffic">
+                <div class="loading">Loading live traffic...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://127.0.0.1:5000'
+            : window.location.origin;
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('kelion_token');
+            const userData = localStorage.getItem('kelion_user');
+
+            if (!token || !userData) {
+                window.location.href = '/';
+                return false;
+            }
+
+            try {
+                const user = JSON.parse(userData);
+                if (user.role !== 'admin') {
+                    alert('Access denied. Admin only.');
+                    window.location.href = '/';
+                    return false;
+                }
+            } catch (e) {
+                window.location.href = '/';
+                return false;
+            }
+
+            return true;
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('kelion_token');
+            localStorage.removeItem('kelion_user');
+            window.location.href = '/';
+        }
+
+        // Load statistics
+        async function loadStats() {
+            const token = localStorage.getItem('kelion_token');
+
+            try {
+                const response = await fetch(`${API_URL}/api/analytics/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+
+                    // Update total stats
+                    document.getElementById('total-views').textContent = stats.total.page_views.toLocaleString();
+                    document.getElementById('unique-sessions').textContent = stats.total.unique_sessions.toLocaleString();
+                    document.getElementById('views-24h').textContent = stats.last_24h.page_views.toLocaleString();
+                    document.getElementById('sessions-24h').textContent = stats.last_24h.unique_sessions.toLocaleString();
+
+                    // Render device & browser charts
+                    renderDeviceBrowserCharts(stats.last_24h);
+
+                    // Render top pages
+                    renderTopPages(stats.top_pages);
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Render device & browser charts
+        function renderDeviceBrowserCharts(data) {
+            const container = document.getElementById('device-browser-charts');
+            const devices = data.devices || {};
+            const browsers = data.browsers || {};
+
+            const maxDevice = Math.max(...Object.values(devices), 1);
+            const maxBrowser = Math.max(...Object.values(browsers), 1);
+
+            let html = '<h3 style="color: #888; font-size: 16px; margin-bottom: 15px;">Devices</h3>';
+            for (const [device, count] of Object.entries(devices)) {
+                const width = (count / maxDevice) * 100;
+                html += `<div class="chart-bar" style="width: ${width}%">${device}: ${count}</div>`;
+            }
+
+            html += '<h3 style="color: #888; font-size: 16px; margin: 30px 0 15px 0;">Browsers</h3>';
+            for (const [browser, count] of Object.entries(browsers)) {
+                const width = (count / maxBrowser) * 100;
+                html += `<div class="chart-bar" style="width: ${width}%">${browser}: ${count}</div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Render top pages
+        function renderTopPages(pages) {
+            const container = document.getElementById('top-pages');
+
+            if (!pages || pages.length === 0) {
+                container.innerHTML = '<div style="color: #888;">No data yet</div>';
+                return;
+            }
+
+            const maxViews = Math.max(...pages.map(p => p.views), 1);
+
+            let html = '';
+            pages.forEach(page => {
+                const width = (page.views / maxViews) * 100;
+                html += `<div class="chart-bar" style="width: ${width}%">${page.title || page.url}: ${page.views} views</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Load live traffic
+        async function loadLiveTraffic() {
+            const token = localStorage.getItem('kelion_token');
+            const container = document.getElementById('live-traffic');
+
+            container.innerHTML = '<div class="loading">Loading...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/analytics/live`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const traffic = data.live_traffic;
+
+                    if (traffic.length === 0) {
+                        container.innerHTML = '<div style="color: #888; text-align: center;">No traffic yet</div>';
+                        return;
+                    }
+
+                    let html = '';
+                    traffic.forEach(view => {
+                        const time = new Date(view.timestamp).toLocaleString('ro-RO');
+                        html += `
+                            <div class="traffic-item">
+                                <div class="traffic-time">🕐 ${time}</div>
+                                <div class="traffic-page">📄 ${view.page_title || view.page_url}</div>
+                                <div class="traffic-meta">
+                                    💻 ${view.device} | 🌐 ${view.browser} | 🌍 ${view.ip}
+                                    ${view.referrer ? `<br>🔗 From: ${view.referrer}` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    container.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading live traffic:', error);
+                container.innerHTML = '<div class="loading">Error loading traffic</div>';
+            }
+        }
+
+        // Initialize
+        if (checkAuth()) {
+            loadStats();
+            loadLiveTraffic();
+
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                loadStats();
+                loadLiveTraffic();
+            }, 30000);
+        }
+    </script>
+</body>
+
+</html>

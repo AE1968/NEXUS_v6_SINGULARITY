@@ -1,0 +1,16 @@
+# NEXUS RESTORE SCRIPT v13
+# Created: 20251222_223804
+
+# To restore this backup:
+# 1. Navigate to the backup directory
+# 2. Copy all files back to the main project directory
+# 3. Run: python app.py
+
+# Backup contains:
+# - All core files (app.py, index.html)
+# - All JavaScript modules (14 files)
+# - Documentation (README, DEPLOYMENT_GUIDE, etc.)
+# - Assets and resources
+
+# Restore command (PowerShell):
+# Copy-Item -Path "C:\Users\adria\.gemini\antigravity\scratch\GENEZA_NEXUS_HUMANOID\backups\NEXUS_BACKUP_v13_20251222_223804\*" -Destination "C:\Users\adria\.gemini\antigravity\scratch\GENEZA_NEXUS_HUMANOID" -Recurse -Force

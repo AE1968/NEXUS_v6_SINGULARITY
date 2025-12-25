@@ -1,0 +1,146 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║     AUTO-LOGOUT DEMO USER - DOCUMENTAȚIE                  ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 22:50
+⏱️  TIMP: 10 minute
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 FUNCȚIONALITATE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User-ul DEMO este deconectat AUTOMAT după 10 minute de la login.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏱️  FLUX:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. User se loghează ca "demo"
+2. Console: "⏱️  Demo user: Auto-logout in 10 minutes"
+3. Timer pornește: 10 minute (600,000 ms)
+4. User folosește aplicația
+5. După 10 minute EXACT:
+   - Console: "⏰ 10 minutes elapsed - Auto-logout demo user"
+   - Alert: "Demo session expired (10 minutes). Please login again."
+   - Logout automat
+   - Modal de login se deschide
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 IMPLEMENTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// În funcția login(), după salvare sesiune:
+
+if (username === 'demo') {
+    console.log('⏱️  Demo user: Auto-logout in 10 minutes');
+    setTimeout(() => {
+        const currentUser = localStorage.getItem('nexus_current_user');
+        if (currentUser === 'demo') {
+            console.log('⏰ 10 minutes elapsed - Auto-logout demo user');
+            alert('Demo session expired (10 minutes). Please login again.');
+            window.logout();
+        }
+    }, 10 * 60 * 1000); // 10 minutes = 600,000 milliseconds
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ CARACTERISTICI:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Doar pentru user "demo"
+✅ Timer: 10 minute exacte
+✅ Verificare înainte de logout (dacă user e încă demo)
+✅ Alert pentru notificare
+✅ Logout automat
+✅ Modal se deschide pentru re-login
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧪 TESTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST RAPID (pentru verificare):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pentru a testa rapid, schimbă temporar:
+10 * 60 * 1000  →  30 * 1000  (30 secunde)
+
+1. Login ca demo
+2. Așteaptă 30 secunde
+3. Verifică logout automat
+
+TEST COMPLET (10 minute):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login ca demo
+2. Console: "⏱️  Demo user: Auto-logout in 10 minutes"
+3. Folosește aplicația
+4. După 10 minute:
+   - Alert apare
+   - Logout automat
+   - Modal se deschide
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  NOTE IMPORTANTE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Timer pornește la LOGIN
+2. Dacă user face logout manual înainte de 10 min, timer continuă
+   dar verificarea `if (currentUser === 'demo')` previne logout-ul
+3. Dacă user se re-loghează ca alt user, timer-ul vechi continuă
+   dar nu afectează noul user (verificare în setTimeout)
+4. La refresh pagină, timer se resetează (normal behavior)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 SCOPUL:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User-ul DEMO este pentru DEMONSTRAȚIE rapidă.
+10 minute este suficient pentru:
+- Explorare interfață
+- Testare funcționalități de bază
+- Decizie dacă vrea să se aboneze
+
+După 10 minute, trebuie să se re-logheze sau să se înregistreze
+cu un abonament plătit.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 COMPARAȚIE UTILIZATORI:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User         | Auto-Logout | Timp
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+demo         | ✅ DA       | 10 minute
+admin        | ❌ NU       | Nelimitat
+user_basic   | ❌ NU       | Nelimitat
+user_premium | ❌ NU       | Nelimitat
+user_enterprise | ❌ NU    | Nelimitat
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ IMPLEMENTAT ȘI FUNCȚIONAL!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: v4.2 - DEMO AUTO-LOGOUT
+📅 DATA: 2025-12-21 22:50
+⏱️  TIMP: 10 minute
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,9 @@
+﻿URL PUBLIC KELION:
+https://raddled-joline-overfruitful.ngrok-free.dev
+
+Pentru kelionai.app:
+1. https://ap.www.namecheap.com
+2. Login: ae1968@kidsdigitalhub.com  
+3. kelionai.app > Advanced DNS
+4. Add URL Redirect: @ -> https://raddled-joline-overfruitful.ngrok-free.dev
+5. Save & Wait 10-30 min

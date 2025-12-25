@@ -1,0 +1,430 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║        PLANURI ABONAMENT - STRUCTURĂ PREȚURI              ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 22:41
+💷 MONEDĂ: GBP (British Pounds)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💰 PLANURI DISPONIBILE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 PLAN 1 LUNĂ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Preț: £10/lună
+Total: £10 (1 lună)
+Economie: £0
+Cel mai flexibil - poți anula oricând
+
+📦 PLAN 3 LUNI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Preț: £7/lună
+Total: £21 (3 luni)
+Economie: £9 (30% reducere)
+⭐ Popular pentru începători
+
+📦 PLAN 6 LUNI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Preț: £5/lună
+Total: £30 (6 luni)
+Economie: £30 (50% reducere)
+⭐⭐ Cel mai popular
+
+📦 PLAN 1 AN (12 LUNI)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Preț: £3/lună
+Total: £36 (12 luni)
+Economie: £84 (70% reducere)
+⭐⭐⭐ Cea mai bună valoare!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 COMPARAȚIE PREȚURI:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Plan      | Preț/lună | Total  | Economie | Reducere
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1 Lună    | £10       | £10    | £0       | 0%
+3 Luni    | £7        | £21    | £9       | 30%
+6 Luni    | £5        | £30    | £30      | 50%
+1 An      | £3        | £36    | £84      | 70%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 TOATE PLANURILE INCLUD:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Acces complet la platformă
+✅ Chat text nelimitat
+✅ Voce (TTS + STT)
+✅ Ambii avatari (M + F)
+✅ Istoric conversații salvat
+✅ Suport tehnic
+✅ Actualizări gratuite
+
+Singura diferență: DURATA și PREȚUL!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💾 STRUCTURĂ BAZĂ DE DATE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const SUBSCRIPTION_PLANS = {
+    '1_month': {
+        id: '1_month',
+        name: '1 Month Plan',
+        duration: 1,
+        durationUnit: 'month',
+        pricePerMonth: 10.00,
+        totalPrice: 10.00,
+        currency: 'GBP',
+        savings: 0,
+        savingsPercent: 0,
+        paypalPlanId: 'P-1MONTH-PLAN-ID',  // Din PayPal Dashboard
+        features: ['full_access', 'chat', 'voice', 'both_avatars'],
+        popular: false
+    },
+    
+    '3_months': {
+        id: '3_months',
+        name: '3 Months Plan',
+        duration: 3,
+        durationUnit: 'month',
+        pricePerMonth: 7.00,
+        totalPrice: 21.00,
+        currency: 'GBP',
+        savings: 9.00,
+        savingsPercent: 30,
+        paypalPlanId: 'P-3MONTHS-PLAN-ID',
+        features: ['full_access', 'chat', 'voice', 'both_avatars'],
+        popular: true,
+        badge: 'Popular'
+    },
+    
+    '6_months': {
+        id: '6_months',
+        name: '6 Months Plan',
+        duration: 6,
+        durationUnit: 'month',
+        pricePerMonth: 5.00,
+        totalPrice: 30.00,
+        currency: 'GBP',
+        savings: 30.00,
+        savingsPercent: 50,
+        paypalPlanId: 'P-6MONTHS-PLAN-ID',
+        features: ['full_access', 'chat', 'voice', 'both_avatars'],
+        popular: true,
+        badge: 'Best Value'
+    },
+    
+    '1_year': {
+        id: '1_year',
+        name: '1 Year Plan',
+        duration: 12,
+        durationUnit: 'month',
+        pricePerMonth: 3.00,
+        totalPrice: 36.00,
+        currency: 'GBP',
+        savings: 84.00,
+        savingsPercent: 70,
+        paypalPlanId: 'P-1YEAR-PLAN-ID',
+        features: ['full_access', 'chat', 'voice', 'both_avatars'],
+        popular: true,
+        badge: 'Best Deal'
+    }
+};
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 UI - Subscription Cards:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<div class="subscription-plans">
+    
+    <!-- 1 MONTH PLAN -->
+    <div class="plan-card">
+        <h3>1 Month</h3>
+        <div class="price">
+            <span class="amount">£10</span>
+            <span class="period">/month</span>
+        </div>
+        <div class="total">Total: £10</div>
+        <ul class="features">
+            <li>✅ Full Access</li>
+            <li>✅ Chat & Voice</li>
+            <li>✅ Both Avatars</li>
+            <li>✅ Cancel Anytime</li>
+        </ul>
+        <button class="select-btn" data-plan="1_month">SELECT</button>
+    </div>
+    
+    <!-- 3 MONTHS PLAN -->
+    <div class="plan-card popular">
+        <span class="badge">POPULAR</span>
+        <h3>3 Months</h3>
+        <div class="price">
+            <span class="amount">£7</span>
+            <span class="period">/month</span>
+        </div>
+        <div class="total">Total: £21 (Save £9)</div>
+        <div class="savings">30% OFF</div>
+        <ul class="features">
+            <li>✅ Full Access</li>
+            <li>✅ Chat & Voice</li>
+            <li>✅ Both Avatars</li>
+            <li>✅ Save 30%</li>
+        </ul>
+        <button class="select-btn" data-plan="3_months">SELECT</button>
+    </div>
+    
+    <!-- 6 MONTHS PLAN -->
+    <div class="plan-card best-value">
+        <span class="badge">BEST VALUE</span>
+        <h3>6 Months</h3>
+        <div class="price">
+            <span class="amount">£5</span>
+            <span class="period">/month</span>
+        </div>
+        <div class="total">Total: £30 (Save £30)</div>
+        <div class="savings">50% OFF</div>
+        <ul class="features">
+            <li>✅ Full Access</li>
+            <li>✅ Chat & Voice</li>
+            <li>✅ Both Avatars</li>
+            <li>✅ Save 50%</li>
+        </ul>
+        <button class="select-btn" data-plan="6_months">SELECT</button>
+    </div>
+    
+    <!-- 1 YEAR PLAN -->
+    <div class="plan-card best-deal">
+        <span class="badge">BEST DEAL</span>
+        <h3>1 Year</h3>
+        <div class="price">
+            <span class="amount">£3</span>
+            <span class="period">/month</span>
+        </div>
+        <div class="total">Total: £36 (Save £84)</div>
+        <div class="savings">70% OFF</div>
+        <ul class="features">
+            <li>✅ Full Access</li>
+            <li>✅ Chat & Voice</li>
+            <li>✅ Both Avatars</li>
+            <li>✅ Save 70%</li>
+        </ul>
+        <button class="select-btn" data-plan="1_year">SELECT</button>
+    </div>
+    
+</div>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💳 PAYPAL INTEGRATION:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function initPayPalForPlan(planId) {
+    const plan = SUBSCRIPTION_PLANS[planId];
+    
+    paypal.Buttons({
+        style: {
+            shape: 'rect',
+            color: 'gold',
+            layout: 'vertical',
+            label: 'subscribe'
+        },
+        
+        createSubscription: function(data, actions) {
+            return actions.subscription.create({
+                'plan_id': plan.paypalPlanId,
+                'application_context': {
+                    'brand_name': 'NEXUS HUMANOID',
+                    'locale': 'en-GB',
+                    'shipping_preference': 'NO_SHIPPING',
+                    'user_action': 'SUBSCRIBE_NOW'
+                }
+            });
+        },
+        
+        onApprove: function(data, actions) {
+            console.log(`✅ Subscription approved: ${plan.name}`);
+            console.log(`   Duration: ${plan.duration} ${plan.durationUnit}(s)`);
+            console.log(`   Total: £${plan.totalPrice}`);
+            console.log(`   Savings: £${plan.savings}`);
+            
+            // Save to database
+            saveUserSubscription({
+                username: currentUser.username,
+                email: currentUser.email,
+                subscriptionId: data.subscriptionID,
+                planId: planId,
+                planName: plan.name,
+                duration: plan.duration,
+                pricePerMonth: plan.pricePerMonth,
+                totalPrice: plan.totalPrice,
+                startDate: new Date().toISOString(),
+                endDate: calculateEndDate(plan.duration),
+                status: 'active'
+            });
+            
+            activateAccount();
+        }
+        
+    }).render('#paypal-button-container');
+}
+
+function calculateEndDate(months) {
+    const now = new Date();
+    now.setMonth(now.getMonth() + months);
+    return now.toISOString();
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 USER DATA STRUCTURE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USERS_DB['john_doe'] = {
+    username: 'john_doe',
+    email: 'john@example.com',
+    password: 'hashed_password',
+    role: 'user',
+    
+    // Subscription details
+    subscription: {
+        planId: '6_months',
+        planName: '6 Months Plan',
+        subscriptionId: 'I-PAYPAL-SUB-12345',
+        status: 'active',
+        
+        // Pricing
+        pricePerMonth: 5.00,
+        totalPrice: 30.00,
+        currency: 'GBP',
+        
+        // Duration
+        duration: 6,
+        durationUnit: 'month',
+        startDate: '2024-12-21T10:00:00Z',
+        endDate: '2025-06-21T10:00:00Z',
+        
+        // Payment
+        paymentMethod: 'paypal',
+        lastPaymentDate: '2024-12-21T10:00:00Z',
+        nextBillingDate: null,  // One-time payment
+        
+        // Stats
+        savings: 30.00,
+        savingsPercent: 50
+    },
+    
+    permissions: ['view', 'chat', 'voice'],
+    chatHistory: [],
+    settings: { language: 'en', voiceEnabled: true },
+    stats: { totalLogins: 0, totalMessages: 0 }
+};
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 RENEWAL LOGIC:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function checkSubscriptionStatus(username) {
+    const user = USERS_DB[username];
+    const now = new Date();
+    const endDate = new Date(user.subscription.endDate);
+    
+    if (now > endDate) {
+        // Subscription expired
+        user.subscription.status = 'expired';
+        user.permissions = ['view'];  // Downgrade to view-only
+        
+        console.log(`⚠️ Subscription expired for ${username}`);
+        sendRenewalEmail(user.email);
+        
+        return false;
+    }
+    
+    // Check if renewal needed soon (7 days before expiry)
+    const daysUntilExpiry = (endDate - now) / (1000 * 60 * 60 * 24);
+    if (daysUntilExpiry <= 7) {
+        sendRenewalReminder(user.email, Math.floor(daysUntilExpiry));
+    }
+    
+    return true;
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📧 EMAIL NOTIFICATIONS:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. WELCOME EMAIL (la înregistrare)
+   Subject: Welcome to NEXUS HUMANOID!
+   Content: Account details, plan info, getting started
+
+2. PAYMENT CONFIRMATION
+   Subject: Payment Received - £XX
+   Content: Receipt, plan details, access info
+
+3. RENEWAL REMINDER (7 zile înainte)
+   Subject: Your subscription expires in 7 days
+   Content: Renewal link, current plan, upgrade options
+
+4. EXPIRATION NOTICE
+   Subject: Your subscription has expired
+   Content: Renewal options, data retention info
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💰 REVENUE CALCULATOR:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Exemplu cu 1000 utilizatori:
+
+250 users × 1 Month  (£10)  = £2,500
+300 users × 3 Months (£21)  = £6,300
+300 users × 6 Months (£30)  = £9,000
+150 users × 1 Year   (£36)  = £5,400
+                      TOTAL = £23,200
+
+Revenue lunar mediu: £23,200 / 6 = £3,867/lună
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ REZUMAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 4 PLANURI DISPONIBILE:
+   - 1 Lună:  £10/lună (£10 total)
+   - 3 Luni:  £7/lună  (£21 total, save 30%)
+   - 6 Luni:  £5/lună  (£30 total, save 50%)
+   - 1 An:    £3/lună  (£36 total, save 70%)
+
+✅ TOATE includ acces complet
+✅ Plată unică pentru întreaga perioadă
+✅ Procesare prin PayPal Business
+✅ Renewal manual la expirare
+
+GATA DE IMPLEMENTARE! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: v4.1 - DURATION-BASED PRICING
+📅 DATA: 2025-12-21 22:41
+💷 MONEDĂ: GBP
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

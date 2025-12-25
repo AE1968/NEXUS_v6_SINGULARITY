@@ -1,0 +1,61 @@
+/* Responsive adjustments for mini calendar and contact button */
+
+/* Desktop - normal size */
+@media (min-width: 1200px) {
+    #mini-calendar-widget {
+        width: 180px !important;
+        bottom: 10px !important;
+        left: 10px !important;
+    }
+}
+
+/* Laptop/Tablet - slightly smaller */
+@media (min-width: 768px) and (max-width: 1199px) {
+    #mini-calendar-widget {
+        width: 160px !important;
+        bottom: 10px !important;
+        left: 10px !important;
+        padding: 6px !important;
+    }
+
+    #mini-calendar-widget .header {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Mobile - very compact */
+@media (max-width: 767px) {
+    #mini-calendar-widget {
+        width: 140px !important;
+        bottom: 5px !important;
+        left: 5px !important;
+        padding: 5px !important;
+    }
+
+    /* Contact button also smaller on mobile */
+    footer a[href="contact.html"] {
+        bottom: 5px !important;
+        right: 5px !important;
+        padding: 8px 16px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    #mini-calendar-widget {
+        width: 120px !important;
+        bottom: 5px !important;
+        left: 5px !important;
+        padding: 4px !important;
+    }
+
+    footer a[href="contact.html"] {
+        padding: 6px 12px !important;
+        font-size: 0.8rem !important;
+    }
+
+    footer a[href="contact.html"] span:first-child {
+        font-size: 1.2rem !important;
+    }
+}

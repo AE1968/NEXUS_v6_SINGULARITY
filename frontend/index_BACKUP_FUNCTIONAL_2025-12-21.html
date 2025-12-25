@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geneza Nexus - Humanoid Interface</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@500&display=swap"
+        rel="stylesheet">
+    <style>
+        /* NEXUS CORE STYLES v2.0 - INLINE FOR GUARANTEED LOADING */
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --dark-bg: #050505;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--dark-bg);
+            color: var(--neon-cyan);
+            font-family: 'Rajdhani', sans-serif;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        /* AVATAR BACKGROUNDS */
+        body.avatar-male {
+            background-image: url('assets/humanoid_male.png');
+        }
+
+        body.avatar-female {
+            background-image: url('assets/humanoid_female.png');
+        }
+
+        /* CONTROL BAR */
+        #control-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            min-width: 600px;
+            background: rgba(0, 10, 15, 0.9);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            z-index: 9999;
+        }
+
+        /* GENDER SWITCHER */
+        .gender-switch-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .avatar-label {
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .bistable-switch {
+            display: flex;
+            border: 1px solid var(--neon-cyan);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #000;
+        }
+
+        .switch-option {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+
+        .switch-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .opt-text {
+            font-weight: bold;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .opt-light {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #333;
+            margin-top: 4px;
+            box-shadow: inset 0 0 2px #000;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        /* ACTIVE STATE - MALE */
+        #switch-male.active {
+            background: rgba(0, 243, 255, 0.15);
+        }
+
+        #switch-male.active .opt-text {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        #switch-male.active .opt-light {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* ACTIVE STATE - FEMALE */
+        #switch-female.active {
+            background: rgba(255, 0, 255, 0.15);
+        }
+
+        #switch-female.active .opt-text {
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        #switch-female.active .opt-light {
+            background: var(--neon-pink);
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        /* INPUT */
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #chatInput {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(0, 243, 255, 0.3);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            padding: 10px;
+            transition: border-color 0.3s;
+        }
+
+        #chatInput:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+        }
+
+        /* BUTTONS */
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 8px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .mic-btn {
+            border-color: #555;
+            color: #aaa;
+        }
+
+        .mic-btn:hover {
+            border-color: #fff;
+            background: #333;
+            color: #fff;
+            box-shadow: none;
+        }
+
+        /* STATUS DISPLAY */
+        #status-display {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-cyan);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body id="nexus-body" class="avatar-male">
+
+    <!-- STATUS DISPLAY -->
+    <div id="status-display">
+        AVATAR: <span id="current-avatar">MALE</span> | SYSTEM: READY
+    </div>
+
+    <!-- CONTROL BAR -->
+    <div id="control-bar">
+        <!-- GENDER SWITCH -->
+        <div class="gender-switch-container">
+            <div class="avatar-label">AVATAR ID</div>
+            <div class="bistable-switch">
+                <div id="switch-male" class="switch-option active">
+                    <span class="opt-text">M</span>
+                    <div class="opt-light"></div>
+                </div>
+                <div id="switch-female" class="switch-option">
+                    <span class="opt-text">F</span>
+                    <div class="opt-light"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INPUT -->
+        <div class="input-wrapper">
+            <input type="text" id="chatInput" placeholder="Enter command or chat..." autocomplete="off">
+        </div>
+
+        <!-- BUTTONS -->
+        <button id="sendBtn" class="action-btn">SEND</button>
+        <button id="micBtn" class="action-btn mic-btn">🎤</button>
+    </div>
+
+    <script>
+        // SIMPLIFIED GENDER SWITCH - GUARANTEED TO WORK
+        console.log('🚀 NEXUS Gender Switch Loading...');
+
+        let currentGender = 'male';
+
+        function switchAvatar(gender) {
+            console.log('═══════════════════════════════════');
+            console.log('🔄 SWITCHING AVATAR TO:', gender.toUpperCase());
+            console.log('═══════════════════════════════════');
+
+            currentGender = gender;
+            const body = document.body;
+            const btnM = document.getElementById('switch-male');
+            const btnF = document.getElementById('switch-female');
+            const statusText = document.getElementById('current-avatar');
+
+            // Remove all classes
+            body.classList.remove('avatar-male', 'avatar-female');
+            btnM.classList.remove('active');
+            btnF.classList.remove('active');
+
+            if (gender === 'male') {
+                body.classList.add('avatar-male');
+                btnM.classList.add('active');
+                statusText.textContent = 'MALE';
+                statusText.style.color = '#00f3ff';
+                console.log('✅ MALE avatar activated');
+                console.log('📸 Background:', window.getComputedStyle(body).backgroundImage);
+            } else {
+                body.classList.add('avatar-female');
+                btnF.classList.add('active');
+                statusText.textContent = 'FEMALE';
+                statusText.style.color = '#ff00ff';
+                console.log('✅ FEMALE avatar activated');
+                console.log('📸 Background:', window.getComputedStyle(body).backgroundImage);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('nexus_avatar_gender', gender);
+            console.log('💾 Saved to localStorage:', gender);
+            console.log('═══════════════════════════════════\n');
+        }
+
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('✅ DOM Ready - Initializing gender switch...\n');
+
+            // Get buttons
+            const btnM = document.getElementById('switch-male');
+            const btnF = document.getElementById('switch-female');
+
+            if (!btnM || !btnF) {
+                console.error('❌ BUTTONS NOT FOUND!');
+                return;
+            }
+
+            // Add click listeners
+            btnM.addEventListener('click', function () {
+                console.log('🖱️ MALE BUTTON CLICKED');
+                switchAvatar('male');
+            });
+
+            btnF.addEventListener('click', function () {
+                console.log('🖱️ FEMALE BUTTON CLICKED');
+                switchAvatar('female');
+            });
+
+            console.log('✅ Click listeners attached');
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function (e) {
+                const input = document.getElementById('chatInput');
+                if (document.activeElement === input) return;
+
+                if (e.key.toLowerCase() === 'm') {
+                    console.log('⌨️ KEY "M" PRESSED');
+                    switchAvatar('male');
+                }
+                if (e.key.toLowerCase() === 'f') {
+                    console.log('⌨️ KEY "F" PRESSED');
+                    switchAvatar('female');
+                }
+            });
+
+            console.log('✅ Keyboard listeners attached');
+
+            // Load saved preference
+            const saved = localStorage.getItem('nexus_avatar_gender') || 'male';
+            console.log('💾 Loading saved preference:', saved);
+            switchAvatar(saved);
+
+            console.log('\n🎉 GENDER SWITCH SYSTEM READY!\n');
+            console.log('Try clicking M or F buttons, or press m/f keys\n');
+        });
+    </script>
+
+</body>
+
+</html>

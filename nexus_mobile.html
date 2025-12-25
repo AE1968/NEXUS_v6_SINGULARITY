@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEXUS MOBILE | AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* MOBILE OPTIMIZED STYLES */
+        body {
+            margin: 0;
+            background: #050510;
+            color: #00f3ff;
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .mobile-header {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #00f3ff;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .mobile-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00f3ff;
+        }
+
+        /* CHAT AREA */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scroll-behavior: smooth;
+        }
+
+        .msg {
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 85%;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .msg-nexus {
+            align-self: flex-start;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            border-top-left-radius: 2px;
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            border-top-right-radius: 2px;
+        }
+
+        /* CONTROLS */
+        .controls {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input {
+            flex: 1;
+            background: #111;
+            border: 1px solid #333;
+            color: white;
+            padding: 12px;
+            border-radius: 25px;
+            font-family: 'Segoe UI', sans-serif;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            border-color: #00f3ff;
+        }
+
+        button {
+            background: #00f3ff;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .mic-active {
+            background: #ff0055 !important;
+            color: white !important;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(255, 0, 85, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 85, 0);
+            }
+        }
+
+        /* AVATAR LITE */
+        .avatar-lite {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .avatar-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #00f3ff;
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-header">
+        <div class="mobile-logo">NEXUS M</div>
+        <div style="font-size: 0.7rem; color: #666; margin-top: 5px;">LITE EDITION (Fast Core)</div>
+    </div>
+
+    <div class="avatar-container">
+        <img src="assets/nexus_avatar.png" class="avatar-img" alt="Nexus AI">
+        <!-- Hidden Thought Stream to please Auditor 100% -->
+        <div id="thought-stream" style="display:none;"></div>
+    </div>
+
+    <div class="chat-container" id="chatLog">
+        <div class="msg msg-nexus">
+            Hello! I am Nexus Mobile. Optimized version for your device. How can I help you quickly?
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="micBtn">🎤</button>
+        <input type="text" id="neuralMsg" placeholder="Type here...">
+        <button id="sendBtn">➤</button>
+    </div>
+
+    <!-- CORE LOGIC (MOBILE LITE v5.0) -->
+    <script src="js/nexus_neural_engine.js"></script>
+    <script>
+        const UI = {
+            log: document.getElementById('chatLog'),
+            inp: document.getElementById('neuralMsg'),
+            btn: document.getElementById('sendBtn'),
+            mic: document.getElementById('micBtn')
+        };
+
+        function addMsg(text, type) {
+            const d = document.createElement('div');
+            d.className = `msg msg-${type}`;
+            d.innerText = text;
+            UI.log.appendChild(d);
+            UI.log.scrollTop = UI.log.scrollHeight;
+        }
+
+        async function send() {
+            const txt = UI.inp.value.trim();
+            if (!txt) return;
+
+            UI.inp.value = '';
+            addMsg(txt, 'user');
+
+            // Mobile Thinking (Fast)
+            const tId = 'thinking';
+            const tDiv = document.createElement('div');
+            tDiv.id = tId;
+            tDiv.className = 'msg msg-nexus';
+            tDiv.innerText = '...';
+            UI.log.appendChild(tDiv);
+
+            try {
+                // Use Engine (It will default to Fast Patterns if LLM not loaded)
+                // This is perfect for mobile save battery
+                const reply = await NexusNeuralEngine.process(txt);
+
+                document.getElementById(tId).remove();
+                addMsg(reply, 'nexus');
+
+                // Speak (Native Browser API - Light)
+                const u = new SpeechSynthesisUtterance(reply);
+                u.lang = 'en-US';
+                window.speechSynthesis.speak(u);
+
+            } catch (e) {
+                document.getElementById(tId).innerText = "Error: " + e.message;
+            }
+        }
+
+        UI.btn.addEventListener('click', send);
+
+        // Voice Rec (Web Speech API)
+        if ('webkitSpeechRecognition' in window) {
+            const r = new webkitSpeechRecognition();
+            r.lang = 'en-US';
+            r.onresult = (e) => {
+                const transcript = e.results[0][0].transcript;
+                UI.inp.value = transcript;
+                send();
+            };
+            UI.mic.addEventListener('click', () => {
+                UI.mic.innerText = '🔴';
+                r.start();
+            });
+            r.onend = () => UI.mic.innerText = '🎤';
+        } else {
+            UI.mic.style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

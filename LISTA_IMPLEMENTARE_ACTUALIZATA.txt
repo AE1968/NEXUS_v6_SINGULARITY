@@ -1,0 +1,141 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║     LISTĂ IMPLEMENTARE - 22:00 → 22:55                    ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 22:55
+⏰ PERIOADĂ: Ultima oră (22:00-22:55)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ DEJA IMPLEMENTAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ✅ Buton LOGIN (dreapta sus)
+2. ✅ Modal LOGIN (username/password)
+3. ✅ Bază de date utilizatori:
+   - admin: Andrada_1968!
+   - demo: demo
+   - user_basic, user_premium, user_enterprise
+4. ✅ Funcție login() cu validare
+5. ✅ Funcție logout()
+6. ✅ updateLoginButton() - schimbă text/culoare
+7. ✅ updateStatusDisplay() - micșorează după login
+8. ✅ Auto-logout la schimbare avatar (M↔F)
+9. ✅ SUBSCRIPTION_TYPES (demo, basic, premium, enterprise)
+10. ✅ Auto-logout DEMO după 10 minute
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ TREBUIE IMPLEMENTAT ACUM:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+11. ❌ Structură abonament cu date expirare
+    - startDate, endDate în user data
+    - notifiedAt3Days flag
+
+12. ❌ Funcție checkSubscriptionStatus()
+    - Verifică zile până la expirare
+    - Returnează: active, expiring_soon, expired
+
+13. ❌ Notificare la 3 zile înainte
+    - Mesaj politicos
+    - Modal sau alert
+    - Flag pentru a nu notifica de mai multe ori
+
+14. ❌ Deconectare automată la expirare
+    - Dacă endDate < now
+    - Logout automat
+    - Downgrade la view-only
+
+15. ❌ Verificare periodică
+    - La login
+    - La fiecare oră (setInterval)
+    - La acțiuni importante
+
+16. ❌ Webhook PayPal pentru reînnoire (Backend)
+    - Endpoint /api/paypal/webhook
+    - Procesare BILLING.SUBSCRIPTION.ACTIVATED
+    - Reactivare cont
+
+17. ❌ Notificare reconectare automată
+    - La confirmare plată
+    - Refresh permisiuni
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 PLAN IMPLEMENTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PRIORITATE 1: Frontend (items 11-15)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fișier: frontend/index.html
+
+Pas 1: Actualizare structură USERS_DB
+  - Adaugă startDate, endDate
+  - Adaugă notifiedAt3Days
+
+Pas 2: Funcție checkSubscriptionStatus()
+  - Calculează zile până la expirare
+  - Verifică status
+  - Returnează status
+
+Pas 3: Funcție showExpiryNotification()
+  - Mesaj politicos
+  - Modal sau alert
+  - Setează flag notifiedAt3Days
+
+Pas 4: Funcție handleSubscriptionExpiry()
+  - Downgrade permisiuni
+  - Logout automat
+  - Alert
+
+Pas 5: Integrare verificare
+  - În funcția login()
+  - setInterval pentru verificare periodică
+
+PRIORITATE 2: Backend (items 16-17)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fișier: backend/app.py
+
+Pas 6: Endpoint /api/paypal/webhook
+  - Primire evenimente PayPal
+  - Procesare BILLING.SUBSCRIPTION.ACTIVATED
+  - Reactivare user
+
+Pas 7: Funcție notify_user_renewal()
+  - Notificare frontend
+  - Refresh permisiuni
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏱️  TIMP ESTIMAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Frontend: 20-30 minute
+Backend: 15-20 minute
+Testare: 10-15 minute
+TOTAL: 45-65 minute
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 ÎNCEPEM IMPLEMENTAREA!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pas următor: Actualizare USERS_DB cu date expirare
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: IMPLEMENTATION CHECKLIST
+📅 DATA: 2025-12-21 22:55
+✅ STATUS: READY TO IMPLEMENT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

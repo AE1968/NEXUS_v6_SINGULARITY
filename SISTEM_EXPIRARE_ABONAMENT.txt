@@ -1,0 +1,374 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   SISTEM EXPIRARE ABONAMENT - DOCUMENTAȚIE                ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 22:54
+⏰ SISTEM: Auto-expirare + Notificări
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 CERINȚE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ⏰ Notificare cu 3 ZILE înainte de expirare
+2. 🔒 Deconectare AUTOMATĂ la expirare (fără plată)
+3. ✅ Reconectare AUTOMATĂ la confirmare plată nouă
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 STRUCTURĂ DATE UTILIZATOR:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USERS_DB['john_doe'] = {
+    username: 'john_doe',
+    email: 'john@example.com',
+    password: 'hashed_password',
+    role: 'user',
+    
+    subscription: {
+        planId: '6_months',
+        planName: '6 Months Plan',
+        subscriptionId: 'I-PAYPAL-SUB-12345',
+        status: 'active',  // 'active', 'expiring_soon', 'expired', 'cancelled'
+        
+        // Dates
+        startDate: '2024-12-21T10:00:00Z',
+        endDate: '2025-06-21T10:00:00Z',
+        
+        // Pricing
+        pricePerMonth: 5.00,
+        totalPrice: 30.00,
+        currency: 'GBP',
+        
+        // Notifications
+        notifiedAt3Days: false,  // A fost notificat?
+        lastNotificationDate: null,
+        
+        // Payment
+        paymentMethod: 'paypal',
+        lastPaymentDate: '2024-12-21T10:00:00Z',
+        nextBillingDate: null,
+        autoRenew: false
+    },
+    
+    permissions: ['view', 'chat', 'voice'],
+    chatHistory: [],
+    settings: { language: 'en', voiceEnabled: true },
+    stats: { totalLogins: 0, totalMessages: 0 }
+};
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏰ LOGICA VERIFICARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function checkSubscriptionStatus(username) {
+    const user = USERS_DB[username];
+    if (!user || !user.subscription) return;
+    
+    const now = new Date();
+    const endDate = new Date(user.subscription.endDate);
+    const daysUntilExpiry = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+    
+    // CAZ 1: Abonament EXPIRAT
+    if (now >= endDate) {
+        if (user.subscription.status !== 'expired') {
+            console.log(`⏰ Subscription EXPIRED for ${username}`);
+            user.subscription.status = 'expired';
+            user.permissions = ['view'];  // Downgrade to view-only
+            
+            // Deconectare automată
+            if (localStorage.getItem('nexus_current_user') === username) {
+                alert('Your subscription has expired. Please renew to continue using the service.');
+                window.logout();
+            }
+        }
+        return 'expired';
+    }
+    
+    // CAZ 2: 3 ZILE până la expirare
+    if (daysUntilExpiry <= 3 && !user.subscription.notifiedAt3Days) {
+        console.log(`⚠️  Subscription expiring in ${daysUntilExpiry} days for ${username}`);
+        user.subscription.status = 'expiring_soon';
+        user.subscription.notifiedAt3Days = true;
+        user.subscription.lastNotificationDate = now.toISOString();
+        
+        // Notificare politicoasă
+        showExpiryNotification(username, daysUntilExpiry);
+        
+        return 'expiring_soon';
+    }
+    
+    // CAZ 3: Abonament ACTIV
+    return 'active';
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💬 NOTIFICARE 3 ZILE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function showExpiryNotification(username, daysLeft) {
+    const user = USERS_DB[username];
+    const planName = user.subscription.planName;
+    const endDate = new Date(user.subscription.endDate);
+    const formattedDate = endDate.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+    
+    // Mesaj politicos
+    const message = `
+        Dear ${username},
+        
+        Your ${planName} subscription will expire in ${daysLeft} day${daysLeft > 1 ? 's' : ''}.
+        
+        Expiry Date: ${formattedDate}
+        
+        To continue enjoying uninterrupted access to all features, 
+        please renew your subscription before it expires.
+        
+        Thank you for being a valued member!
+    `;
+    
+    // Afișare notificare
+    showNotificationModal(message, 'warning');
+    
+    // Log
+    console.log(`📧 Expiry notification sent to ${username}`);
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔒 DECONECTARE LA EXPIRARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function handleSubscriptionExpiry(username) {
+    const user = USERS_DB[username];
+    
+    // Schimbă status
+    user.subscription.status = 'expired';
+    
+    // Downgrade permisiuni
+    user.permissions = ['view'];  // Doar vizualizare
+    
+    // Salvează în DB
+    saveUserData(username);
+    
+    // Dacă user este logat, deconectează-l
+    const currentUser = localStorage.getItem('nexus_current_user');
+    if (currentUser === username) {
+        // Mesaj politicos
+        const message = `
+            Your subscription has expired.
+            
+            You have been logged out automatically.
+            
+            To continue using our service, please renew your subscription.
+            
+            Thank you for your understanding!
+        `;
+        
+        alert(message);
+        
+        // Logout automat
+        window.logout();
+    }
+    
+    console.log(`🔒 User ${username} logged out due to subscription expiry`);
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ RECONECTARE LA PLATĂ NOUĂ:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Webhook PayPal (Backend)
+@app.route('/api/paypal/webhook', methods=['POST'])
+def paypal_webhook():
+    data = request.json
+    event_type = data.get('event_type')
+    
+    if event_type == 'BILLING.SUBSCRIPTION.ACTIVATED':
+        subscription_id = data['resource']['id']
+        
+        // Găsește user-ul
+        username = find_user_by_subscription_id(subscription_id)
+        if username:
+            user = USERS_DB[username]
+            
+            // Reactivează abonament
+            user.subscription.status = 'active'
+            user.subscription.startDate = datetime.now().isoformat()
+            user.subscription.endDate = calculate_end_date(user.subscription.planId)
+            user.subscription.notifiedAt3Days = False
+            
+            // Restabilește permisiuni
+            user.permissions = get_permissions_for_plan(user.subscription.planId)
+            
+            // Salvează
+            save_user_data(username)
+            
+            // Notifică user-ul (dacă e online)
+            notify_user_renewal_success(username)
+            
+            console.log(f"✅ Subscription renewed for {username}")
+    
+    return jsonify({'status': 'received'}), 200
+
+// Frontend - Notificare reconectare
+function notify_user_renewal_success(username) {
+    const currentUser = localStorage.getItem('nexus_current_user');
+    
+    if (currentUser === username) {
+        // User este online - notificare instant
+        const message = `
+            Great news!
+            
+            Your subscription has been successfully renewed!
+            
+            You now have full access to all features again.
+            
+            Thank you for your continued support!
+        `;
+        
+        showNotificationModal(message, 'success');
+        
+        // Refresh permisiuni
+        location.reload();  // Sau update dinamic
+    }
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏱️  VERIFICARE PERIODICĂ:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// La fiecare LOGIN
+function login(username, password) {
+    // ... validare credențiale ...
+    
+    // Verifică status abonament
+    const status = checkSubscriptionStatus(username);
+    
+    if (status === 'expired') {
+        alert('Your subscription has expired. Please renew to login.');
+        return false;
+    }
+    
+    // ... continuă login ...
+}
+
+// Verificare periodică (la fiecare 1 oră)
+setInterval(() => {
+    const currentUser = localStorage.getItem('nexus_current_user');
+    if (currentUser) {
+        checkSubscriptionStatus(currentUser);
+    }
+}, 60 * 60 * 1000); // 1 oră
+
+// Verificare la fiecare acțiune importantă
+function sendMessage(message) {
+    const currentUser = localStorage.getItem('nexus_current_user');
+    const status = checkSubscriptionStatus(currentUser);
+    
+    if (status === 'expired') {
+        alert('Your subscription has expired. Please renew to continue.');
+        return false;
+    }
+    
+    // ... trimite mesaj ...
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 STATUSURI ABONAMENT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Status          | Descriere                    | Acțiune
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+active          | Abonament activ              | Acces complet
+expiring_soon   | 3 zile până la expirare      | Notificare + Acces complet
+expired         | Abonament expirat            | Logout + View only
+cancelled       | Anulat de user               | Logout + View only
+pending         | În așteptare plată           | View only
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 FLUX COMPLET:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SCENARIUL 1: Expirare fără reînnoire
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ziua 1:   User plătește £30 pentru 6 luni
+Ziua 177: (3 zile înainte) Notificare: "Expires in 3 days"
+Ziua 178: (2 zile înainte) Reminder
+Ziua 179: (1 zi înainte) Final reminder
+Ziua 180: EXPIRARE
+          - Status → 'expired'
+          - Permissions → ['view']
+          - Dacă e logat → Logout automat
+          - Alert: "Subscription expired"
+
+SCENARIUL 2: Reînnoire înainte de expirare
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ziua 177: Notificare: "Expires in 3 days"
+Ziua 178: User plătește pentru reînnoire
+          - PayPal webhook → Backend
+          - Status → 'active'
+          - EndDate → +6 luni
+          - notifiedAt3Days → false
+          - Notificare: "Successfully renewed!"
+          - Dacă e logat → Refresh automat
+
+SCENARIUL 3: Reînnoire după expirare
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ziua 180: Expirare → Logout
+Ziua 185: User vrea să se logheze
+          - Login blocat: "Subscription expired"
+          - Opțiune: "Renew Now"
+          - User plătește
+          - PayPal confirmă
+          - Status → 'active'
+          - Permissions restaurate
+          - Login permis
+          - Notificare: "Welcome back!"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ REZUMAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Notificare la 3 zile înainte (politicoasă)
+✅ Deconectare automată la expirare (fără plată)
+✅ Reconectare automată la confirmare plată nouă
+✅ Verificare periodică (la login + la fiecare oră)
+✅ Mesaje politicoase pentru user
+✅ Downgrade la view-only la expirare
+✅ Restaurare completă la reînnoire
+
+GATA DE IMPLEMENTARE! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: v4.3 - SUBSCRIPTION EXPIRY SYSTEM
+📅 DATA: 2025-12-21 22:54
+⏰ STATUS: DOCUMENTAT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

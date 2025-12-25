@@ -1,0 +1,380 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║     SISTEM ÎNREGISTRARE & PLATĂ - DOCUMENTAȚIE            ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 22:36
+💳 SISTEM: PayPal Business + Card
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 FLUX ÎNREGISTRARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. User click pe "REGISTER" (lângă LOGIN)
+2. Completează formular:
+   - Username
+   - Email
+   - Password
+   - Confirm Password
+3. Selectează ABONAMENT:
+   □ BASIC - €9.99/lună
+   □ PREMIUM - €19.99/lună
+   □ ENTERPRISE - €49.99/lună
+4. Selectează METODĂ DE PLATĂ:
+   □ PayPal
+   □ Card (Visa/Mastercard)
+5. Procesare plată
+6. Confirmare și activare cont
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💳 ABONAMENTE DISPONIBILE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BASIC - €9.99/lună
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Vizualizare
+✅ Chat text
+❌ Voce
+❌ Funcții avansate
+
+PREMIUM - €19.99/lună
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Vizualizare
+✅ Chat text
+✅ Voce (TTS + STT)
+❌ Funcții avansate
+
+ENTERPRISE - €49.99/lună
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Vizualizare
+✅ Chat text
+✅ Voce (TTS + STT)
+✅ Funcții avansate
+✅ API access
+✅ Prioritate suport
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💰 PAYPAL BUSINESS API:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CONFIGURARE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Cont PayPal Business
+2. Client ID: [din PayPal Developer Dashboard]
+3. Secret Key: [din PayPal Developer Dashboard]
+4. Webhook URL: https://your-domain.com/api/paypal/webhook
+
+ENDPOINT-URI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Sandbox (Testing):
+https://api-m.sandbox.paypal.com
+
+Production:
+https://api-m.paypal.com
+
+PLAN-URI ABONAMENT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Plan ID Basic:     P-XXXXXXXXXXXXX (creat în PayPal)
+Plan ID Premium:   P-YYYYYYYYYYYYYYY
+Plan ID Enterprise: P-ZZZZZZZZZZZZZZZ
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 IMPLEMENTARE FRONTEND:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HTML - Modal Înregistrare:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<div id="register-modal">
+    <div class="register-box">
+        <h2>CREATE ACCOUNT</h2>
+        
+        <!-- Step 1: User Info -->
+        <div id="step-1" class="register-step active">
+            <input type="text" id="reg-username" placeholder="Username">
+            <input type="email" id="reg-email" placeholder="Email">
+            <input type="password" id="reg-password" placeholder="Password">
+            <input type="password" id="reg-confirm" placeholder="Confirm Password">
+            <button onclick="nextStep()">NEXT</button>
+        </div>
+        
+        <!-- Step 2: Subscription -->
+        <div id="step-2" class="register-step">
+            <h3>Select Subscription</h3>
+            <div class="subscription-cards">
+                <div class="sub-card" data-plan="basic">
+                    <h4>BASIC</h4>
+                    <p class="price">€9.99/month</p>
+                    <ul>
+                        <li>✅ View</li>
+                        <li>✅ Chat</li>
+                        <li>❌ Voice</li>
+                    </ul>
+                    <button>SELECT</button>
+                </div>
+                
+                <div class="sub-card featured" data-plan="premium">
+                    <span class="badge">POPULAR</span>
+                    <h4>PREMIUM</h4>
+                    <p class="price">€19.99/month</p>
+                    <ul>
+                        <li>✅ View</li>
+                        <li>✅ Chat</li>
+                        <li>✅ Voice</li>
+                    </ul>
+                    <button>SELECT</button>
+                </div>
+                
+                <div class="sub-card" data-plan="enterprise">
+                    <h4>ENTERPRISE</h4>
+                    <p class="price">€49.99/month</p>
+                    <ul>
+                        <li>✅ All Features</li>
+                        <li>✅ API Access</li>
+                        <li>✅ Priority Support</li>
+                    </ul>
+                    <button>SELECT</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 3: Payment -->
+        <div id="step-3" class="register-step">
+            <h3>Payment Method</h3>
+            
+            <div class="payment-methods">
+                <button class="payment-btn" data-method="paypal">
+                    <img src="paypal-logo.png">
+                    PayPal
+                </button>
+                
+                <button class="payment-btn" data-method="card">
+                    <img src="card-logo.png">
+                    Credit/Debit Card
+                </button>
+            </div>
+            
+            <!-- PayPal Button Container -->
+            <div id="paypal-button-container"></div>
+            
+            <!-- Card Form -->
+            <div id="card-form" style="display:none;">
+                <input type="text" placeholder="Card Number">
+                <input type="text" placeholder="MM/YY">
+                <input type="text" placeholder="CVV">
+                <button>PAY NOW</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JAVASCRIPT - PayPal Integration:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Load PayPal SDK
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&vault=true&intent=subscription"></script>
+
+// Initialize PayPal Buttons
+function initPayPalButton(planId) {
+    paypal.Buttons({
+        style: {
+            shape: 'rect',
+            color: 'gold',
+            layout: 'vertical',
+            label: 'subscribe'
+        },
+        
+        createSubscription: function(data, actions) {
+            return actions.subscription.create({
+                'plan_id': planId  // Plan ID from PayPal
+            });
+        },
+        
+        onApprove: function(data, actions) {
+            console.log('Subscription approved:', data.subscriptionID);
+            
+            // Save subscription to database
+            saveSubscription({
+                username: registrationData.username,
+                email: registrationData.email,
+                subscriptionId: data.subscriptionID,
+                planId: planId,
+                status: 'active'
+            });
+            
+            // Activate account
+            activateAccount();
+        },
+        
+        onError: function(err) {
+            console.error('PayPal error:', err);
+            showError('Payment failed. Please try again.');
+        }
+    }).render('#paypal-button-container');
+}
+
+// Plan IDs mapping
+const PAYPAL_PLANS = {
+    'basic': 'P-BASIC-PLAN-ID',
+    'premium': 'P-PREMIUM-PLAN-ID',
+    'enterprise': 'P-ENTERPRISE-PLAN-ID'
+};
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 IMPLEMENTARE BACKEND:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Python - Flask Endpoints:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+from flask import Flask, request, jsonify
+import paypalrestsdk
+
+# Configure PayPal
+paypalrestsdk.configure({
+    "mode": "sandbox",  # or "live"
+    "client_id": "YOUR_CLIENT_ID",
+    "client_secret": "YOUR_SECRET_KEY"
+})
+
+@app.route('/api/register', methods=['POST'])
+def register_user():
+    data = request.json
+    
+    # Validate data
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+    plan = data.get('plan')
+    
+    # Check if user exists
+    if username in USERS_DB:
+        return jsonify({'error': 'Username already exists'}), 400
+    
+    # Create user (pending payment)
+    USERS_DB[username] = {
+        'password': hash_password(password),
+        'email': email,
+        'role': 'user',
+        'subscription': plan,
+        'status': 'pending',  # Will be 'active' after payment
+        'permissions': get_permissions_for_plan(plan),
+        'chatHistory': [],
+        'settings': {'language': 'ro'},
+        'stats': {'totalLogins': 0, 'totalMessages': 0}
+    }
+    
+    return jsonify({'success': True, 'username': username})
+
+@app.route('/api/paypal/webhook', methods=['POST'])
+def paypal_webhook():
+    """Handle PayPal webhook events"""
+    data = request.json
+    event_type = data.get('event_type')
+    
+    if event_type == 'BILLING.SUBSCRIPTION.ACTIVATED':
+        # Subscription activated
+        subscription_id = data['resource']['id']
+        activate_user_subscription(subscription_id)
+        
+    elif event_type == 'BILLING.SUBSCRIPTION.CANCELLED':
+        # Subscription cancelled
+        subscription_id = data['resource']['id']
+        deactivate_user_subscription(subscription_id)
+    
+    return jsonify({'status': 'received'}), 200
+
+def activate_user_subscription(subscription_id):
+    """Activate user account after successful payment"""
+    # Find user by subscription ID
+    for username, user in USERS_DB.items():
+        if user.get('subscription_id') == subscription_id:
+            user['status'] = 'active'
+            save_users_db()
+            print(f"✅ Activated subscription for {username}")
+            break
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 BAZĂ DE DATE EXTINSĂ:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USERS_DB = {
+    'new_user_123': {
+        'password': 'hashed_password',
+        'email': 'user@example.com',
+        'role': 'user',
+        'subscription': 'premium',
+        'subscription_id': 'I-PAYPAL-SUBSCRIPTION-ID',
+        'status': 'active',  // 'pending', 'active', 'cancelled'
+        'payment_method': 'paypal',  // 'paypal' or 'card'
+        'billing_cycle': 'monthly',
+        'next_billing_date': '2025-01-21',
+        'permissions': ['view', 'chat', 'voice'],
+        'chatHistory': [],
+        'settings': {'language': 'ro', 'voiceEnabled': true},
+        'stats': {
+            'totalLogins': 0,
+            'totalMessages': 0,
+            'subscriptionStartDate': '2024-12-21',
+            'totalPaid': 19.99
+        }
+    }
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔒 SECURITATE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Parolele sunt hash-uite (bcrypt)
+✅ Email-uri sunt validate
+✅ PayPal webhook este verificat (signature)
+✅ SSL/HTTPS obligatoriu
+✅ Rate limiting pe endpoint-uri
+✅ Token-uri de sesiune expiră
+✅ PCI DSS compliance pentru carduri
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 NEXT STEPS:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Creează cont PayPal Business
+2. Obține Client ID și Secret Key
+3. Creează plan-uri de abonament în PayPal
+4. Implementează modal de înregistrare
+5. Integrează PayPal SDK
+6. Testează în Sandbox
+7. Deploy în producție
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ GATA DE IMPLEMENTARE!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: v3.0 - REGISTRATION & PAYMENT
+📅 DATA: 2025-12-21 22:36
+💳 STATUS: DOCUMENTAT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

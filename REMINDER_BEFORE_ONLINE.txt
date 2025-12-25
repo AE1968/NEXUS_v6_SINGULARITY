@@ -1,0 +1,58 @@
+╔═══════════════════════════════════════════════════════════╗
+║   REMINDER: ÎNAINTE DE A MERGE ONLINE                      ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 Creat: 2025-12-22
+🎯 Status: LOCAL DEVELOPMENT MODE
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  DE FĂCUT ÎNAINTE DE DEPLOY PRODUCȚIE:
+
+1. 📧 EMAIL CONFIRMATION
+   - Testează trimiterea efectivă de email
+   - Verifică că mesajele ajung (nu în spam)
+   - Actualizează link-ul din email de la localhost la domeniul real
+
+2. 💳 PAYPAL PLAN IDs
+   - Creează planurile în PayPal Business Dashboard:
+     • 1 Lună - £10/lună
+     • 3 Luni - £7/lună (£21 total)
+     • 6 Luni - £5/lună (£30 total)
+     • 1 An - £3/lună (£36 total)
+   - Copiază Plan ID-urile și înlocuiește în inregistrare.html:
+     • P-1MONTH-PLAN-ID
+     • P-3MONTHS-PLAN-ID
+     • P-6MONTHS-PLAN-ID
+     • P-1YEAR-PLAN-ID
+
+3. 🔐 PAYPAL CREDENTIALS
+   - Verifică că folosești credențiale LIVE (nu sandbox)
+   - Actualizează URL-ul API de la sandbox la live:
+     • api-m.sandbox.paypal.com → api-m.paypal.com
+
+4. 🌐 CORS & URLs
+   - Adaugă domeniul de producție în ALLOWED_ORIGINS (config_kelion.py)
+   - Actualizează link-urile din email template
+
+5. 🔒 SECURITATE
+   - Schimbă SECRET_KEY cu o cheie nouă, unică
+   - Verifică că config_kelion.py NU este în git
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ FUNCȚIONAL ACUM (LOCAL):
+
+- Landing page cu avatar M/F
+- Înregistrare cu planuri și PayPal buttons
+- Backend API pentru register/login
+- Email confirmation (pregătit, de testat)
+- PayPal webhook handler
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 TESTARE LOCALĂ:
+   python backend/app.py
+   Accesează: http://127.0.0.1:8000/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

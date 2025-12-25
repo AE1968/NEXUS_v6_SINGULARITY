@@ -1,0 +1,265 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   USER DEMO - ACCES COMPLET (10 MINUTE)                   ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 23:26
+🎯 PRINCIPIU: Demo = Acces COMPLET pentru 10 minute
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ USER DEMO - PERMISIUNI:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USERS_DB['demo'] = {
+    password: 'demo',
+    role: 'demo',
+    subscription: 'demo',
+    
+    // ACCES COMPLET în 10 minute:
+    permissions: [
+        'view',              // ✅ Vizualizare
+        'chat',              // ✅ Chat text
+        'voice',             // ✅ Voice/TTS
+        'advanced_features'  // ✅ Funcții avansate
+    ],
+    
+    // Limită de timp
+    sessionDuration: 10 * 60 * 1000,  // 10 minute
+    
+    chatHistory: [],
+    settings: { language: 'ro', voiceEnabled: true },
+    stats: { totalLogins: 0, totalMessages: 0 }
+};
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 CE POATE FACE USER DEMO:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ÎN PRIMELE 10 MINUTE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Schimbare avatar (M ↔ F)
+✅ Chat text cu AI
+✅ Voice/TTS (ascultă răspunsuri)
+✅ Funcții avansate (toate)
+✅ Salvare chat history
+✅ Modificare setări
+✅ Toate funcționalitățile platformei
+
+DUPĂ 10 MINUTE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ Logout automat
+❌ Chat history șters (opțional)
+❌ Trebuie să se re-logheze pentru alte 10 minute
+   SAU
+✅ Să se înregistreze cu abonament plătit
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 COMPARAȚIE PERMISIUNI:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User Type    | View | Chat | Voice | Advanced | Durată
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DEMO         | ✅   | ✅   | ✅    | ✅       | 10 min
+BASIC        | ✅   | ✅   | ❌    | ❌       | 1-12 luni
+PREMIUM      | ✅   | ✅   | ✅    | ❌       | 1-12 luni
+ENTERPRISE   | ✅   | ✅   | ✅    | ✅       | 1-12 luni
+ADMIN        | ✅   | ✅   | ✅    | ✅       | Permanent
+TEST         | ✅   | ✅   | ❌    | ❌       | Permanent
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 SCOPUL USER DEMO:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 DEMO = EXPERIENȚĂ COMPLETĂ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User-ul DEMO trebuie să experimenteze TOTUL pentru a decide
+dacă vrea să plătească pentru abonament.
+
+10 minute este suficient pentru:
+✅ Testare chat
+✅ Testare voice
+✅ Testare funcții avansate
+✅ Schimbare avatar M/F
+✅ Decizie dacă vrea abonament
+
+Dacă îi place → Se înregistrează cu plan plătit
+Dacă nu îi place → Poate încerca din nou (re-login demo)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 FLUX DEMO:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MINUT 0:00 - Login
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login: demo / demo
+2. Status: "DEMO [DEMO] | MALE | READY (10:00 left)"
+3. Permisiuni: TOATE activate
+4. Chat: "Hello! How are you?"
+5. AI răspunde cu voce ✅
+6. Funcționează perfect!
+
+MINUT 5:00 - Testare funcții
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Status: "DEMO [DEMO] | MALE | READY (5:00 left)"
+2. Schimbă avatar la F
+3. Auto-logout + Re-login
+4. Status: "DEMO [DEMO] | FEMALE | READY (10:00 left)" ← RESETAT!
+5. Continuă testare
+
+MINUT 9:30 - Aproape de expirare
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Status: "DEMO [DEMO] | FEMALE | READY (0:30 left)"
+2. Warning: "Demo expires soon!"
+3. Opțiune: "Extend" sau "Register Now"
+
+MINUT 10:00 - Expirare
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Alert: "Demo session expired (10 minutes)"
+2. Logout automat
+3. Status: "AVATAR: FEMALE | SYSTEM: OFF"
+4. Modal: "Enjoyed the demo? Register now!"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 IMPLEMENTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ACTUALIZARE USERS_DB:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+'demo': {
+    password: 'demo',
+    role: 'demo',
+    subscription: 'demo',
+    subscriptionDetails: {
+        startDate: null,
+        endDate: null,
+        status: 'active',
+        notifiedAt3Days: false
+    },
+    // SCHIMBARE: Permisiuni COMPLETE
+    permissions: ['view', 'chat', 'voice', 'advanced_features'],
+    chatHistory: [],
+    settings: { 
+        language: 'ro', 
+        voiceEnabled: true  // ✅ Voice activat!
+    },
+    stats: { totalLogins: 0, totalMessages: 0 }
+}
+
+VERIFICARE PERMISIUNI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function hasPermission(permission) {
+    const currentUser = localStorage.getItem('nexus_current_user');
+    if (!currentUser) return false;
+    
+    const user = USERS_DB[currentUser];
+    if (!user) return false;
+    
+    // Demo are TOATE permisiunile în 10 minute
+    if (user.role === 'demo') {
+        // Verifică dacă sesiunea e încă activă
+        const loginTime = new Date(localStorage.getItem('nexus_login_time'));
+        const now = new Date();
+        const elapsed = now - loginTime;
+        
+        if (elapsed < 10 * 60 * 1000) {
+            return true;  // ✅ ACCES COMPLET
+        } else {
+            return false;  // ❌ Expirat
+        }
+    }
+    
+    // Pentru alți useri, verifică permissions array
+    return user.permissions.includes(permission);
+}
+
+EXEMPLU UTILIZARE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Înainte de a activa voice
+if (hasPermission('voice')) {
+    enableVoice();  // ✅ Demo poate!
+} else {
+    showUpgradeMessage();  // Pentru Basic
+}
+
+// Înainte de funcții avansate
+if (hasPermission('advanced_features')) {
+    showAdvancedPanel();  // ✅ Demo poate!
+} else {
+    showUpgradeMessage();  // Pentru Basic/Premium
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  OPȚIONAL: RE-LOGIN DEMO
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OPȚIUNE A: Permite re-login nelimitat
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User poate face login demo de câte ori vrea
+→ Fiecare sesiune = 10 minute
+→ Bun pentru testare extensivă
+
+OPȚIUNE B: Limitează la 3 sesiuni/zi
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tracking în localStorage:
+- demo_sessions_today: 2
+- demo_last_session: '2024-12-21'
+
+Dacă > 3 sesiuni → "Register to continue"
+
+OPȚIUNE C: Permite nelimitat (RECOMANDAT)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Demo este pentru TESTARE
+→ Nu restricționăm
+→ User decide când vrea să plătească
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ REZUMAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ User DEMO = ACCES COMPLET
+✅ Toate funcțiile disponibile
+✅ Voice activat
+✅ Funcții avansate activate
+✅ Durată: 10 minute
+✅ Poate re-login pentru alte 10 minute
+✅ Scopul: Experiență completă pentru decizie
+
+DEMO = ENTERPRISE pentru 10 minute! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: USER DEMO - ACCES COMPLET
+📅 DATA: 2025-12-21 23:26
+✅ STATUS: DOCUMENTAT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

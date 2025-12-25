@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GENEZA KELION - AI HUMANOID SYSTEM</title>
+    <!-- PAYPAL SDK (LOADED DYNAMICALLY BELOW) -->
+    <script id="paypal-sdk"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* KELION CORE STYLES v2.0 - INLINE FOR GUARANTEED LOADING */
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --dark-bg: #050505;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--dark-bg);
+            color: var(--neon-cyan);
+            font-family: 'Rajdhani', sans-serif;
+            background-repeat: no-repeat;
+            background-position: center 15%;
+            background-size: cover;
+            transition: background-image 0.5s ease-in-out;
+            position: relative;
+        }
+
+        /* ANIMATED OVERLAY FOR BREATHING EFFECT */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 40%, rgba(0, 243, 255, 0.1) 0%, transparent 50%);
+            animation: breathe 4s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* AVATAR BACKGROUNDS WITH ANIMATION */
+        body.avatar-male {
+            background-image: url('assets/humanoid_male.png');
+            animation: subtleMove 8s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        body.avatar-male::before {
+            background: radial-gradient(circle at 50% 40%, rgba(0, 243, 255, 0.15) 0%, transparent 50%);
+        }
+
+        body.avatar-female {
+            --neon-cyan: #ff00ea;
+            /* Dynamic Theme Switch */
+            background-image: url('assets/humanoid_female.png');
+            animation: subtleMove 8s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        body.avatar-female::before {
+            background: radial-gradient(circle at 50% 40%, rgba(255, 0, 255, 0.15) 0%, transparent 50%);
+        }
+
+        /* BREATHING ANIMATION */
+        @keyframes breathe {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
+        }
+
+        @keyframes subtleMove {
+
+            0%,
+            100% {
+                background-position: center 20%;
+            }
+
+            25% {
+                background-position: 50.5% 20.5%;
+            }
+
+            50% {
+                background-position: center 20%;
+            }
+
+            75% {
+                background-position: 49.5% 19.5%;
+            }
+        }
+
+        drum,
+        .footer-nexus {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: rgba(0, 243, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            z-index: 1000;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* GLOW PULSE ANIMATION */
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                filter: brightness(1) contrast(1);
+            }
+
+            50% {
+                filter: brightness(1.05) contrast(1.02);
+            }
+        }
+
+        /* CONTROL BAR */
+        #control-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            min-width: 600px;
+            background: rgba(0, 10, 15, 0.9);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 10px 20px;
+            display: none;
+            /* Hidden by default - shown only for logged-in users */
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            z-index: 9999;
+        }
+
+        #control-bar.visible {
+            display: flex;
+        }
+
+        /* GENDER SWITCHER */
+        .gender-switch-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .avatar-label {
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .bistable-switch {
+            display: flex;
+            border: 1px solid var(--neon-cyan);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #000;
+        }
+
+        .switch-option {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+
+        .switch-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .opt-text {
+            font-weight: bold;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .opt-light {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #333;
+            margin-top: 4px;
+            box-shadow: inset 0 0 2px #000;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        /* ACTIVE STATE - MALE */
+        #switch-male.active {
+            background: rgba(0, 243, 255, 0.15);
+        }
+
+        #switch-male.active .opt-text {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        #switch-male.active .opt-light {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* ACTIVE STATE - FEMALE */
+        #switch-female.active {
+            background: rgba(255, 0, 255, 0.15);
+        }
+
+        #switch-female.active .opt-text {
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        #switch-female.active .opt-light {
+            background: var(--neon-pink);
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        /* INPUT */
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+            display: none;
+            /* Hidden by default */
+        }
+
+        #control-bar.logged-in .input-wrapper {
+            display: block;
+            /* Show for logged-in users */
+        }
+
+        #chatInput {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(0, 243, 255, 0.3);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            padding: 10px;
+            transition: border-color 0.3s;
+        }
+
+        #chatInput:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+        }
+
+        /* BUTTONS */
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 8px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+            display: none;
+            /* Hidden by default */
+        }
+
+        #control-bar.logged-in .action-btn {
+            display: block;
+            /* Show for logged-in users */
+        }
+
+        .action-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .mic-btn {
+            border-color: #555;
+            color: #aaa;
+        }
+
+        .mic-btn:hover {
+            border-color: #fff;
+            background: #333;
+            color: #fff;
+            box-shadow: none;
+        }
+
+        /* STATUS DISPLAY */
+        #status-display {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-cyan);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+
+        /* LOGIN BUTTON (TOP RIGHT) */
+        #login-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #login-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        #login-btn.logged-in {
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        #login-btn.logged-in:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        #register-btn {
+            position: fixed;
+            top: 20px;
+            right: 170px;
+            background: rgba(255, 0, 255, 0.05);
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 10px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        #user-info-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 20, 30, 0.8);
+            border-left: 3px solid var(--neon-cyan);
+            padding: 15px;
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            display: none;
+            z-index: 900;
+            min-width: 150px;
+            box-shadow: -10px 0 20px rgba(0, 243, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .user-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .user-plan {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #register-btn:hover {
+            background: var(--neon-pink);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        /* LOGIN MODAL */
+        #login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #login-modal.active {
+            display: flex;
+        }
+
+        .login-box {
+            background: rgba(10, 20, 30, 0.95);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 20px;
+            /* Reduced padding */
+            width: 380px;
+            /* Slightly reduced width */
+            max-width: 95%;
+            max-height: 90vh;
+            /* Prevent overflow on small screens */
+            overflow-y: auto;
+            /* Enable scroll if needed */
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+        }
+
+        .login-box h2 {
+            margin: 0 0 15px 0;
+            /* Reduced margin */
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            font-size: 1.5rem;
+            /* Reduced font size */
+        }
+
+        .login-box .input-group {
+            margin-bottom: 12px;
+            /* Reduced margin */
+        }
+
+        .login-box label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--neon-cyan);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 8px 12px;
+            /* Reduced padding */
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .login-box .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            /* Reduced margin */
+        }
+
+        .login-box button {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--neon-cyan);
+            background: transparent;
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .login-box button:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .login-box .cancel-btn {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        .login-box .cancel-btn:hover {
+            background: #ff4444;
+            color: #fff;
+            box-shadow: 0 0 15px #ff4444;
+        }
+
+        .login-error {
+            color: #ff4444;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .login-error.active {
+            display: block;
+        }
+
+        /* REGISTER MODAL (uses same styles as login-modal) */
+        #register-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #register-modal.active {
+            display: flex;
+        }
+
+        /* FORGOT PASSWORD MODAL */
+        #forgot-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #forgot-modal.active {
+            display: flex;
+        }
+
+        /* USER INFO PANEL */
+        #user-info-panel {
+            position: fixed;
+            top: 70px;
+            /* Below login button */
+            right: 20px;
+            text-align: right;
+            font-family: 'Rajdhani', sans-serif;
+            color: #fff;
+            z-index: 1000;
+            display: none;
+            pointer-events: none;
+        }
+
+        #user-info-panel .user-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+            margin-bottom: 2px;
+        }
+
+        #user-info-panel .user-plan {
+            font-size: 0.9rem;
+            color: #aaa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+
+<body id="kelion-body" class="avatar-male">
+
+    <!-- BACKGROUND EQUIPMENT ANIMATION (BEHIND AVATAR) -->
+    <canvas id="bg-equipment-canvas"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;"></canvas>
+
+    <!-- STATUS DISPLAY -->
+    <div id="status-display">
+        AVATAR: <span id="current-avatar">MALE</span> | SYSTEM: READY
+    </div>
+
+    <!-- ENTRY BUTTONS (TOP RIGHT) -->
+    <button id="register-btn">CREATE ACCOUNT</button>
+    <button id="login-btn">LOGIN</button>
+
+    <!-- CORE FOOTER -->
+    <div class="footer-nexus">KELION SYSTEM CORE v10.0 // GENEZA NEXUS HUMANOID PROJECT</div>
+    <div id="user-info-panel">
+        <div id="panel-username" class="user-name"></div>
+        <div id="panel-plan" class="user-plan"></div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal">
+        <div class="login-box">
+            <h2>KELION LOGIN</h2>
+            <div
+                style="margin-bottom: 15px; font-size: 0.8rem; color: #888; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; border: 1px dashed var(--neon-cyan);">
+                <div style="font-weight: bold; color: var(--neon-cyan); margin-bottom: 5px; text-align: center;">DEMO
+                    ACCESS</div>
+                <div style="display: flex; justify-content: center; gap: 20px;">
+                    <span>User: <b style="color:#fff">demo</b></span> <span>Pass: <b style="color:#fff">demo</b></span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+            </div>
+            <div class="btn-group">
+                <button id="login-submit-btn">LOGIN</button>
+                <button id="login-cancel-btn" class="cancel-btn">CANCEL</button>
+            </div>
+            <div id="login-error" class="login-error">Invalid credentials. Please try again.</div>
+            <div style="margin-top: 20px; text-align: center; font-size: 0.85rem;">
+                <a href="#" id="forgot-password-link"
+                    style="color: var(--neon-cyan); text-decoration: none; margin-right: 15px;">Forgot Password?</a>
+                <span style="color: #666;">|</span>
+                <a href="#" id="register-link"
+                    style="color: var(--neon-pink); text-decoration: none; margin-left: 15px;">Create Account</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgot-modal">
+        <div class="login-box">
+            <h2>RESET PASSWORD</h2>
+            <p style="font-size: 0.8rem; color: var(--neon-cyan); margin-bottom: 15px;">
+                Enter your username and security key
+            </p>
+            <div class="input-group">
+                <label for="forgot-username">Username</label>
+                <input type="text" id="forgot-username" placeholder="Your username" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="security-key">Security Key</label>
+                <input type="text" id="security-key" placeholder="Your security key" autocomplete="off">
+                <small style="color: #888; font-size: 0.75rem;">Security key was provided when you registered</small>
+            </div>
+            <div class="input-group">
+                <label for="new-password">New Password</label>
+                <input type="password" id="new-password" placeholder="Min 8 characters" autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <label for="confirm-new-password">Confirm New Password</label>
+                <input type="password" id="confirm-new-password" placeholder="Re-enter password"
+                    autocomplete="new-password">
+            </div>
+            <div class="btn-group">
+                <button id="reset-submit-btn">RESET PASSWORD</button>
+                <button id="reset-cancel-btn" class="cancel-btn">CANCEL</button>
+            </div>
+            <div id="reset-error" class="login-error"></div>
+        </div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div id="register-modal">
+        <div class="login-box">
+            <h2>CREATE NEW ACCOUNT</h2>
+            <p style="font-size: 0.8rem; color: var(--neon-cyan); margin-bottom: 15px;">
+                Your account works on BOTH avatars (Male & Female)
+            </p>
+            <div class="input-group">
+                <label for="reg-username">Username</label>
+                <input type="text" id="reg-username" placeholder="Choose username" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="reg-email">Email</label>
+                <input type="email" id="reg-email" placeholder="your@email.com" autocomplete="email">
+            </div>
+            <div class="input-group">
+                <label for="reg-password">Password</label>
+                <input type="password" id="reg-password" placeholder="Min 8 characters" autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <label for="reg-confirm">Confirm Password</label>
+                <input type="password" id="reg-confirm" placeholder="Re-enter password" autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <label for="reg-avatar">Preferred Avatar</label>
+                <select id="reg-avatar"
+                    style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); border-radius: 4px; font-family: 'Rajdhani', sans-serif;">
+                    <option value="male">Male (KELION)</option>
+                    <option value="female">Female (VEONA)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="reg-plan">Subscription Plan</label>
+                <select id="reg-plan"
+                    style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); border-radius: 4px; font-family: 'Rajdhani', sans-serif;">
+                    <option value="basic">1 Month - £10.00</option>
+                    <option value="premium">3 Months - £21.00 (Save 30%)</option>
+                    <option value="enterprise">1 Year - £36.00 (Save 70%)</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button id="register-submit-btn">CREATE ACCOUNT</button>
+                <button id="register-cancel-btn" class="cancel-btn">CANCEL</button>
+            </div>
+            <div id="register-error" class="login-error"></div>
+            <div style="font-size: 0.75rem; color: #888; margin-top: 10px; text-align: center;">
+                Note: This is a demo. In production, payment would be processed via PayPal.
+            </div>
+
+            <!-- OTP CONTAINER -->
+            <div id="otp-verification-container"
+                style="display: none; animation: fadeIn 0.3s ease; margin-top:20px; border-top:1px solid #333; padding-top:20px;">
+                <h3 style="color: var(--neon-cyan); margin-bottom: 20px; font-size:1.1rem;">VERIFY EMAIL ADDRESS</h3>
+                <p style="color: #aaa; margin-bottom: 20px; font-size:0.9rem;">
+                    A secure verification code has been sent to:<br>
+                    <span id="otp-email-target"
+                        style="color: #fff; font-weight: bold; border-bottom:1px solid #444;"></span>
+                </p>
+                <input type="text" id="otp-code-input" maxlength="6" placeholder="______"
+                    style="width: 200px; text-align: center; font-size: 24px; letter-spacing: 12px; padding: 10px; background: rgba(0,0,0,0.5); border: 2px solid var(--neon-cyan); color: #fff; margin-bottom: 25px; border-radius: 8px; outline:none;">
+                <div class="btn-group" style="justify-content:center;">
+                    <button onclick="verifyOTP()"
+                        style="background: var(--neon-cyan); color: #000; font-weight:bold; width:auto; padding:10px 20px;">VERIFY
+                        CODE</button>
+                    <button onclick="cancelOTP()" class="cancel-btn"
+                        style="width:auto; padding:10px 20px;">BACK</button>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.8rem; color: #555;">(Check backend logs for code)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div id="payment-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; justify-content: center; align-items: center;">
+        <div class="login-box" style="text-align: center; max-width: 450px;">
+            <h2 style="color: #00f3ff; margin-bottom: 10px;">SECURE CHECKOUT</h2>
+
+            <!-- TRUST INDICATORS -->
+            <div
+                style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; opacity: 0.8;">
+                <div
+                    style="display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: #00ff00; border: 1px solid #00ff00; padding: 2px 6px; border-radius: 4px;">
+                    <span>🔒</span> SSL ENCRYPTED
+                </div>
+                <div style="font-size: 0.7rem; color: #aaa;">TRUSTED PAYMENT</div>
+            </div>
+
+            <div id="payment-summary"
+                style="margin-bottom: 20px; font-family: 'Rajdhani', sans-serif; color: #fff; font-size: 1.1rem; border-bottom: 1px solid rgba(0,243,255,0.3); padding-bottom: 15px;">
+                Loading order details...
+            </div>
+
+            <!-- PAYPAL SMART BUTTONS CONTAINER -->
+            <div id="paypal-button-container" style="margin-top: 20px; min-height: 150px;">
+                <!-- Buttons rendered by JS SDK -->
+            </div>
+
+            <div style="font-size: 0.8rem; color: #888; margin-bottom: 15px;">
+                Securely processed by PayPal. No card details stored on this server.
+            </div>
+
+            <!-- LEGAL CHECKBOX (MANDATORY) -->
+            <div
+                style="margin-top: 15px; text-align: left; font-size: 0.75rem; color: #aaa; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
+                <label style="display: flex; align-items: start; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="terms-checkbox" style="width: auto; margin-top: 3px;">
+                    <span>
+                        I agree to the <span
+                            style="color: var(--neon-cyan); text-decoration: underline; cursor: pointer;">Terms of
+                            Service</span>,
+                        <span style="color: var(--neon-cyan); text-decoration: underline; cursor: pointer;">Privacy
+                            Policy</span>, and automatic renewal.
+                        I understand that subscription fees are non-refundable after 14 days.
+                    </span>
+                </label>
+            </div>
+
+            <div id="payment-processing"
+                style="display: none; margin-top: 20px; color: #00f3ff; font-family: 'Orbitron', sans-serif;">
+                <div style="font-size: 2rem; animation: pulse 1s infinite;">⚡</div>
+                <div>PROCESSING TRANSACTION...</div>
+                <div style="font-size: 0.8rem; color: #888;">Do not close this window</div>
+            </div>
+
+            <button id="payment-cancel" class="cancel-btn" style="margin-top: 20px; width: 100%;">CANCEL ORDER</button>
+        </div>
+    </div>
+
+    <!-- CONTROL BAR -->
+    <div id="control-bar">
+        <!-- GENDER SWITCH -->
+        <div class="gender-switch-container">
+            <div class="avatar-label">AVATAR ID</div>
+            <div class="bistable-switch">
+                <div id="switch-male" class="switch-option active">
+                    <span class="opt-text">M</span>
+                    <div class="opt-light"></div>
+                </div>
+                <div id="switch-female" class="switch-option">
+                    <span class="opt-text">F</span>
+                    <div class="opt-light"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INPUT -->
+        <div class="input-wrapper">
+            <input type="text" id="chatInput" placeholder="Enter command or chat..." autocomplete="off">
+        </div>
+
+        <!-- BUTTONS -->
+        <button id="sendBtn" class="action-btn">SEND</button>
+        <button id="micBtn" class="action-btn mic-btn">🎤</button>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // KELION CORE SYSTEM v10.0 - CONSOLIDATED & STABLE
+        // ═══════════════════════════════════════════════════════════
+
+        // 1. GLOBAL CONFIG & STATE
+        let SYSTEM_CONFIG = {
+            API_URL: window.location.origin.includes(':3000') ? 'http://localhost:8000' :
+                (window.location.origin === 'null' ? 'http://localhost:8000' : window.location.origin),
+            PAYPAL_CLIENT_ID: ''
+        };
+
+        let USERS_DB = {};
+        let currentGender = 'male';
+        let pendingRegistrationData = null;
+
+        // 2. CORE SYSTEM FUNCTIONS
+        async function initSystem() {
+            try {
+                console.log('🔄 Kelion: Initializing API connection...');
+                const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/config`);
+                const data = await res.json();
+                SYSTEM_CONFIG.PAYPAL_CLIENT_ID = data.paypal_client_id;
+                SYSTEM_CONFIG.API_URL = data.api_url;
+
+                const script = document.getElementById('paypal-sdk');
+                if (script) {
+                    script.src = `https://www.paypal.com/sdk/js?client-id=${data.paypal_client_id}&currency=GBP`;
+                    console.log('💳 PayPal SDK Integrated.');
+                }
+            } catch (e) {
+                console.warn("⚠️ Standalone Mode (Backend Reachable: No)");
+            }
+        }
+
+        function switchAvatar(gender) {
+            currentGender = gender;
+            const body = document.body;
+            body.classList.remove('avatar-male', 'avatar-female');
+            body.classList.add(gender === 'male' ? 'avatar-male' : 'avatar-female');
+
+            document.getElementById('switch-male')?.classList.toggle('active', gender === 'male');
+            document.getElementById('switch-female')?.classList.toggle('active', gender === 'female');
+
+            const statusText = document.getElementById('current-avatar');
+            if (statusText) {
+                statusText.textContent = gender.toUpperCase();
+                statusText.style.color = gender === 'male' ? '#00f3ff' : '#ff00ff';
+            }
+
+            localStorage.setItem('kelion_avatar_gender', gender);
+            updateStatusDisplay(!!localStorage.getItem('kelion_current_user'), localStorage.getItem('kelion_current_user'), localStorage.getItem('kelion_user_subscription'));
+        }
+
+        function updateStatusDisplay(isLoggedIn, username = '', subscription = '') {
+            const statusDisplay = document.getElementById('status-display');
+            const infoPanel = document.getElementById('user-info-panel');
+            const controlBar = document.getElementById('control-bar');
+            if (!statusDisplay) return;
+
+            const avatarName = currentGender.toUpperCase();
+            if (isLoggedIn) {
+                statusDisplay.style.fontSize = '0.75rem';
+                statusDisplay.style.padding = '6px 12px';
+                statusDisplay.innerHTML = `${username.toUpperCase()} [${(subscription || 'BASIC').toUpperCase()}] | ${avatarName}`;
+
+                if (infoPanel) {
+                    const uEl = document.getElementById('panel-username');
+                    const pEl = document.getElementById('panel-plan');
+                    if (uEl) uEl.textContent = username.toUpperCase();
+                    if (pEl) pEl.textContent = (subscription || 'BASIC').toUpperCase() + ' PLAN';
+                    infoPanel.style.display = 'block';
+                }
+                // Show control bar with all features (input + buttons)
+                if (controlBar) {
+                    controlBar.classList.add('visible');
+                    controlBar.classList.add('logged-in');
+                }
+            } else {
+                statusDisplay.style.fontSize = '0.9rem';
+                statusDisplay.style.padding = '10px 20px';
+                statusDisplay.innerHTML = `AVATAR: <span style="color:${currentGender === 'male' ? '#00f3ff' : '#ff00ff'}">${avatarName}</span> | SYSTEM: READY`;
+                if (infoPanel) infoPanel.style.display = 'none';
+
+                // Show control bar but only with M/F buttons (no input/action buttons)
+                if (controlBar) {
+                    controlBar.classList.add('visible');
+                    controlBar.classList.remove('logged-in');
+                }
+            }
+        }
+
+        function updateLoginButton(isLoggedIn, username = '') {
+            const loginBtn = document.getElementById('login-btn');
+            const regBtn = document.getElementById('register-btn');
+            if (!loginBtn) return;
+            loginBtn.textContent = isLoggedIn ? `LOGOUT (${username.toUpperCase()})` : 'LOGIN';
+            loginBtn.classList.toggle('logged-in', isLoggedIn);
+            if (regBtn) regBtn.style.display = isLoggedIn ? 'none' : 'block';
+        }
+
+        window.logout = function () {
+            const keys = ['kelion_token', 'kelion_current_user', 'kelion_user_role', 'kelion_user_subscription', 'kelion_login_time'];
+            keys.forEach(k => localStorage.removeItem(k));
+            location.reload();
+        };
+
+        // 3. MODAL & UI ACTIONS
+        window.openLoginModal = () => document.getElementById('login-modal')?.classList.add('active');
+        window.closeLoginModal = () => document.getElementById('login-modal')?.classList.remove('active');
+        window.openRegisterModal = () => { closeLoginModal(); document.getElementById('register-modal')?.classList.add('active'); };
+        window.closeRegisterModal = () => document.getElementById('register-modal')?.classList.remove('active');
+
+        async function handleLogin() {
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value;
+            const err = document.getElementById('login-error');
+            if (!u || !p) return;
+
+            try {
+                const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('kelion_token', data.token);
+                    localStorage.setItem('kelion_current_user', u);
+                    localStorage.setItem('kelion_user_role', data.role);
+                    localStorage.setItem('kelion_user_subscription', data.subscription);
+                    location.reload();
+                } else { err.textContent = data.error; err.style.display = 'block'; }
+            } catch (e) { err.textContent = 'Server Offline'; err.style.display = 'block'; }
+        }
+
+        window.startOTP = async function (email) {
+            document.getElementById('otp-verification-container').style.display = 'block';
+            document.getElementById('otp-email-target').innerText = email;
+            document.querySelectorAll('#register-modal .input-group, #register-modal .btn-group').forEach(el => el.style.display = 'none');
+            await fetch(`${SYSTEM_CONFIG.API_URL}/api/send-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+        };
+
+        window.verifyOTP = async function () {
+            const code = document.getElementById('otp-code-input').value;
+            const email = document.getElementById('otp-email-target').innerText;
+            const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/verify-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code })
+            });
+            const data = await res.json();
+            if (data.success) openPaymentModal(pendingRegistrationData);
+            else alert("Cod invalid.");
+        };
+
+        window.cancelOTP = () => location.reload();
+
+        function openPaymentModal(userData) {
+            let price = userData.plan === 'enterprise' ? '36.00' : (userData.plan === 'premium' ? '21.00' : '10.00');
+            document.getElementById('payment-summary').innerHTML = `<div style="font-size: 1.4rem;">PLAN ${userData.plan.toUpperCase()}</div><div style="font-size: 2rem; color: #00f3ff;">£${price}</div>`;
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = '';
+            paypal.Buttons({
+                createOrder: (data, actions) => actions.order.create({ purchase_units: [{ description: `KELION AI - ${userData.plan}`, amount: { value: price } }] }),
+                onApprove: (data, actions) => actions.order.capture().then(async (details) => {
+                    const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...userData, paypalOrderId: details.id })
+                    });
+                    const r = await res.json();
+                    if (r.success) { alert("Cont activat!"); location.reload(); }
+                })
+            }).render('#paypal-button-container');
+            document.getElementById('register-modal').classList.remove('active');
+            document.getElementById('payment-modal').style.display = 'flex';
+        }
+
+        // 4. ADMIN & UTILS
+        async function openAdminConsole() {
+            document.getElementById('admin-modal').style.display = 'flex';
+            const res = await fetch(`${SYSTEM_CONFIG.API_URL}/api/users`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('kelion_token') } });
+            const users = await res.json();
+            let h = '<table style="width:100%; text-align:left; border-collapse:collapse;"><tr><th>USER</th><th>PLAN</th><th>STATUS</th></tr>';
+            for (let u in users) { h += `<tr style="border-bottom:1px solid #222;"><td style="padding:8px;">${u}</td><td>${users[u].subscription}</td><td>${users[u].account_status}</td></tr>`; }
+            document.getElementById('admin-table-container').innerHTML = h + '</table>';
+        }
+
+        // 5. BOOTSTRAP
+        document.addEventListener('DOMContentLoaded', () => {
+            initSystem();
+            switchAvatar(localStorage.getItem('kelion_avatar_gender') || 'male');
+
+            const currentUser = localStorage.getItem('kelion_current_user');
+            if (currentUser) {
+                updateLoginButton(true, currentUser);
+                updateStatusDisplay(true, currentUser, localStorage.getItem('kelion_user_subscription'));
+            }
+
+            // Bindings
+            document.getElementById('switch-male')?.addEventListener('click', () => switchAvatar('male'));
+            document.getElementById('switch-female')?.addEventListener('click', () => switchAvatar('female'));
+            document.getElementById('login-btn')?.addEventListener('click', () => { if (localStorage.getItem('kelion_current_user')) window.logout(); else openLoginModal(); });
+            document.getElementById('register-btn')?.addEventListener('click', openRegisterModal);
+            document.getElementById('login-submit-btn')?.addEventListener('click', handleLogin);
+            document.getElementById('login-cancel-btn')?.addEventListener('click', closeLoginModal);
+            document.getElementById('register-link')?.addEventListener('click', (e) => { e.preventDefault(); openRegisterModal(); });
+            document.getElementById('register-submit-btn')?.addEventListener('click', () => {
+                const u = document.getElementById('reg-username').value.trim();
+                const em = document.getElementById('reg-email').value.trim();
+                const p = document.getElementById('reg-password').value;
+                const c = document.getElementById('reg-confirm').value;
+                if (!u || !em || !p || p !== c) { alert("Verifică datele"); return; }
+                pendingRegistrationData = { username: u, email: em, password: p, plan: document.getElementById('reg-plan').value };
+                window.startOTP(em);
+            });
+            document.getElementById('register-cancel-btn')?.addEventListener('click', closeRegisterModal);
+            document.getElementById('admin-db-btn')?.addEventListener('click', openAdminConsole);
+
+            setInterval(() => {
+                const b = document.getElementById('admin-db-btn');
+                if (b) b.style.display = (localStorage.getItem('kelion_user_role') === 'admin') ? 'block' : 'none';
+            }, 1000);
+
+            initBackgroundParticles();
+            console.log('🚀 Kelion v10.0 Online');
+        });
+
+        function initBackgroundParticles() {
+            const canvas = document.getElementById('bg-equipment-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const ps = [];
+            for (let i = 0; i < 40; i++) ps.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, s: Math.random() * 2 + 1, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5 });
+            function anim() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ps.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0; if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${currentGender === 'male' ? '0,243,255' : '255,0,255'}, 0.3)`; ctx.fill();
+                });
+                requestAnimationFrame(anim);
+            }
+            anim();
+        }
+    </script>
+</body>
+
+</html>

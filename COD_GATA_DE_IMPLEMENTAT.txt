@@ -1,0 +1,378 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   COD GATA DE COPIAT ÎN INDEX.HTML                        ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 23:33
+🎯 OBIECTIV: Cod complet pentru implementare rapidă
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INSTRUCȚIUNI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Deschide: frontend/index.html
+2. Găsește secțiunea <script> (înainte de </body>)
+3. Adaugă codul de mai jos ÎNAINTE de </script>
+4. Salvează și reîmprospătează browser-ul
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+COD JAVASCRIPT - COPIAZĂ ȘI LIPEȘTE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// ═══════════════════════════════════════════════════════════
+// USERS DATABASE - DEMO IMPLEMENTATION
+// ═══════════════════════════════════════════════════════════
+
+const USERS_DB = {
+    'admin': {
+        password: 'Andrada_1968!',
+        email: 'admin@geneza-nexus.com',
+        role: 'admin',
+        subscription: 'enterprise',
+        subscriptionDetails: {
+            startDate: null,
+            endDate: null,
+            status: 'active',
+            notifiedAt3Days: false
+        },
+        permissions: ['view', 'chat', 'voice', 'advanced_features'],
+        chatHistory: [],
+        settings: { language: 'ro', voiceEnabled: true },
+        stats: { totalLogins: 0, totalMessages: 0 }
+    },
+    'demo': {
+        password: 'demo',
+        email: 'demo@geneza-nexus.com',
+        role: 'demo',
+        subscription: 'demo',
+        subscriptionDetails: {
+            startDate: null,
+            endDate: null,
+            status: 'active',
+            notifiedAt3Days: false
+        },
+        // ACCES COMPLET pentru 10 minute
+        permissions: ['view', 'chat', 'voice', 'advanced_features'],
+        chatHistory: [],
+        settings: { language: 'ro', voiceEnabled: true },
+        stats: { totalLogins: 0, totalMessages: 0 }
+    },
+    'test': {
+        password: 'test123',
+        email: 'test@example.com',
+        role: 'user',
+        subscription: 'basic',
+        subscriptionDetails: {
+            startDate: null,
+            endDate: null,
+            status: 'active',
+            notifiedAt3Days: false
+        },
+        permissions: ['view', 'chat'],
+        chatHistory: [],
+        settings: { language: 'en', voiceEnabled: false },
+        stats: { totalLogins: 0, totalMessages: 0 }
+    }
+};
+
+// ═══════════════════════════════════════════════════════════
+// LOGIN/LOGOUT SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+function login(username, password) {
+    const user = USERS_DB[username];
+    
+    if (!user) {
+        console.log('❌ User not found:', username);
+        return false;
+    }
+    
+    if (user.password !== password) {
+        console.log('❌ Invalid password');
+        return false;
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('nexus_current_user', username);
+    localStorage.setItem('nexus_login_time', new Date().toISOString());
+    
+    console.log('✅ Login successful:', username);
+    
+    // Update status display
+    updateStatusDisplay(true, username, user.subscription);
+    
+    // Start demo countdown if demo user
+    if (user.role === 'demo') {
+        startDemoCountdown();
+    }
+    
+    return true;
+}
+
+function logout() {
+    const username = localStorage.getItem('nexus_current_user');
+    console.log('👋 Logout:', username);
+    
+    localStorage.removeItem('nexus_current_user');
+    localStorage.removeItem('nexus_login_time');
+    
+    // Update status display
+    updateStatusDisplay(false);
+    
+    // Clear demo countdown
+    if (window.demoCountdownInterval) {
+        clearInterval(window.demoCountdownInterval);
+    }
+}
+
+// Make logout available globally
+window.logout = logout;
+
+// ═══════════════════════════════════════════════════════════
+// STATUS DISPLAY SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+function updateStatusDisplay(isLoggedIn = false, username = '', subscription = '') {
+    const statusDisplay = document.getElementById('status-display');
+    if (!statusDisplay) return;
+    
+    const gender = localStorage.getItem('nexus_avatar_gender') || 'male';
+    const genderUpper = gender.toUpperCase();
+    
+    if (!isLoggedIn) {
+        // DEFAULT: SYSTEM OFF (roșu)
+        statusDisplay.style.background = 'rgba(255, 0, 0, 0.2)';
+        statusDisplay.style.borderColor = '#ff0000';
+        statusDisplay.style.color = '#ff0000';
+        statusDisplay.innerHTML = `AVATAR: ${genderUpper} | SYSTEM: <span style="color: #ff0000;">OFF</span>`;
+        return;
+    }
+    
+    const user = USERS_DB[username];
+    if (!user) return;
+    
+    const subUpper = subscription.toUpperCase();
+    const userUpper = username.toUpperCase();
+    
+    // ADMIN - permanent READY (verde)
+    if (user.role === 'admin') {
+        statusDisplay.style.background = 'rgba(0, 255, 0, 0.2)';
+        statusDisplay.style.borderColor = '#00ff00';
+        statusDisplay.style.color = '#00ff00';
+        statusDisplay.innerHTML = `${userUpper} [${subUpper}] | ${genderUpper} | <span style="color: #00ff00;">READY</span>`;
+        return;
+    }
+    
+    // TEST - permanent READY (verde)
+    if (username === 'test') {
+        statusDisplay.style.background = 'rgba(0, 255, 0, 0.2)';
+        statusDisplay.style.borderColor = '#00ff00';
+        statusDisplay.style.color = '#00ff00';
+        statusDisplay.innerHTML = `${userUpper} [${subUpper}] | ${genderUpper} | <span style="color: #00ff00;">READY</span>`;
+        return;
+    }
+    
+    // DEMO - countdown (cyan)
+    if (user.role === 'demo') {
+        statusDisplay.style.background = 'rgba(0, 255, 255, 0.2)';
+        statusDisplay.style.borderColor = '#00ffff';
+        statusDisplay.style.color = '#00ffff';
+        statusDisplay.innerHTML = `${userUpper} [${subUpper}] | ${genderUpper} | <span id="demo-status" style="color: #00ffff;">READY (10:00 left)</span>`;
+        return;
+    }
+    
+    // USER - normal (verde)
+    statusDisplay.style.background = 'rgba(0, 255, 0, 0.2)';
+    statusDisplay.style.borderColor = '#00ff00';
+    statusDisplay.style.color = '#00ff00';
+    statusDisplay.innerHTML = `${userUpper} [${subUpper}] | ${genderUpper} | <span style="color: #00ff00;">READY</span>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// DEMO COUNTDOWN SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+function startDemoCountdown() {
+    const loginTime = new Date(localStorage.getItem('nexus_login_time'));
+    const endTime = new Date(loginTime.getTime() + 10 * 60 * 1000); // +10 min
+    
+    // Clear previous interval
+    if (window.demoCountdownInterval) {
+        clearInterval(window.demoCountdownInterval);
+    }
+    
+    window.demoCountdownInterval = setInterval(() => {
+        const now = new Date();
+        const timeLeft = endTime - now;
+        
+        if (timeLeft <= 0) {
+            clearInterval(window.demoCountdownInterval);
+            alert('Demo session expired (10 minutes).\n\nYou have been logged out.\n\nTo continue, please register for a paid plan.');
+            logout();
+            return;
+        }
+        
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        const demoStatus = document.getElementById('demo-status');
+        if (demoStatus) {
+            demoStatus.textContent = `READY (${timeString} left)`;
+        }
+    }, 1000); // Update every second
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTO-LOGOUT ON AVATAR SWITCH
+// ═══════════════════════════════════════════════════════════
+
+// Modifică funcția switchAvatar existentă pentru a include auto-logout
+const originalSwitchAvatar = window.switchAvatar || switchAvatar;
+
+function switchAvatar(gender) {
+    const currentUser = localStorage.getItem('nexus_current_user');
+    const currentGender = localStorage.getItem('nexus_avatar_gender');
+    
+    // Dacă e logat și schimbă avatar-ul
+    if (currentUser && gender !== currentGender) {
+        console.log('⚠️  Avatar changed - Auto-logout');
+        logout();
+    }
+    
+    // Call original function
+    if (typeof originalSwitchAvatar === 'function') {
+        originalSwitchAvatar(gender);
+    }
+    
+    // Update status display after switch
+    const user = localStorage.getItem('nexus_current_user');
+    if (user) {
+        const userData = USERS_DB[user];
+        if (userData) {
+            updateStatusDisplay(true, user, userData.subscription);
+        }
+    } else {
+        updateStatusDisplay(false);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIMPLE LOGIN UI (pentru testare rapidă)
+// ═══════════════════════════════════════════════════════════
+
+// Adaugă un buton LOGIN simplu în colțul din dreapta sus
+document.addEventListener('DOMContentLoaded', function() {
+    // Verifică dacă există deja un buton login
+    if (document.getElementById('quick-login-btn')) return;
+    
+    // Creează buton
+    const loginBtn = document.createElement('button');
+    loginBtn.id = 'quick-login-btn';
+    loginBtn.textContent = 'LOGIN';
+    loginBtn.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: transparent;
+        border: 1px solid #00f3ff;
+        color: #00f3ff;
+        padding: 10px 25px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border-radius: 6px;
+        z-index: 10000;
+        transition: all 0.3s;
+    `;
+    
+    loginBtn.addEventListener('mouseenter', function() {
+        this.style.background = '#00f3ff';
+        this.style.color = '#000';
+        this.style.boxShadow = '0 0 15px #00f3ff';
+    });
+    
+    loginBtn.addEventListener('mouseleave', function() {
+        this.style.background = 'transparent';
+        this.style.color = '#00f3ff';
+        this.style.boxShadow = 'none';
+    });
+    
+    loginBtn.addEventListener('click', function() {
+        const currentUser = localStorage.getItem('nexus_current_user');
+        
+        if (currentUser) {
+            // Logout
+            if (confirm('Logout from ' + currentUser + '?')) {
+                logout();
+                this.textContent = 'LOGIN';
+            }
+        } else {
+            // Login prompt
+            const username = prompt('Username:\n\nadmin / Andrada_1968!\ndemo / demo\ntest / test123');
+            if (!username) return;
+            
+            const password = prompt('Password for ' + username + ':');
+            if (!password) return;
+            
+            if (login(username, password)) {
+                alert('✅ Login successful!\n\nWelcome, ' + username + '!');
+                this.textContent = 'LOGOUT';
+            } else {
+                alert('❌ Login failed!\n\nInvalid username or password.');
+            }
+        }
+    });
+    
+    document.body.appendChild(loginBtn);
+    
+    // Check if already logged in
+    const currentUser = localStorage.getItem('nexus_current_user');
+    if (currentUser) {
+        loginBtn.textContent = 'LOGOUT';
+        const user = USERS_DB[currentUser];
+        if (user) {
+            updateStatusDisplay(true, currentUser, user.subscription);
+            if (user.role === 'demo') {
+                startDemoCountdown();
+            }
+        }
+    } else {
+        updateStatusDisplay(false);
+    }
+    
+    console.log('✅ Login system initialized');
+});
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TESTARE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Salvează fișierul
+2. Reîmprospătează browser-ul (F5)
+3. Vei vedea buton "LOGIN" în dreapta sus
+4. Click pe LOGIN
+5. Introdu:
+   - Username: demo
+   - Password: demo
+6. Verifică:
+   - Status: "DEMO [DEMO] | MALE | READY (10:00 left)"
+   - Countdown activ
+   - Buton devine "LOGOUT"
+
+CREDENȚIALE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+admin / Andrada_1968!  → Verde, permanent
+demo / demo            → Cyan, 10 min countdown
+test / test123         → Verde, permanent
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ GATA! Sistemul va fi funcțional imediat!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

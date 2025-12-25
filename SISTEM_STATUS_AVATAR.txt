@@ -1,0 +1,335 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   SISTEM STATUS AVATAR - DOCUMENTAȚIE                     ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 23:24
+🎯 SISTEM: Status dinamic bazat pe login și abonament
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 STATUSURI POSIBILE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. DEFAULT (fără login):
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   AVATAR: MALE | SYSTEM: OFF
+   AVATAR: FEMALE | SYSTEM: OFF
+   
+   Culoare: ROȘU (#ff0000)
+   Când: Niciun user logat
+
+2. DEMO (10 minute):
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DEMO [DEMO] | MALE | READY (9:45 left)
+   DEMO [DEMO] | FEMALE | READY (9:45 left)
+   
+   Culoare: CYAN (#00ffff)
+   Countdown: Actualizat la fiecare secundă
+   La expirare: Logout + "SYSTEM: OFF"
+
+3. USER PLĂTIT (activ):
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   JOHN_DOE [PREMIUM] | MALE | READY
+   JOHN_DOE [PREMIUM] | FEMALE | READY
+   
+   Culoare: VERDE (#00ff00)
+   Când: Abonament activ
+
+4. USER PLĂTIT (expiring soon - 3 zile):
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   JOHN_DOE [PREMIUM] | MALE | READY (expires in 2 days)
+   
+   Culoare: GALBEN/ORANGE (#ffaa00)
+   Când: Mai puțin de 3 zile până la expirare
+
+5. USER PLĂTIT (expirat):
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   JOHN_DOE [EXPIRED] | MALE | RENEW TO CONTINUE
+   
+   Culoare: ROȘU (#ff0000)
+   Când: Abonament expirat
+   Acțiune: Logout automat
+
+6. ADMIN (permanent):
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ADMIN [ENTERPRISE] | MALE | READY
+   ADMIN [ENTERPRISE] | FEMALE | READY
+   
+   Culoare: VERDE (#00ff00)
+   Când: Permanent, fără expirare
+
+7. TEST (permanent):
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TEST [BASIC] | MALE | READY
+   TEST [BASIC] | FEMALE | READY
+   
+   Culoare: VERDE (#00ff00)
+   Când: Permanent, fără expirare
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 IMPLEMENTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HTML:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<div id="status-display" class="status-off">
+    AVATAR: <span id="current-avatar">MALE</span> | SYSTEM: <span id="system-status">OFF</span>
+</div>
+
+CSS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+#status-display {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.status-off {
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid #ff0000;
+    color: #ff0000;
+}
+
+.status-ready {
+    background: rgba(0, 255, 0, 0.2);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+}
+
+.status-demo {
+    background: rgba(0, 255, 255, 0.2);
+    border: 1px solid #00ffff;
+    color: #00ffff;
+}
+
+.status-expiring {
+    background: rgba(255, 170, 0, 0.2);
+    border: 1px solid #ffaa00;
+    color: #ffaa00;
+}
+
+.status-expired {
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid #ff0000;
+    color: #ff0000;
+}
+
+JavaScript:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Update status display
+function updateStatusDisplay(isLoggedIn, username = '', subscription = '') {
+    const statusDisplay = document.getElementById('status-display');
+    const systemStatus = document.getElementById('system-status');
+    const currentAvatar = document.getElementById('current-avatar');
+    
+    if (!statusDisplay || !systemStatus) return;
+    
+    const gender = localStorage.getItem('nexus_avatar_gender') || 'male';
+    currentAvatar.textContent = gender.toUpperCase();
+    
+    // Remove all status classes
+    statusDisplay.classList.remove('status-off', 'status-ready', 'status-demo', 'status-expiring', 'status-expired');
+    
+    if (!isLoggedIn) {
+        // DEFAULT: OFF (roșu)
+        statusDisplay.classList.add('status-off');
+        systemStatus.textContent = 'OFF';
+        statusDisplay.innerHTML = `AVATAR: <span id="current-avatar">${gender.toUpperCase()}</span> | SYSTEM: <span id="system-status">OFF</span>`;
+        return;
+    }
+    
+    const user = USERS_DB[username];
+    if (!user) return;
+    
+    // ADMIN - permanent READY
+    if (user.role === 'admin') {
+        statusDisplay.classList.add('status-ready');
+        statusDisplay.innerHTML = `${username.toUpperCase()} [${subscription.toUpperCase()}] | ${gender.toUpperCase()} | <span id="system-status">READY</span>`;
+        return;
+    }
+    
+    // TEST - permanent READY
+    if (username === 'test') {
+        statusDisplay.classList.add('status-ready');
+        statusDisplay.innerHTML = `${username.toUpperCase()} [${subscription.toUpperCase()}] | ${gender.toUpperCase()} | <span id="system-status">READY</span>`;
+        return;
+    }
+    
+    // DEMO - countdown 10 minute
+    if (user.role === 'demo') {
+        statusDisplay.classList.add('status-demo');
+        startDemoCountdown(username, gender, subscription);
+        return;
+    }
+    
+    // USER PLĂTIT - verifică expirare
+    const status = checkSubscriptionStatus(username);
+    
+    if (status === 'expired') {
+        statusDisplay.classList.add('status-expired');
+        statusDisplay.innerHTML = `${username.toUpperCase()} [EXPIRED] | ${gender.toUpperCase()} | <span id="system-status">RENEW TO CONTINUE</span>`;
+    } else if (status === 'expiring_soon') {
+        const daysLeft = getDaysUntilExpiry(username);
+        statusDisplay.classList.add('status-expiring');
+        statusDisplay.innerHTML = `${username.toUpperCase()} [${subscription.toUpperCase()}] | ${gender.toUpperCase()} | <span id="system-status">READY (expires in ${daysLeft} days)</span>`;
+    } else {
+        statusDisplay.classList.add('status-ready');
+        statusDisplay.innerHTML = `${username.toUpperCase()} [${subscription.toUpperCase()}] | ${gender.toUpperCase()} | <span id="system-status">READY</span>`;
+    }
+}
+
+// Demo countdown
+let demoCountdownInterval = null;
+
+function startDemoCountdown(username, gender, subscription) {
+    const loginTime = new Date(localStorage.getItem('nexus_login_time'));
+    const endTime = new Date(loginTime.getTime() + 10 * 60 * 1000); // +10 min
+    
+    // Clear previous interval
+    if (demoCountdownInterval) {
+        clearInterval(demoCountdownInterval);
+    }
+    
+    demoCountdownInterval = setInterval(() => {
+        const now = new Date();
+        const timeLeft = endTime - now;
+        
+        if (timeLeft <= 0) {
+            clearInterval(demoCountdownInterval);
+            alert('Demo session expired (10 minutes)');
+            window.logout();
+            return;
+        }
+        
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        const statusDisplay = document.getElementById('status-display');
+        if (statusDisplay) {
+            statusDisplay.innerHTML = `${username.toUpperCase()} [${subscription.toUpperCase()}] | ${gender.toUpperCase()} | <span id="system-status">READY (${timeString} left)</span>`;
+        }
+    }, 1000); // Update every second
+}
+
+// Get days until expiry
+function getDaysUntilExpiry(username) {
+    const user = USERS_DB[username];
+    if (!user || !user.subscriptionDetails || !user.subscriptionDetails.endDate) return 0;
+    
+    const now = new Date();
+    const endDate = new Date(user.subscriptionDetails.endDate);
+    return Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 FLUX COMPLET:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SCENARIUL 1: Pornire aplicație (fără login)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Aplicație pornește
+2. Status: "AVATAR: MALE | SYSTEM: OFF" (roșu)
+3. User apasă 'F'
+4. Status: "AVATAR: FEMALE | SYSTEM: OFF" (roșu)
+
+SCENARIUL 2: Login DEMO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login: demo / demo
+2. Status: "DEMO [DEMO] | MALE | READY (10:00 left)" (cyan)
+3. Countdown: "9:59... 9:58... 9:57..."
+4. La 0:00 → Logout + "SYSTEM: OFF"
+
+SCENARIUL 3: Login USER PLĂTIT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login: john_doe / password
+2. Verificare: 15 zile până la expirare
+3. Status: "JOHN_DOE [PREMIUM] | MALE | READY" (verde)
+
+SCENARIUL 4: USER PLĂTIT - 2 zile până la expirare
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login: john_doe / password
+2. Verificare: 2 zile până la expirare
+3. Status: "JOHN_DOE [PREMIUM] | MALE | READY (expires in 2 days)" (orange)
+4. Alert: "Subscription expires in 2 days!"
+
+SCENARIUL 5: USER PLĂTIT - EXPIRAT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login: john_doe / password
+2. Verificare: EXPIRAT
+3. Status: "JOHN_DOE [EXPIRED] | MALE | RENEW TO CONTINUE" (roșu)
+4. Alert: "Subscription expired!"
+5. Logout automat
+6. Status: "AVATAR: MALE | SYSTEM: OFF"
+
+SCENARIUL 6: Login ADMIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login: admin / Andrada_1968!
+2. Status: "ADMIN [ENTERPRISE] | MALE | READY" (verde)
+3. Permanent, fără countdown
+
+SCENARIUL 7: Login TEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login: test / test123
+2. Status: "TEST [BASIC] | MALE | READY" (verde)
+3. Permanent, fără expirare
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 REZUMAT CULORI:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Status          | Culoare | Când
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OFF             | ROȘU    | Fără login
+READY           | VERDE   | Admin, Test, User activ
+READY (time)    | CYAN    | Demo (countdown)
+READY (expires) | ORANGE  | User (3 zile sau mai puțin)
+RENEW           | ROȘU    | User expirat
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ CARACTERISTICI:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Status dinamic bazat pe login
+✅ Culori clare (roșu/verde/cyan/orange)
+✅ Countdown pentru demo
+✅ Warning pentru expirare apropiată
+✅ Admin și Test permanent READY
+✅ Update automat la schimbare avatar
+✅ Mesaje clare pentru user
+
+GATA DE IMPLEMENTARE! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: SISTEM STATUS AVATAR
+📅 DATA: 2025-12-21 23:24
+✅ STATUS: DOCUMENTAT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

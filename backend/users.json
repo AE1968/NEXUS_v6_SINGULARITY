@@ -1,0 +1,44 @@
+{
+    "admin": {
+        "password": "scrypt:32768:8:1$wIZ1mR5lKFKaBfzP$4d1e1c2a11729d278533b9b383f4f612c7c6573e85bc0fb63e1df5ebe67853031fe89aa14a7479018babae4bc32891743668c21f3cb10e50c90b449283c531c6",
+        "role": "admin",
+        "subscription": "enterprise",
+        "accountStatus": "active",
+        "email": "admin@nexus.ai",
+        "billing": {
+            "history": []
+        },
+        "subscriptionDetails": {
+            "status": "active",
+            "planName": "SYSTEM ADMIN"
+        }
+    },
+    "demo": {
+        "password": "scrypt:32768:8:1$67BJI5FGnNDt8dcK$36d4ec57e3bc9fc1e12e1645a1a4043cfe18df1a7476debc88299cfd0c1ed9a5cc450da93582893fb7b01ada90a2e5de88859456ab7ecb832a31069fa4110812",
+        "role": "demo",
+        "subscription": "basic",
+        "accountStatus": "active",
+        "email": "demo@nexus.ai",
+        "billing": {
+            "history": []
+        },
+        "subscriptionDetails": {
+            "status": "active",
+            "planName": "DEMO ACCOUNT"
+        }
+    },
+    "test": {
+        "password": "scrypt:32768:8:1$LWvXc5aZbAafIpJK$0b7f73acc5ae1d8c8710d1c012d9b95289e26dbf506f4034e5f94eeb4a8b3d698f4acb007b5523b7cfc6222208f6633208c7333ee2321a69c4458075247f6ba7",
+        "role": "user",
+        "subscription": "basic",
+        "accountStatus": "active",
+        "email": "test@example.com",
+        "billing": {
+            "history": []
+        },
+        "subscriptionDetails": {
+            "status": "active",
+            "planName": "1 Month Plan"
+        }
+    }
+}

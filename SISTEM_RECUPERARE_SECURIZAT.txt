@@ -1,0 +1,266 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   SISTEM RECUPERARE SECURIZAT - DOCUMENTAȚIE              ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 23:14
+🔐 SISTEM: Email-based Security Key Recovery
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 FLUX COMPLET:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SCENARIUL 1: Înregistrare User Nou
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. User click "Create Account"
+2. Completează: username, email, password, plan
+3. Sistem generează SECURITY KEY automat
+4. Alert afișează:
+   ✅ Account created!
+   🔑 Security Key: XXXX-XXXX-XXXX-XXXX
+   ⚠️  SAVE THIS KEY! You'll need it to reset your password.
+
+5. User salvează key-ul (notițe, manager parole, etc.)
+6. Cont activ, poate face login
+
+SCENARIUL 2: User Uită Parola (ARE Security Key)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Click "Forgot Password?"
+2. Are 2 opțiuni:
+   A) "I have my security key" → Introduce key direct
+   B) "I lost my security key" → Request new key via email
+
+Opțiunea A - Cu Security Key:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Introduce username
+2. Introduce security key salvat
+3. Introduce new password
+4. Confirm password
+5. ✅ Password reset!
+6. Login cu parola nouă
+
+Opțiunea B - Fără Security Key (PIERDUT):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Click "I lost my security key"
+2. Introduce username
+3. Introduce email (verificare)
+4. Sistem verifică: username + email match?
+5. Dacă DA:
+   - Generează SECURITY KEY NOU
+   - Trimite pe email
+   - Înlocuiește vechiul key în DB
+6. User primește email:
+   
+   Subject: New Security Key - NEXUS Account
+   
+   Hello [username],
+   
+   Your new security key is:
+   🔑 XXXX-XXXX-XXXX-XXXX
+   
+   Use this key to reset your password.
+   Keep it safe for future use!
+
+7. User folosește noul key pentru reset parolă
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 IMPLEMENTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MODAL 1: Forgot Password - Opțiuni
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<div id="forgot-modal">
+    <h2>FORGOT PASSWORD?</h2>
+    <p>Choose recovery method:</p>
+    
+    <button id="have-key-btn">I have my security key</button>
+    <button id="lost-key-btn">I lost my security key</button>
+</div>
+
+MODAL 2A: Reset cu Security Key Existent
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<div id="reset-with-key-modal">
+    <h2>RESET PASSWORD</h2>
+    <input id="username" placeholder="Username">
+    <input id="security-key" placeholder="XXXX-XXXX-XXXX-XXXX">
+    <input id="new-password" type="password" placeholder="New password">
+    <input id="confirm-password" type="password" placeholder="Confirm password">
+    <button id="reset-btn">RESET PASSWORD</button>
+</div>
+
+MODAL 2B: Request New Security Key
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+<div id="request-key-modal">
+    <h2>REQUEST NEW SECURITY KEY</h2>
+    <p>We'll send a new key to your email</p>
+    <input id="username" placeholder="Username">
+    <input id="email" placeholder="your@email.com">
+    <button id="send-key-btn">SEND NEW KEY</button>
+</div>
+
+FUNCȚII JavaScript:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Request new security key via email
+function requestNewSecurityKey(username, email) {
+    const user = USERS_DB[username];
+    
+    // Validate
+    if (!user) {
+        return { success: false, error: 'Username not found' };
+    }
+    
+    if (user.email !== email) {
+        return { success: false, error: 'Email does not match our records' };
+    }
+    
+    // Generate NEW security key
+    const newKey = generateSecurityKey();
+    
+    // Update in database
+    user.securityKey = newKey;
+    
+    // Send email (in production)
+    sendSecurityKeyEmail(email, username, newKey);
+    
+    // For demo: show in console
+    console.log(`📧 Email sent to: ${email}`);
+    console.log(`🔑 New Security Key: ${newKey}`);
+    console.log(`⚠️  Old key has been replaced!`);
+    
+    return { 
+        success: true, 
+        message: 'New security key sent to your email!',
+        key: newKey  // Only for demo - remove in production
+    };
+}
+
+// Send email with new key (backend function)
+function sendSecurityKeyEmail(email, username, securityKey) {
+    // In production: use email service (SendGrid, AWS SES, etc.)
+    
+    const emailContent = `
+        Subject: New Security Key - NEXUS Account
+        
+        Hello ${username},
+        
+        You requested a new security key for your NEXUS account.
+        
+        Your new security key is:
+        🔑 ${securityKey}
+        
+        Use this key to reset your password at:
+        https://nexus.example.com/reset-password
+        
+        IMPORTANT:
+        - This key replaces your old security key
+        - Keep it safe for future password resets
+        - If you didn't request this, contact support immediately
+        
+        Best regards,
+        NEXUS Team
+    `;
+    
+    // Send via email service
+    // emailService.send(email, emailContent);
+    
+    console.log('📧 Email would be sent:', emailContent);
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 SECURITATE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Username + Email trebuie să match EXACT
+✅ Vechiul key este ÎNLOCUIT (nu mai funcționează)
+✅ Noul key este trimis DOAR pe email-ul înregistrat
+✅ Email-ul NU poate fi schimbat fără security key
+✅ Rate limiting: max 3 request-uri/oră per user
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 STRUCTURĂ USER DATA:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USERS_DB['john_doe'] = {
+    username: 'john_doe',
+    email: 'john@example.com',
+    password: 'hashed_password',
+    securityKey: 'ABCD-EFGH-JKLM-NPQR',  // Current active key
+    securityKeyHistory: [
+        {
+            key: 'OLD1-KEY1-KEY1-KEY1',
+            createdAt: '2024-12-01T10:00:00Z',
+            replacedAt: '2024-12-15T14:30:00Z'
+        },
+        {
+            key: 'OLD2-KEY2-KEY2-KEY2',
+            createdAt: '2024-12-15T14:30:00Z',
+            replacedAt: '2024-12-21T23:14:00Z'
+        }
+    ],
+    keyRequestCount: 2,  // Tracking pentru rate limiting
+    lastKeyRequest: '2024-12-21T23:14:00Z',
+    // ... rest of user data
+};
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ AVANTAJE SISTEM:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ User NU trebuie să țină minte security key
+✅ Poate cere unul nou oricând (prin email)
+✅ Email-ul este verificat (trebuie să aibă acces)
+✅ Vechiul key devine invalid (securitate)
+✅ Istoric pentru audit
+✅ Rate limiting împotriva abuzului
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 REZUMAT FLUX:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Înregistrare:
+  → Generează security key
+  → Afișează user-ului
+  → Salvează în DB
+
+Uitat parolă + AM key:
+  → Introduce username + key
+  → Reset parolă direct
+
+Uitat parolă + PIERDUT key:
+  → Introduce username + email
+  → Sistem verifică match
+  → Generează key NOU
+  → Trimite pe email
+  → Înlocuiește vechiul key
+  → User folosește noul key pentru reset
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SISTEM COMPLET SECURIZAT!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: v5.0 - EMAIL SECURITY KEY RECOVERY
+📅 DATA: 2025-12-21 23:14
+🔐 STATUS: DOCUMENTAT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

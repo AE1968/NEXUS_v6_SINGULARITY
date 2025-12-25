@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>NEXUS - MEMORY PURGE</title>
+    <style>
+        body {
+            background: #000;
+            color: #00f3ff;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-shadow: 0 0 20px #00f3ff;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #00ff41;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🧠 NEXUS MEMORY PURGE</h1>
+    <div id="status">INITIALIZING WIPE SEQUENCE...</div>
+
+    <script>
+        setTimeout(() => {
+            // 1. Clear LocalStorage
+            localStorage.clear();
+            document.getElementById('status').innerHTML += "<br>✅ LocalStorage CLEARED";
+
+            // 2. Clear SessionStorage
+            sessionStorage.clear();
+            document.getElementById('status').innerHTML += "<br>✅ SessionStorage CLEARED";
+
+            // 3. Reset User Profile to Default
+            const defaultProfile = {
+                name: 'Adrian',
+                preferences: {},
+                interactionHistory: [],
+                emotionalState: 'neutral'
+            };
+            localStorage.setItem('nexus_user_profile', JSON.stringify(defaultProfile));
+            document.getElementById('status').innerHTML += "<br>✅ Default Profile RESTORED";
+
+            document.getElementById('status').innerHTML += "<br><br>🚀 SYSTEM REBOOTING IN 3 SECONDS...";
+
+            setTimeout(() => {
+                window.location.href = 'nexus_core.html';
+            }, 3000);
+        }, 1000);
+    </script>
+</body>
+
+</html>

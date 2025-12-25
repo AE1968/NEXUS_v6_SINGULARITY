@@ -1,0 +1,232 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║           GHID DE TESTARE - SISTEM LOGIN                  ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 22:34
+✅ STATUS: GATA DE TESTARE
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 CE AM IMPLEMENTAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Bază de date cu 5 utilizatori + abonamente
+✅ User "admin" cu parola "Andrada_1968!"
+✅ User "demo" cu parola "demo"
+✅ 3 abonamente (Basic, Premium, Enterprise)
+✅ Separare strictă între utilizatori
+✅ Status display se micșorează după login
+✅ Auto-logout la schimbare avatar
+✅ Tracking statistici (logins, messages)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧪 TESTE DE EFECTUAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 1: Login ADMIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Deschide http://localhost:3000/
+2. Click pe "LOGIN" (dreapta sus)
+3. Username: admin
+4. Password: Andrada_1968!
+5. Click "LOGIN"
+
+✅ VERIFICĂRI:
+   - Modal se închide
+   - Buton devine "LOGOUT (ADMIN)" (verde)
+   - Status display se MICȘOREAZĂ
+   - Afișează: "ADMIN [ENTERPRISE] | MALE"
+   - Console: "✅ User "admin" logged in successfully"
+   - Console: "Role: admin"
+   - Console: "Subscription: enterprise"
+   - Console: "Total logins: 1"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 2: Login DEMO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Dacă ești logat ca admin, fă logout
+2. Click pe "LOGIN"
+3. Username: demo
+4. Password: demo
+5. Click "LOGIN"
+
+✅ VERIFICĂRI:
+   - Modal se închide
+   - Buton devine "LOGOUT (DEMO)" (verde)
+   - Status display se MICȘOREAZĂ
+   - Afișează: "DEMO [DEMO] | MALE"
+   - Console: "✅ User "demo" logged in successfully"
+   - Console: "Role: demo"
+   - Console: "Subscription: demo"
+   - Console: "Permissions: view"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 3: Separare Utilizatori (CRITIC!)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login ca "admin"
+2. Verifică console: "Total logins: X"
+3. Logout
+4. Login ca "demo"
+5. Verifică console: "Total logins: Y" (diferit de X!)
+6. Logout
+7. Login ca "admin" din nou
+8. Verifică console: "Total logins: X+1"
+
+✅ VERIFICĂRI:
+   - Fiecare user are propriile statistici
+   - NU se amestecă datele între useri
+   - Admin și Demo au contoare separate
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 4: Auto-Logout la Schimbare Avatar
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login ca "admin" pe avatar MASCULIN
+2. Apasă tasta 'F' (sau click pe butonul F)
+3. Verifică:
+   - Console: "🔄 Avatar changed - Auto logout triggered"
+   - Console: "🔓 User "admin" logged out"
+   - Modal de login se deschide AUTOMAT
+4. Re-login ca "admin"
+5. Verifică:
+   - Avatar este acum FEMININ
+   - Status display: "ADMIN [ENTERPRISE] | FEMALE"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 5: Status Display Micșorare
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ÎNAINTE DE LOGIN:
+   - Mărime: Normală
+   - Text: "AVATAR: MALE | SYSTEM: READY"
+   - Font size: 0.9rem
+   - Padding: 10px 20px
+
+DUPĂ LOGIN:
+   - Mărime: MAI MICĂ
+   - Text: "ADMIN [ENTERPRISE] | MALE"
+   - Font size: 0.75rem
+   - Padding: 6px 12px
+
+DUPĂ LOGOUT:
+   - Revine la mărime normală
+   - Text: "AVATAR: MALE | SYSTEM: READY"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 6: Toate Abonamentele
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Testează fiecare user:
+
+1. admin / Andrada_1968!
+   → Status: "ADMIN [ENTERPRISE] | MALE"
+
+2. demo / demo
+   → Status: "DEMO [DEMO] | MALE"
+
+3. user_basic / basic123
+   → Status: "USER_BASIC [BASIC] | MALE"
+
+4. user_premium / premium123
+   → Status: "USER_PREMIUM [PREMIUM] | MALE"
+
+5. user_enterprise / enterprise123
+   → Status: "USER_ENTERPRISE [ENTERPRISE] | MALE"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 7: Credențiale Invalide
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Click "LOGIN"
+2. Username: admin
+3. Password: wrong_password
+4. Click "LOGIN"
+
+✅ VERIFICĂRI:
+   - Mesaj roșu: "Invalid credentials"
+   - Console: "❌ Invalid password for user "admin""
+   - Modal rămâne deschis
+   - Password field se golește
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 8: User Inexistent
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Click "LOGIN"
+2. Username: nonexistent
+3. Password: anything
+4. Click "LOGIN"
+
+✅ VERIFICĂRI:
+   - Mesaj roșu: "Invalid credentials"
+   - Console: "❌ User "nonexistent" not found"
+   - Modal rămâne deschis
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 VERIFICĂRI CONSOLE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+La fiecare login, verifică în console:
+
+✅ User logged in successfully
+✅ Role: [role]
+✅ Subscription: [subscription]
+✅ Permissions: [list]
+✅ Avatar: [male/female]
+✅ Total logins: [number]
+
+La logout:
+✅ User logged out
+✅ Auto logout triggered (la schimbare avatar)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ CHECKLIST FINAL:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+□ Login admin funcționează
+□ Login demo funcționează
+□ Toate abonamentele funcționează
+□ Status display se micșorează după login
+□ Status display revine la normal după logout
+□ Auto-logout la schimbare avatar
+□ Separare strictă între useri
+□ Statistici separate pentru fiecare user
+□ Credențiale invalide sunt respinse
+□ Useri inexistenți sunt respinși
+□ Modal se deschide/închide corect
+□ Buton LOGIN/LOGOUT se actualizează
+□ Console logs sunt corecte
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 GATA DE TESTARE!
+
+Deschide: http://localhost:3000/
+Începe cu TEST 1 și continuă în ordine!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: v2.4 - READY FOR TESTING
+📅 DATA: 2025-12-21 22:34
+✅ STATUS: IMPLEMENTAT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

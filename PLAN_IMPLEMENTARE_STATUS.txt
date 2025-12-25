@@ -1,0 +1,87 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   PLAN IMPLEMENTARE - STATUS DINAMIC                      ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 23:30
+🎯 OBIECTIV: Implementare sistem status dinamic în index.html
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 CHECKLIST IMPLEMENTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FIȘIER: frontend/index.html (1531 linii, 58994 bytes)
+
+TASK 1: Verificare structură existentă
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Găsește unde este definit USERS_DB
+☐ Găsește unde este funcția login()
+☐ Găsește unde este funcția updateStatusDisplay()
+☐ Găsește unde este HTML pentru status display
+
+TASK 2: Actualizare USERS_DB pentru DEMO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Schimbă permissions: ['view'] 
+   → ['view', 'chat', 'voice', 'advanced_features']
+☐ Schimbă voiceEnabled: false → true
+
+TASK 3: Adăugare CSS pentru statusuri
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Adaugă .status-off (roșu)
+☐ Adaugă .status-ready (verde)
+☐ Adaugă .status-demo (cyan)
+☐ Adaugă .status-expiring (orange)
+☐ Adaugă .status-expired (roșu)
+
+TASK 4: Actualizare funcție updateStatusDisplay()
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Adaugă logică pentru status OFF (default)
+☐ Adaugă logică pentru status DEMO (countdown)
+☐ Adaugă logică pentru status ADMIN (permanent)
+☐ Adaugă logică pentru status TEST (permanent)
+☐ Adaugă logică pentru status USER (cu verificare expirare)
+
+TASK 5: Implementare countdown DEMO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Creează funcția startDemoCountdown()
+☐ Update la fiecare secundă
+☐ Afișare format: "READY (9:45 left)"
+☐ Logout automat la 0:00
+
+TASK 6: Testare
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Login demo → verifică countdown
+☐ Login admin → verifică status permanent
+☐ Schimbare avatar → verifică update
+☐ Expirare demo → verifică logout
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 GĂSIRE LOCAȚII ÎN FIȘIER:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Căutări necesare:
+1. grep "USERS_DB" → găsește linia unde e definit
+2. grep "function login" → găsește funcția login
+3. grep "updateStatusDisplay" → găsește funcția
+4. grep "status-display" → găsește HTML-ul
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 NOTĂ:
+
+Fișierul are 1531 linii și 58994 bytes.
+Este un fișier mare, deci trebuie să lucrez cu atenție.
+Voi face modificări incrementale și voi testa după fiecare.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ GATA DE START!
+
+Următorul pas: Căutare în fișier pentru a găsi locațiile exacte.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

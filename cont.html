@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contul Meu | GENEZA NEXUS</title>
+    <!-- NEXUS VIEWPORT SYSTEM (AUTO-ZOOM) -->
+    <script src="js/nexus_viewport.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --matrix-green: #00ff41;
+            --gold: #ffd700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a0a0a 100%);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        nav a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-family: 'Orbitron';
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 100px 20px 50px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-family: 'Orbitron';
+            font-size: 2rem;
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+        }
+
+        .section {
+            background: rgba(10, 20, 30, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron';
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item label {
+            display: block;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .badge-active {
+            background: rgba(0, 255, 65, 0.2);
+            color: var(--matrix-green);
+        }
+
+        .badge-demo {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--gold);
+        }
+
+        .badge-expired {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--neon-cyan);
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Rajdhani';
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Orbitron';
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .btn-danger {
+            background: #ff4444;
+        }
+
+        .child-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .child-info h4 {
+            color: var(--neon-cyan);
+            margin-bottom: 5px;
+        }
+
+        .child-info p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .child-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .device-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .device-badge {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .qr-code {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+
+        .upgrade-box {
+            background: linear-gradient(135deg, rgba(188, 19, 254, 0.2), rgba(0, 243, 255, 0.2));
+            border: 2px solid var(--neon-purple);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .upgrade-box h3 {
+            color: var(--neon-purple);
+            margin-bottom: 10px;
+        }
+
+        .access-denied {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        #accountContent {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">GENEZA NEXUS</a>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <a href="nexus_core.html" style="color: rgba(255,255,255,0.8);">🧠 Nexus Core</a>
+            <button onclick="logout()" class="btn btn-secondary" style="padding: 8px 15px;">Deconectare</button>
+        </div>
+    </nav>
+
+    <!-- Access Denied -->
+    <div id="accessDenied" class="access-denied">
+        <h1 style="color: #ff4444; font-family: 'Orbitron'; margin-bottom: 20px;">🔒 Autentificare Necesară</h1>
+        <p>Trebuie să fii autentificat pentru a accesa contul tău.</p>
+        <a href="index.html" class="btn"
+            style="display: inline-block; margin-top: 20px; text-decoration: none;">Autentifică-te</a>
+    </div>
+
+    <!-- Account Content -->
+    <div id="accountContent" class="container">
+        <header class="page-header">
+            <h1 class="page-title">👤 Contul Meu</h1>
+            <p style="color: rgba(255,255,255,0.7);">Gestionează contul și setările tale</p>
+        </header>
+
+        <!-- Warning for expiring -->
+        <div id="expirationWarning" class="warning-box" style="display: none;"></div>
+
+        <!-- Demo Upgrade Box -->
+        <div id="demoUpgrade" class="upgrade-box" style="display: none;">
+            <h3>🎁 Cont Demo Activ</h3>
+            <p style="margin-bottom: 15px;">Ai acces la toate funcțiile, dar nu poți salva. Upgrade pentru acces
+                complet!</p>
+            <a href="abonamente.html" class="btn">💎 Vezi Abonamentele</a>
+        </div>
+
+        <!-- Account Info -->
+        <div class="section">
+            <h2 class="section-title">📋 Informații Cont</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Nume</label>
+                    <div class="value" id="userName">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Email</label>
+                    <div class="value" id="userEmail">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Tip Cont</label>
+                    <div class="value" id="userType">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Abonament</label>
+                    <div class="value" id="userSubscription">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Valabil până la</label>
+                    <div class="value" id="userExpires">-</div>
+                </div>
+                <div class="info-item">
+                    <label>Membru din</label>
+                    <div class="value" id="userSince">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Children Section -->
+        <div class="section">
+            <h2 class="section-title">👶 Conturi Copii <span id="childCount"
+                    style="opacity: 0.6; font-size: 0.9rem;"></span></h2>
+
+            <div id="childrenList"></div>
+
+            <div id="addChildForm"
+                style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(0, 243, 255, 0.2);">
+                <h4 style="color: var(--neon-cyan); margin-bottom: 15px;">➕ Adaugă Cont Copil</h4>
+                <form onsubmit="addChild(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Numele Copilului *</label>
+                            <input type="text" id="childName" required placeholder="Ex: Maria">
+                        </div>
+                        <div class="form-group">
+                            <label>Vârsta *</label>
+                            <select id="childAge" required>
+                                <option value="">Selectează</option>
+                                <option value="5">5 ani</option>
+                                <option value="6">6 ani</option>
+                                <option value="7">7 ani</option>
+                                <option value="8">8 ani</option>
+                                <option value="9">9 ani</option>
+                                <option value="10">10 ani</option>
+                                <option value="11">11 ani</option>
+                                <option value="12">12 ani</option>
+                                <option value="13">13 ani</option>
+                                <option value="14">14 ani</option>
+                                <option value="15">15 ani</option>
+                                <option value="16">16 ani</option>
+                                <option value="17">17 ani</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Poreclă (opțional)</label>
+                            <input type="text" id="childNickname" placeholder="Cum vrei să-i spună Nexus">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">✅ Adaugă Copil</button>
+                    <button type="button" onclick="toggleAddChild(false)" class="btn btn-secondary"
+                        style="margin-left: 10px;">Anulează</button>
+                </form>
+            </div>
+
+            <button id="addChildBtn" onclick="toggleAddChild(true)" class="btn" style="margin-top: 15px;">
+                ➕ Adaugă Cont Copil
+            </button>
+        </div>
+
+        <!-- Devices Section -->
+        <div class="section">
+            <h2 class="section-title">📱 Dispozitivele Mele</h2>
+            <div id="deviceInfo">
+                <p style="margin-bottom: 10px;">
+                    Ai folosit <strong id="devicesUsed">0</strong> din <strong id="devicesMax">3</strong> dispozitive
+                    gratuite.
+                </p>
+                <div class="device-list" id="deviceList"></div>
+            </div>
+
+            <div class="qr-section">
+                <h4 style="color: var(--neon-cyan); margin-bottom: 10px;">🔗 Adaugă Dispozitiv Nou</h4>
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Scanează acest cod de pe noul dispozitiv
+                    pentru a-l adăuga la contul tău.</p>
+                <div class="qr-code" id="deviceQR">
+                    <div
+                        style="width: 150px; height: 150px; background: #ddd; display: flex; align-items: center; justify-content: center; color: #333; font-size: 0.8rem;">
+                        Cod QR
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; opacity: 0.7;">Codul expiră în 5 minute</p>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                <p style="color: var(--gold);">💡 Ai nevoie de mai multe dispozitive?</p>
+                <p style="font-size: 0.9rem; margin-top: 5px;">Adaugă dispozitive suplimentare pentru doar
+                    £1/dispozitiv.</p>
+                <button onclick="addExtraDevice()" class="btn btn-secondary" style="margin-top: 10px;">➕ Adaugă
+                    Dispozitiv (£1)</button>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="section" style="border-color: rgba(255, 68, 68, 0.3);">
+            <h2 class="section-title" style="color: #ff4444;">⚠️ Zonă Periculoasă</h2>
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 15px;">Acțiunile de mai jos sunt ireversibile.</p>
+            <button onclick="deleteAccount()" class="btn btn-danger">🗑️ Șterge Contul</button>
+        </div>
+    </div>
+
+    <script src="js/nexus_user_system.js"></script>
+    <script>
+        let currentUser = null;
+
+        function checkAuth() {
+            const isAuth = localStorage.getItem('nexus_authenticated') === 'true';
+            const role = localStorage.getItem('nexus_role');
+
+            if (isAuth && role !== 'child') {
+                document.getElementById('accessDenied').style.display = 'none';
+                document.getElementById('accountContent').style.display = 'block';
+                loadAccountData();
+            } else {
+                document.getElementById('accessDenied').style.display = 'block';
+                document.getElementById('accountContent').style.display = 'none';
+            }
+        }
+
+        function loadAccountData() {
+            const email = localStorage.getItem('nexus_email');
+            const role = localStorage.getItem('nexus_role');
+            const name = localStorage.getItem('nexus_user');
+            const subscription = localStorage.getItem('nexus_subscription');
+            const expires = localStorage.getItem('nexus_expires');
+
+            // Get full user data
+            if (typeof NexusUserSystem !== 'undefined') {
+                const payingClients = NexusUserSystem.databases.getPayingClients();
+                const demoClients = NexusUserSystem.databases.getDemoClients();
+                currentUser = payingClients[email] || demoClients[email];
+            }
+
+            // Display info
+            document.getElementById('userName').textContent = currentUser ?
+                `${currentUser.firstName} ${currentUser.lastName}` : name;
+            document.getElementById('userEmail').textContent = email || '-';
+
+            const typeLabel = role === 'admin' ? 'Administrator' :
+                role === 'demo' ? 'Demo' : 'Abonat';
+            const typeClass = role === 'demo' ? 'badge-demo' : 'badge-active';
+            document.getElementById('userType').innerHTML = `<span class="badge ${typeClass}">${typeLabel}</span>`;
+
+            document.getElementById('userSubscription').textContent = subscription ?
+                subscription.charAt(0).toUpperCase() + subscription.slice(1) : '-';
+
+            document.getElementById('userExpires').textContent = expires ?
+                new Date(expires).toLocaleDateString('ro-RO') : '-';
+
+            document.getElementById('userSince').textContent = currentUser?.createdAt ?
+                new Date(currentUser.createdAt).toLocaleDateString('ro-RO') : '-';
+
+            // Check expiration warning
+            if (expires) {
+                const daysLeft = Math.ceil((new Date(expires) - new Date()) / (1000 * 60 * 60 * 24));
+                if (daysLeft <= 5 && daysLeft > 0) {
+                    document.getElementById('expirationWarning').style.display = 'block';
+                    document.getElementById('expirationWarning').innerHTML =
+                        `⚠️ Abonamentul tău expiră în <strong>${daysLeft} zile</strong>! <a href="abonamente.html" style="color: var(--gold);">Reînnoiește acum</a>`;
+                }
+            }
+
+            // Show demo upgrade box
+            if (role === 'demo') {
+                document.getElementById('demoUpgrade').style.display = 'block';
+            }
+
+            // Load children
+            loadChildren(email);
+
+            // Load devices
+            loadDevices();
+        }
+
+        function loadChildren(email) {
+            if (!email || typeof NexusUserSystem === 'undefined') return;
+
+            const result = NexusUserSystem.listChildren(email);
+            const container = document.getElementById('childrenList');
+            const countSpan = document.getElementById('childCount');
+
+            if (!result.success) {
+                container.innerHTML = '<p style="opacity: 0.6;">Nu s-au putut încărca conturile copii.</p>';
+                return;
+            }
+
+            countSpan.textContent = `(${result.children.length}/${result.maxChildren})`;
+
+            if (result.children.length === 0) {
+                container.innerHTML = '<p style="opacity: 0.6;">Nu ai niciun cont de copil adăugat.</p>';
+            } else {
+                container.innerHTML = result.children.map(child => `
+                    <div class="child-card">
+                        <div class="child-info">
+                            <h4>👶 ${child.name} (${child.nickname})</h4>
+                            <p>${child.age} ani • Grup: ${child.ageGroup} • 
+                               ${child.permissions.canChat ? '💬 Chat' : ''} 
+                               ${child.permissions.canVoice ? '🎤 Voce' : ''} 
+                               ${child.permissions.canSave ? '💾 Salvare' : ''}
+                            </p>
+                            <p style="font-size: 0.8rem; margin-top: 5px;">
+                                Sesiune max: ${child.permissions.maxSessionMinutes} min
+                            </p>
+                        </div>
+                        <div class="child-actions">
+                            <button onclick="loginAsChild('${child.id}')" class="btn btn-secondary" style="padding: 8px 15px;">
+                                ▶️ Intră
+                            </button>
+                            <button onclick="removeChild('${child.id}')" class="btn btn-danger" style="padding: 8px 15px;">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Hide add button if max reached
+            if (!result.canAddMore) {
+                document.getElementById('addChildBtn').style.display = 'none';
+            }
+        }
+
+        function loadDevices() {
+            if (!currentUser) return;
+
+            const devices = currentUser.devices || [];
+            const max = (currentUser.maxDevices || 3) + (currentUser.extraDevices || 0);
+
+            document.getElementById('devicesUsed').textContent = devices.length;
+            document.getElementById('devicesMax').textContent = max;
+
+            const list = document.getElementById('deviceList');
+            list.innerHTML = devices.map((d, i) => `
+                <span class="device-badge">📱 Dispozitiv ${i + 1}</span>
+            `).join('');
+        }
+
+        function toggleAddChild(show) {
+            document.getElementById('addChildForm').style.display = show ? 'block' : 'none';
+            document.getElementById('addChildBtn').style.display = show ? 'none' : 'block';
+        }
+
+        function addChild(e) {
+            e.preventDefault();
+
+            const email = localStorage.getItem('nexus_email');
+            const childData = {
+                name: document.getElementById('childName').value,
+                age: document.getElementById('childAge').value,
+                nickname: document.getElementById('childNickname').value
+            };
+
+            const result = NexusUserSystem.addChildAccount(email, childData);
+
+            if (result.success) {
+                alert(`✅ ${result.message}\n\nPermisiuni pentru grupa ${result.permissions.ageGroup}:\n` +
+                    `• Chat: ${result.permissions.canChat ? 'Da' : 'Nu'}\n` +
+                    `• Voce: ${result.permissions.canVoice ? 'Da' : 'Nu'}\n` +
+                    `• Salvare: ${result.permissions.canSave ? 'Da' : 'Nu'}\n` +
+                    `• Sesiune max: ${result.permissions.maxSessionMinutes} minute`);
+
+                // Reset form
+                document.getElementById('childName').value = '';
+                document.getElementById('childAge').value = '';
+                document.getElementById('childNickname').value = '';
+                toggleAddChild(false);
+
+                // Reload
+                loadAccountData();
+            } else {
+                alert('❌ ' + result.error);
+            }
+        }
+
+        function loginAsChild(childId) {
+            const email = localStorage.getItem('nexus_email');
+            const result = NexusUserSystem.loginChild(email, childId);
+
+            if (result.success) {
+                alert(`🎉 ${result.message}\n\nAtenție: Sesiunea durează maxim ${result.sessionLimit} minute.`);
+                window.location.href = 'nexus_core.html';
+            } else {
+                alert('❌ ' + result.error);
+            }
+        }
+
+        function removeChild(childId) {
+            if (!confirm('Sigur vrei să ștergi acest cont de copil?')) return;
+
+            const email = localStorage.getItem('nexus_email');
+            const result = NexusUserSystem.removeChild(email, childId);
+
+            if (result.success) {
+                alert('✅ ' + result.message);
+                loadAccountData();
+            } else {
+                alert('❌ ' + result.error);
+            }
+        }
+
+        function addExtraDevice() {
+            const email = localStorage.getItem('nexus_email');
+            const result = NexusUserSystem.addExtraDevice(email);
+
+            if (result.requiresPayment) {
+                if (confirm(`${result.message}\n\nContinui cu plata?`)) {
+                    // În producție, redirect la procesator plăți
+                    alert('💳 Redirecționare către plată... (demo)');
+                }
+            } else {
+                alert('❌ ' + result.error);
+            }
+        }
+
+        function deleteAccount() {
+            if (!confirm('⚠️ ATENȚIE!\n\nȘtergerea contului este IREVERSIBILĂ!\n\nToate datele tale vor fi pierdute.\n\nContinui?')) return;
+            if (!confirm('Ultima confirmare: Ești ABSOLUT sigur?')) return;
+
+            alert('📧 Te rugăm să ne contactezi la ae1968@kidsdigitalhub.com pentru ștergerea contului.');
+        }
+
+        function logout() {
+            localStorage.removeItem('nexus_authenticated');
+            localStorage.removeItem('nexus_user');
+            localStorage.removeItem('nexus_role');
+            localStorage.removeItem('nexus_email');
+            window.location.href = 'index.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+
+</html>

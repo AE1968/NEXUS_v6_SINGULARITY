@@ -1,0 +1,65 @@
+╔═══════════════════════════════════════════════════════════════╗
+║         GENEZA NEXUS HUMANOID - PROJECT STATUS                 ║
+║         Ultima actualizare: 2025-12-22 12:31                   ║
+╚═══════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 VERSIUNEA CURENTĂ: BACKUP 4
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ FUNCȚIONALITĂȚI IMPLEMENTATE:
+
+1. [✅] Landing page cu avataruri KELION (M) și VEONA (F)
+2. [✅] Switch M/F funcțional cu imagini diferite
+3. [✅] Login funcțional (demo/demo, admin/Andrada_1968!)
+4. [✅] Enter key pentru login
+5. [✅] Modal se închide instantaneu la login
+6. [✅] Avatar blocat după login (nu poți schimba M↔F fără logout)
+7. [✅] Sistem de voce TTS:
+   - Voce masculină pentru KELION
+   - Voce feminină pentru VEONA
+   - Salut bazat pe ora zilei (Good morning/afternoon/evening)
+   - Rate voce: 1.2
+   - Voci neurale prioritizate
+8. [✅] PayPal SDK integrat (LOCAL_TEST_MODE activ)
+9. [✅] Email confirmation pregătit (SMTP configurat)
+10. [✅] Backend Flask cu SQLite
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏳ DE FĂCUT (NEXT STEPS):
+
+1. [ ] Crearea planurilor PayPal în Dashboard și înlocuirea Plan ID-urilor
+2. [ ] Testare completă a fluxului de înregistrare cu plată
+3. [ ] Implementare chat/conversație cu avatar
+4. [ ] Dezactivare LOCAL_TEST_MODE pentru producție
+5. [ ] Deploy online (Netlify frontend + Railway/Render backend)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 CUM SĂ PORNEȘTI PROIECTUL:
+
+1. Deschide terminal în: c:\Users\adria\.gemini\antigravity\scratch\GENEZA_NEXUS_HUMANOID
+2. Rulează: python backend/app.py
+3. Accesează: http://127.0.0.1:8000/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📁 BACKUP-URI SALVATE:
+
+- BACKUP_1_KELION_VEONA - Avataruri + nume
+- BACKUP_2_LOGIN_FUNCTIONAL - Login funcțional
+- BACKUP_3_VOICE_WORKING - Sistem voce complet
+- BACKUP_4_LOGIN_ENTER_MODAL - Enter key + modal instant close
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 CÂND REVII, SPUNE-MI:
+
+"Continuă de la STATUS-ul din PROJECT_STATUS.txt"
+
+Voi citi acest fișier și voi continua exact de unde am rămas!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

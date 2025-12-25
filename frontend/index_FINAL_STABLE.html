@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geneza Nexus - Humanoid Interface</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@500&display=swap"
+        rel="stylesheet">
+    <style>
+        /* NEXUS CORE STYLES v2.0 - INLINE FOR GUARANTEED LOADING */
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --dark-bg: #050505;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--dark-bg);
+            color: var(--neon-cyan);
+            font-family: 'Rajdhani', sans-serif;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            transition: background-image 0.5s ease-in-out;
+            position: relative;
+        }
+
+        /* ANIMATED OVERLAY FOR BREATHING EFFECT */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 40%, rgba(0, 243, 255, 0.1) 0%, transparent 50%);
+            animation: breathe 4s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* AVATAR BACKGROUNDS WITH ANIMATION */
+        body.avatar-male {
+            background-image: url('assets/humanoid_male.png');
+            animation: subtleMove 8s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        body.avatar-male::before {
+            background: radial-gradient(circle at 50% 40%, rgba(0, 243, 255, 0.15) 0%, transparent 50%);
+        }
+
+        body.avatar-female {
+            background-image: url('assets/humanoid_female.png');
+            animation: subtleMove 8s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+        }
+
+        body.avatar-female::before {
+            background: radial-gradient(circle at 50% 40%, rgba(255, 0, 255, 0.15) 0%, transparent 50%);
+        }
+
+        /* BREATHING ANIMATION */
+        @keyframes breathe {
+
+            0%,
+            100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.9;
+                transform: scale(1.02);
+            }
+        }
+
+        /* SUBTLE MOVEMENT FOR REALISM */
+        @keyframes subtleMove {
+
+            0%,
+            100% {
+                background-position: center center;
+            }
+
+            25% {
+                background-position: 51% 49%;
+            }
+
+            50% {
+                background-position: center center;
+            }
+
+            75% {
+                background-position: 49% 51%;
+            }
+        }
+
+        /* GLOW PULSE ANIMATION */
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                filter: brightness(1) contrast(1);
+            }
+
+            50% {
+                filter: brightness(1.05) contrast(1.02);
+            }
+        }
+
+        /* CONTROL BAR */
+        #control-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            min-width: 600px;
+            background: rgba(0, 10, 15, 0.9);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            z-index: 9999;
+        }
+
+        /* GENDER SWITCHER */
+        .gender-switch-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .avatar-label {
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .bistable-switch {
+            display: flex;
+            border: 1px solid var(--neon-cyan);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #000;
+        }
+
+        .switch-option {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+
+        .switch-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .opt-text {
+            font-weight: bold;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .opt-light {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #333;
+            margin-top: 4px;
+            box-shadow: inset 0 0 2px #000;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        /* ACTIVE STATE - MALE */
+        #switch-male.active {
+            background: rgba(0, 243, 255, 0.15);
+        }
+
+        #switch-male.active .opt-text {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        #switch-male.active .opt-light {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* ACTIVE STATE - FEMALE */
+        #switch-female.active {
+            background: rgba(255, 0, 255, 0.15);
+        }
+
+        #switch-female.active .opt-text {
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        #switch-female.active .opt-light {
+            background: var(--neon-pink);
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        /* INPUT */
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #chatInput {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(0, 243, 255, 0.3);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            padding: 10px;
+            transition: border-color 0.3s;
+        }
+
+        #chatInput:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+        }
+
+        /* BUTTONS */
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 8px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .mic-btn {
+            border-color: #555;
+            color: #aaa;
+        }
+
+        .mic-btn:hover {
+            border-color: #fff;
+            background: #333;
+            color: #fff;
+            box-shadow: none;
+        }
+
+        /* STATUS DISPLAY */
+        #status-display {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-cyan);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+
+        /* LOGIN BUTTON (TOP RIGHT) */
+        #login-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #login-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        #login-btn.logged-in {
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        #login-btn.logged-in:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        /* REGISTER BUTTON (TOP RIGHT, NEXT TO LOGIN) */
+        #register-btn {
+            position: fixed;
+            top: 20px;
+            right: 140px;
+            /* Left of LOGIN button */
+            background: transparent;
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 10px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #register-btn:hover {
+            background: var(--neon-pink);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        /* LOGIN MODAL */
+        #login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #login-modal.active {
+            display: flex;
+        }
+
+        .login-box {
+            background: rgba(10, 20, 30, 0.95);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 40px;
+            width: 400px;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+        }
+
+        .login-box h2 {
+            margin: 0 0 30px 0;
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .login-box .input-group {
+            margin-bottom: 20px;
+        }
+
+        .login-box label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--neon-cyan);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .login-box .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .login-box button {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--neon-cyan);
+            background: transparent;
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .login-box button:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .login-box .cancel-btn {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        .login-box .cancel-btn:hover {
+            background: #ff4444;
+            color: #fff;
+            box-shadow: 0 0 15px #ff4444;
+        }
+
+        .login-error {
+            color: #ff4444;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .login-error.active {
+            display: block;
+        }
+
+        /* REGISTER MODAL (uses same styles as login-modal) */
+        #register-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #register-modal.active {
+            display: flex;
+        }
+
+        /* FORGOT PASSWORD MODAL */
+        #forgot-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #forgot-modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body id="nexus-body" class="avatar-male">
+
+    <!-- BACKGROUND EQUIPMENT ANIMATION (BEHIND AVATAR) -->
+    <canvas id="bg-equipment-canvas"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;"></canvas>
+
+    <!-- STATUS DISPLAY -->
+    <div id="status-display">
+        AVATAR: <span id="current-avatar">MALE</span> | SYSTEM: READY
+    </div>
+
+    <!-- LOGIN BUTTON (TOP RIGHT) -->
+    <button id="login-btn">LOGIN</button>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal">
+        <div class="login-box">
+            <h2>NEXUS LOGIN</h2>
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+            </div>
+            <div class="btn-group">
+                <button id="login-submit-btn">LOGIN</button>
+                <button id="login-cancel-btn" class="cancel-btn">CANCEL</button>
+            </div>
+            <div id="login-error" class="login-error">Invalid credentials. Please try again.</div>
+            <div style="margin-top: 20px; text-align: center; font-size: 0.85rem;">
+                <a href="#" id="forgot-password-link"
+                    style="color: var(--neon-cyan); text-decoration: none; margin-right: 15px;">Forgot Password?</a>
+                <span style="color: #666;">|</span>
+                <a href="#" id="register-link"
+                    style="color: var(--neon-pink); text-decoration: none; margin-left: 15px;">Create Account</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgot-modal">
+        <div class="login-box">
+            <h2>RESET PASSWORD</h2>
+            <p style="font-size: 0.8rem; color: var(--neon-cyan); margin-bottom: 15px;">
+                Enter your username and security key
+            </p>
+            <div class="input-group">
+                <label for="forgot-username">Username</label>
+                <input type="text" id="forgot-username" placeholder="Your username" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label for="security-key">Security Key</label>
+                <input type="text" id="security-key" placeholder="Your security key" autocomplete="off">
+                <small style="color: #888; font-size: 0.75rem;">Security key was provided when you registered</small>
+            </div>
+            <div class="input-group">
+                <label for="new-password">New Password</label>
+                <input type="password" id="new-password" placeholder="Min 8 characters" autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <label for="confirm-new-password">Confirm New Password</label>
+                <input type="password" id="confirm-new-password" placeholder="Re-enter password"
+                    autocomplete="new-password">
+            </div>
+            <div class="btn-group">
+                <button id="reset-submit-btn">RESET PASSWORD</button>
+                <button id="reset-cancel-btn" class="cancel-btn">CANCEL</button>
+            </div>
+            <div id="reset-error" class="login-error"></div>
+        </div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div id="register-modal">
+        <div class="login-box">
+            <h2>CREATE NEW ACCOUNT</h2>
+            <p style="font-size: 0.8rem; color: var(--neon-cyan); margin-bottom: 15px;">
+                Your account works on BOTH avatars (Male & Female)
+            </p>
+            <div class="input-group">
+                <label for="reg-username">Username</label>
+                <input type="text" id="reg-username" placeholder="Choose username" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="reg-email">Email</label>
+                <input type="email" id="reg-email" placeholder="your@email.com" autocomplete="email">
+            </div>
+            <div class="input-group">
+                <label for="reg-password">Password</label>
+                <input type="password" id="reg-password" placeholder="Min 8 characters" autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <label for="reg-confirm">Confirm Password</label>
+                <input type="password" id="reg-confirm" placeholder="Re-enter password" autocomplete="new-password">
+            </div>
+            <div class="input-group">
+                <label for="reg-plan">Subscription Plan</label>
+                <select id="reg-plan"
+                    style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); border-radius: 4px; font-family: 'Rajdhani', sans-serif;">
+                    <option value="basic">1 Month - £10.00</option>
+                    <option value="premium">3 Months - £21.00 (Save 30%)</option>
+                    <option value="enterprise">1 Year - £36.00 (Save 70%)</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button id="register-submit-btn">CREATE ACCOUNT</button>
+                <button id="register-cancel-btn" class="cancel-btn">CANCEL</button>
+            </div>
+            <div id="register-error" class="login-error"></div>
+            <div style="font-size: 0.75rem; color: #888; margin-top: 10px; text-align: center;">
+                Note: This is a demo. In production, payment would be processed via PayPal.
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL BAR -->
+    <div id="control-bar">
+        <!-- GENDER SWITCH -->
+        <div class="gender-switch-container">
+            <div class="avatar-label">AVATAR ID</div>
+            <div class="bistable-switch">
+                <div id="switch-male" class="switch-option active">
+                    <span class="opt-text">M</span>
+                    <div class="opt-light"></div>
+                </div>
+                <div id="switch-female" class="switch-option">
+                    <span class="opt-text">F</span>
+                    <div class="opt-light"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INPUT -->
+        <div class="input-wrapper">
+            <input type="text" id="chatInput" placeholder="Enter command or chat..." autocomplete="off">
+        </div>
+
+        <!-- BUTTONS -->
+        <button id="sendBtn" class="action-btn">SEND</button>
+        <button id="micBtn" class="action-btn mic-btn">🎤</button>
+    </div>
+
+    <script>
+        // SIMPLIFIED GENDER SWITCH - GUARANTEED TO WORK
+        console.log('🚀 NEXUS Gender Switch Loading...');
+
+        let currentGender = 'male';
+
+        function switchAvatar(gender) {
+            console.log('═══════════════════════════════════');
+            console.log('🔄 SWITCHING AVATAR TO:', gender.toUpperCase());
+            console.log('═══════════════════════════════════');
+
+            currentGender = gender;
+            const body = document.body;
+            const btnM = document.getElementById('switch-male');
+            const btnF = document.getElementById('switch-female');
+            const statusText = document.getElementById('current-avatar');
+
+            // Remove all classes
+            body.classList.remove('avatar-male', 'avatar-female');
+            btnM.classList.remove('active');
+            btnF.classList.remove('active');
+
+            // AUTO-LOGOUT when changing avatar
+            const currentUser = localStorage.getItem('nexus_current_user');
+            const currentGenderStored = localStorage.getItem('nexus_avatar_gender');
+
+            if (currentUser && currentGenderStored && currentGenderStored !== gender) {
+                console.log('🔄 Avatar changed - Auto logout triggered');
+                if (window.logout) window.logout();
+            }
+
+            if (gender === 'male') {
+                body.classList.add('avatar-male');
+                btnM.classList.add('active');
+                statusText.textContent = 'MALE';
+                statusText.style.color = '#00f3ff';
+                console.log('✅ MALE avatar activated');
+                console.log('📸 Background:', window.getComputedStyle(body).backgroundImage);
+            } else {
+                body.classList.add('avatar-female');
+                btnF.classList.add('active');
+                statusText.textContent = 'FEMALE';
+                statusText.style.color = '#ff00ff';
+                console.log('✅ FEMALE avatar activated');
+                console.log('📸 Background:', window.getComputedStyle(body).backgroundImage);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('nexus_avatar_gender', gender);
+            console.log('💾 Saved to localStorage:', gender);
+
+            // FORCE UPDATE STATUS DISPLAY
+            if (typeof updateStatusDisplay === 'function') {
+                // Mic delay pentru a asigura propagarea localStorage
+                setTimeout(() => {
+                    const currentUser = localStorage.getItem('nexus_current_user');
+                    // Dacă e logat, luăm datele
+                    let sub = '';
+                    if (currentUser && typeof USERS_DB !== 'undefined' && USERS_DB[currentUser]) {
+                        sub = USERS_DB[currentUser].subscription;
+                    }
+                    updateStatusDisplay(!!currentUser, currentUser, sub);
+                }, 50);
+            }
+
+            console.log('═══════════════════════════════════\n');
+        }
+
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('✅ DOM Ready - Initializing gender switch...\n');
+
+            // Get buttons
+            const btnM = document.getElementById('switch-male');
+            const btnF = document.getElementById('switch-female');
+
+            if (!btnM || !btnF) {
+                console.error('❌ BUTTONS NOT FOUND!');
+                return;
+            }
+
+            // Add click listeners
+            btnM.addEventListener('click', function () {
+                console.log('🖱️ MALE BUTTON CLICKED');
+                switchAvatar('male');
+            });
+
+            btnF.addEventListener('click', function () {
+                console.log('🖱️ FEMALE BUTTON CLICKED');
+                switchAvatar('female');
+            });
+
+            console.log('✅ Click listeners attached');
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function (e) {
+                const input = document.getElementById('chatInput');
+                if (document.activeElement === input) return;
+
+                if (e.key.toLowerCase() === 'm') {
+                    console.log('⌨️ KEY "M" PRESSED');
+                    switchAvatar('male');
+                }
+                if (e.key.toLowerCase() === 'f') {
+                    console.log('⌨️ KEY "F" PRESSED');
+                    switchAvatar('female');
+                }
+            });
+
+            console.log('✅ Keyboard listeners attached');
+
+            // Load saved preference
+            const saved = localStorage.getItem('nexus_avatar_gender') || 'male';
+            console.log('💾 Loading saved preference:', saved);
+            switchAvatar(saved);
+
+            console.log('\n🎉 GENDER SWITCH SYSTEM READY!\n');
+            console.log('Try clicking M or F buttons, or press m/f keys\n');
+
+            // Initialize background particles animation
+            initBackgroundParticles();
+        });
+
+        // SIMPLE FLOATING PARTICLES (BEHIND AVATAR)
+        function initBackgroundParticles() {
+            const canvas = document.getElementById('bg-equipment-canvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const particleCount = 40;
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 3 + 1;
+                    this.speedX = (Math.random() - 0.5) * 0.8;
+                    this.speedY = (Math.random() - 0.5) * 0.8;
+                    this.opacity = Math.random() * 0.6 + 0.2;
+                }
+
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+
+                    // Wrap around screen
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                    if (this.y > canvas.height) this.y = 0;
+                }
+
+                draw() {
+                    const isMale = document.body.classList.contains('avatar-male');
+                    const color = isMale ? '0, 243, 255' : '255, 0, 255';
+
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${color}, ${this.opacity})`;
+                    ctx.fill();
+
+                    // Glow effect
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = `rgba(${color}, ${this.opacity * 0.8})`;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+
+            // Create particles
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            // Animation loop
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            // Resize handler
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+
+            console.log('✨ Background particles initialized');
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // USER DATABASE WITH SUBSCRIPTIONS & STRICT ISOLATION
+        // ═══════════════════════════════════════════════════════════
+
+        const SUBSCRIPTION_TYPES = {
+            DEMO: 'demo',
+            BASIC: 'basic',
+            PREMIUM: 'premium',
+            ENTERPRISE: 'enterprise'
+        };
+
+        const USERS_DB = {
+            'admin': {
+                password: 'Andrada_1968!',
+                role: 'admin',
+                subscription: SUBSCRIPTION_TYPES.ENTERPRISE,
+                subscriptionDetails: {
+                    startDate: null,  // Admin doesn't expire
+                    endDate: null,
+                    status: 'active',
+                    notifiedAt3Days: false
+                },
+                permissions: ['view', 'chat', 'voice', 'admin', 'manage_users'],
+                chatHistory: [],
+                settings: { language: 'ro', voiceEnabled: true },
+                stats: { totalLogins: 0, totalMessages: 0 }
+            },
+
+            'demo': {
+                password: 'demo',
+                role: 'demo',
+                subscription: SUBSCRIPTION_TYPES.DEMO,
+                subscriptionDetails: {
+                    startDate: null,
+                    endDate: null,
+                    status: 'active',
+                    notifiedAt3Days: false
+                },
+                // ACCES COMPLET pentru 10 minute
+                permissions: ['view', 'chat', 'voice', 'advanced_features'],
+                chatHistory: [],
+                settings: { language: 'ro', voiceEnabled: true },
+                stats: { totalLogins: 0, totalMessages: 0 }
+            },
+
+            'test': {
+                password: 'test123',
+                role: 'user',
+                subscription: SUBSCRIPTION_TYPES.BASIC,
+                subscriptionDetails: {
+                    startDate: null,
+                    endDate: null,
+                    status: 'active',
+                    notifiedAt3Days: false
+                },
+                permissions: ['view', 'chat'],
+                chatHistory: [],
+                settings: { language: 'en', voiceEnabled: false },
+                stats: { totalLogins: 0, totalMessages: 0 }
+            },
+
+            'user_basic': {
+                password: 'basic123',
+                role: 'user',
+                subscription: SUBSCRIPTION_TYPES.BASIC,
+                subscriptionDetails: {
+                    startDate: '2024-12-21T10:00:00Z',
+                    endDate: '2025-01-21T10:00:00Z',  // 1 month from start
+                    status: 'active',
+                    notifiedAt3Days: false
+                },
+                permissions: ['view', 'chat'],
+                chatHistory: [],
+                settings: { language: 'ro', voiceEnabled: false },
+                stats: { totalLogins: 0, totalMessages: 0 }
+            },
+
+            'user_premium': {
+                password: 'premium123',
+                role: 'user',
+                subscription: SUBSCRIPTION_TYPES.PREMIUM,
+                subscriptionDetails: {
+                    startDate: '2024-12-21T10:00:00Z',
+                    endDate: '2025-03-21T10:00:00Z',  // 3 months from start
+                    status: 'active',
+                    notifiedAt3Days: false
+                },
+                permissions: ['view', 'chat', 'voice'],
+                chatHistory: [],
+                settings: { language: 'ro', voiceEnabled: true },
+                stats: { totalLogins: 0, totalMessages: 0 }
+            },
+
+            'user_enterprise': {
+                password: 'enterprise123',
+                role: 'user',
+                subscription: SUBSCRIPTION_TYPES.ENTERPRISE,
+                subscriptionDetails: {
+                    startDate: '2024-12-21T10:00:00Z',
+                    endDate: '2025-12-21T10:00:00Z',  // 1 year from start
+                    status: 'active',
+                    notifiedAt3Days: false
+                },
+                permissions: ['view', 'chat', 'voice', 'advanced_features'],
+                chatHistory: [],
+                settings: { language: 'ro', voiceEnabled: true },
+                stats: { totalLogins: 0, totalMessages: 0 }
+            },
+
+            'test': {
+                password: 'test123',
+                email: 'test@example.com',
+                role: 'user',
+                subscription: 'basic',  // 1 month plan
+                subscriptionDetails: {
+                    startDate: new Date().toISOString(),  // Starts now
+                    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),  // +30 days
+                    status: 'active',
+                    notifiedAt3Days: false,
+                    planName: '1 Month Plan',
+                    pricePerMonth: 10.00,
+                    totalPrice: 10.00,
+                    currency: 'GBP'
+                },
+                permissions: ['view', 'chat'],
+                chatHistory: [],
+                settings: { language: 'en', voiceEnabled: false },
+                stats: { totalLogins: 0, totalMessages: 0 }
+            }
+        };
+
+        // Login function with subscription support
+        function login(username, password) {
+            const user = USERS_DB[username];
+
+            if (!user) {
+                console.log(`❌ User "${username}" not found`);
+                return false;
+            }
+
+            // Validate password
+            if (user.password !== password) {
+                console.log(`❌ Invalid password for user "${username}"`);
+                return false;
+            }
+
+            // Check subscription status BEFORE allowing login
+            const subscriptionStatus = checkSubscriptionStatus(username);
+            if (subscriptionStatus === 'expired') {
+                alert('Your subscription has expired. Please renew to login.');
+                console.log(`🔒 Login blocked for ${username} - subscription expired`);
+                return false;
+            }
+
+            const currentGender = localStorage.getItem('nexus_avatar_gender') || 'male';
+
+            // Update user stats
+            user.stats.totalLogins++;
+
+            // Save user session with full details
+            localStorage.setItem('nexus_current_user', username);
+            localStorage.setItem('nexus_user_role', user.role);
+            localStorage.setItem('nexus_user_subscription', user.subscription);
+            localStorage.setItem('nexus_user_permissions', JSON.stringify(user.permissions));
+            localStorage.setItem('nexus_login_gender', currentGender);
+            localStorage.setItem('nexus_login_time', new Date().toISOString());
+
+            // Update UI
+            updateLoginButton(true, username, user.subscription);
+            updateStatusDisplay(true, username, user.subscription);
+            closeLoginModal();
+
+            console.log(`✅ User "${username}" logged in successfully`);
+            console.log(`   Role: ${user.role}`);
+            console.log(`   Subscription: ${user.subscription}`);
+            console.log(`   Permissions: ${user.permissions.join(', ')}`);
+            console.log(`   Avatar: ${currentGender}`);
+            console.log(`   Total logins: ${user.stats.totalLogins}`);
+
+            // Auto-logout for DEMO user after 10 minutes
+            if (username === 'demo') {
+                console.log('⏱️  Demo user: Auto-logout in 10 minutes');
+                setTimeout(() => {
+                    const currentUser = localStorage.getItem('nexus_current_user');
+                    if (currentUser === 'demo') {
+                        console.log('⏰ 10 minutes elapsed - Auto-logout demo user');
+                        alert('Demo session expired (10 minutes). Please login again.');
+                        window.logout();
+                    }
+                }, 10 * 60 * 1000); // 10 minutes in milliseconds
+            }
+
+            return true;
+        }
+
+        // Logout function
+        window.logout = function () {
+            const username = localStorage.getItem('nexus_current_user');
+
+            // Clear user session
+            localStorage.removeItem('nexus_current_user');
+            localStorage.removeItem('nexus_user_role');
+            localStorage.removeItem('nexus_user_subscription');
+            localStorage.removeItem('nexus_user_permissions');
+            localStorage.removeItem('nexus_login_gender');
+            localStorage.removeItem('nexus_login_time');
+
+            // Update UI
+            updateLoginButton(false);
+            updateStatusDisplay(false);
+
+            // Show login modal for new login
+            openLoginModal();
+
+            console.log(`🔓 User "${username}" logged out`);
+        }
+
+        // Update login button
+        function updateLoginButton(isLoggedIn, username = '', subscription = '') {
+            const loginBtn = document.getElementById('login-btn');
+            if (!loginBtn) return;
+
+            if (isLoggedIn) {
+                loginBtn.textContent = `LOGOUT (${username.toUpperCase()})`;
+                loginBtn.classList.add('logged-in');
+            } else {
+                loginBtn.textContent = 'LOGIN';
+                loginBtn.classList.remove('logged-in');
+            }
+        }
+
+        // Update status display (shrink after login)
+        function updateStatusDisplay(isLoggedIn, username = '', subscription = '') {
+            const statusDisplay = document.getElementById('status-display');
+            const currentAvatar = document.getElementById('current-avatar');
+
+            if (!statusDisplay) return;
+
+            if (isLoggedIn) {
+                // Shrink and show user info
+                statusDisplay.style.fontSize = '0.75rem';
+                statusDisplay.style.padding = '6px 12px';
+                const avatarText = currentAvatar ? currentAvatar.textContent : 'UNKNOWN';
+                const subBadge = subscription.toUpperCase();
+                statusDisplay.innerHTML = `${username.toUpperCase()} [${subBadge}] | ${avatarText}`;
+            } else {
+                // Reset to normal size
+                statusDisplay.style.fontSize = '0.9rem';
+                statusDisplay.style.padding = '10px 20px';
+                const avatarText = currentAvatar ? currentAvatar.textContent : 'MALE';
+                statusDisplay.innerHTML = `AVATAR: <span id="current-avatar">${avatarText}</span> | SYSTEM: READY`;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // SUBSCRIPTION EXPIRY MANAGEMENT
+        // ═══════════════════════════════════════════════════════════
+
+        // Check subscription status and handle expiry
+        function checkSubscriptionStatus(username) {
+            const user = USERS_DB[username];
+            if (!user || !user.subscriptionDetails) return 'active';
+
+            const details = user.subscriptionDetails;
+
+            // Admin and demo don't expire
+            if (user.role === 'admin' || user.role === 'demo') {
+                return 'active';
+            }
+
+            // No end date means active
+            if (!details.endDate) return 'active';
+
+            const now = new Date();
+            const endDate = new Date(details.endDate);
+            const daysUntilExpiry = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+
+            // EXPIRED
+            if (now >= endDate) {
+                if (details.status !== 'expired') {
+                    console.log(`⏰ Subscription EXPIRED for ${username}`);
+                    handleSubscriptionExpiry(username);
+                }
+                return 'expired';
+            }
+
+            // EXPIRING SOON (3 days or less)
+            if (daysUntilExpiry <= 3 && !details.notifiedAt3Days) {
+                console.log(`⚠️  Subscription expiring in ${daysUntilExpiry} days for ${username}`);
+                details.status = 'expiring_soon';
+                details.notifiedAt3Days = true;
+                showExpiryNotification(username, daysUntilExpiry);
+                return 'expiring_soon';
+            }
+
+            // ACTIVE
+            return 'active';
+        }
+
+        // Show expiry notification (3 days before)
+        function showExpiryNotification(username, daysLeft) {
+            const user = USERS_DB[username];
+            const endDate = new Date(user.subscriptionDetails.endDate);
+            const formattedDate = endDate.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const message = `Dear ${username},\n\nYour subscription will expire in ${daysLeft} day${daysLeft > 1 ? 's' : ''}.\n\nExpiry Date: ${formattedDate}\n\nTo continue enjoying uninterrupted access to all features, please renew your subscription before it expires.\n\nThank you for being a valued member!`;
+
+            alert(message);
+            console.log(`📧 Expiry notification sent to ${username}`);
+        }
+
+        // Handle subscription expiry
+        function handleSubscriptionExpiry(username) {
+            const user = USERS_DB[username];
+
+            // Update status
+            user.subscriptionDetails.status = 'expired';
+
+            // Downgrade permissions to view-only
+            user.permissions = ['view'];
+
+            console.log(`🔒 Subscription expired for ${username} - downgraded to view-only`);
+
+            // If user is currently logged in, log them out
+            const currentUser = localStorage.getItem('nexus_current_user');
+            if (currentUser === username) {
+                const message = `Your subscription has expired.\n\nYou have been logged out automatically.\n\nTo continue using our service, please renew your subscription.\n\nThank you for your understanding!`;
+
+                alert(message);
+                window.logout();
+            }
+        }
+
+        // Periodic subscription check (every hour)
+        setInterval(() => {
+            const currentUser = localStorage.getItem('nexus_current_user');
+            if (currentUser && currentUser !== 'demo' && currentUser !== 'admin') {
+                checkSubscriptionStatus(currentUser);
+            }
+        }, 60 * 60 * 1000); // 1 hour
+
+        // ═══════════════════════════════════════════════════════════
+        // USER REGISTRATION SYSTEM
+        // ═══════════════════════════════════════════════════════════
+
+        // Generate random security key
+        function generateSecurityKey() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';  // No confusing chars
+            let key = '';
+            for (let i = 0; i < 16; i++) {
+                if (i > 0 && i % 4 === 0) key += '-';
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return key;  // Format: XXXX-XXXX-XXXX-XXXX
+        }
+
+        // Reset password with security key
+        function resetPassword(username, securityKey, newPassword) {
+            const user = USERS_DB[username];
+
+            if (!user) {
+                return { success: false, error: 'Username not found' };
+            }
+
+            if (user.securityKey !== securityKey) {
+                return { success: false, error: 'Invalid security key' };
+            }
+
+            // Update password
+            user.password = newPassword;  // In production: hash this!
+
+            console.log(`✅ Password reset for user "${username}"`);
+            return { success: true };
+        }
+
+        // Register new user
+        function registerUser(username, email, password, plan) {
+            // Validate username uniqueness
+            if (USERS_DB[username]) {
+                return { success: false, error: 'Username already exists' };
+            }
+
+            // Validate email uniqueness
+            for (let user in USERS_DB) {
+                if (USERS_DB[user].email === email) {
+                    return { success: false, error: 'Email already registered' };
+                }
+            }
+
+            // Calculate subscription dates based on plan
+            const now = new Date();
+            let endDate;
+            let planName;
+            let pricePerMonth;
+            let totalPrice;
+
+            switch (plan) {
+                case 'basic':
+                    endDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // +30 days
+                    planName = '1 Month Plan';
+                    pricePerMonth = 10.00;
+                    totalPrice = 10.00;
+                    break;
+                case 'premium':
+                    endDate = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000); // +90 days
+                    planName = '3 Months Plan';
+                    pricePerMonth = 7.00;
+                    totalPrice = 21.00;
+                    break;
+                case 'enterprise':
+                    endDate = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000); // +365 days
+                    planName = '1 Year Plan';
+                    pricePerMonth = 3.00;
+                    totalPrice = 36.00;
+                    break;
+                default:
+                    return { success: false, error: 'Invalid plan selected' };
+            }
+
+            // Create new user in UNIFIED database
+            USERS_DB[username] = {
+                password: password,  // In production: hash this!
+                email: email,
+                role: 'user',
+                subscription: plan,
+                subscriptionDetails: {
+                    startDate: now.toISOString(),
+                    endDate: endDate.toISOString(),
+                    status: 'active',
+                    notifiedAt3Days: false,
+                    planName: planName,
+                    pricePerMonth: pricePerMonth,
+                    totalPrice: totalPrice,
+                    currency: 'GBP'
+                },
+                permissions: plan === 'basic' ? ['view', 'chat'] :
+                    plan === 'premium' ? ['view', 'chat', 'voice'] :
+                        ['view', 'chat', 'voice', 'advanced_features'],
+                chatHistory: [],
+                settings: { language: 'en', voiceEnabled: plan !== 'basic' },
+                stats: { totalLogins: 0, totalMessages: 0 },
+                // Security key for password recovery
+                securityKey: generateSecurityKey()
+            };
+
+            const securityKey = USERS_DB[username].securityKey;
+
+            console.log(`✅ New user "${username}" registered successfully`);
+            console.log(`   Email: ${email}`);
+            console.log(`   Plan: ${planName}`);
+            console.log(`   Total: £${totalPrice}`);
+            console.log(`   Expires: ${endDate.toLocaleDateString()}`);
+            console.log(`   Security Key: ${securityKey}`);
+            console.log(`   ⚠️  Account works on BOTH avatars (M/F)`);
+
+            return { success: true, username: username, securityKey: securityKey };
+        }
+
+        // Open register modal
+        function openRegisterModal() {
+            const modal = document.getElementById('register-modal');
+            const errorDiv = document.getElementById('register-error');
+
+            // Clear all fields
+            document.getElementById('reg-username').value = '';
+            document.getElementById('reg-email').value = '';
+            document.getElementById('reg-password').value = '';
+            document.getElementById('reg-confirm').value = '';
+            document.getElementById('reg-plan').value = 'basic';
+
+            if (errorDiv) errorDiv.classList.remove('active');
+            if (modal) modal.classList.add('active');
+        }
+
+        // Close register modal
+        function closeRegisterModal() {
+            const modal = document.getElementById('register-modal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        // Open forgot password modal
+        function openForgotModal() {
+            closeLoginModal();
+            const modal = document.getElementById('forgot-modal');
+            const errorDiv = document.getElementById('reset-error');
+
+            // Clear all fields
+            document.getElementById('forgot-username').value = '';
+            document.getElementById('security-key').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-new-password').value = '';
+
+            if (errorDiv) errorDiv.classList.remove('active');
+            if (modal) modal.classList.add('active');
+        }
+
+        // Close forgot password modal
+        function closeForgotModal() {
+            const modal = document.getElementById('forgot-modal');
+            if (modal) modal.classList.remove('active');
+        }
+
+
+        // Open login modal
+        function openLoginModal() {
+            const modal = document.getElementById('login-modal');
+            const errorDiv = document.getElementById('login-error');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            if (modal) {
+                modal.classList.add('active');
+                if (errorDiv) errorDiv.classList.remove('active');
+                if (usernameInput) usernameInput.value = '';
+                if (passwordInput) passwordInput.value = '';
+                if (usernameInput) usernameInput.focus();
+            }
+        }
+
+        // Close login modal
+        function closeLoginModal() {
+            const modal = document.getElementById('login-modal');
+            const errorDiv = document.getElementById('login-error');
+
+            if (modal) modal.classList.remove('active');
+            if (errorDiv) errorDiv.classList.remove('active');
+        }
+
+        // Initialize login system
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginBtn = document.getElementById('login-btn');
+            const loginSubmitBtn = document.getElementById('login-submit-btn');
+            const loginCancelBtn = document.getElementById('login-cancel-btn');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorDiv = document.getElementById('login-error');
+
+            // Check if user is already logged in
+            const currentUser = localStorage.getItem('nexus_current_user');
+            if (currentUser) {
+                updateLoginButton(true, currentUser);
+            }
+
+            // Login button click
+            if (loginBtn) {
+                loginBtn.addEventListener('click', () => {
+                    const isLoggedIn = localStorage.getItem('nexus_current_user');
+                    if (isLoggedIn) {
+                        logout();
+                    } else {
+                        openLoginModal();
+                    }
+                });
+            }
+
+            // Submit login
+            if (loginSubmitBtn) {
+                loginSubmitBtn.addEventListener('click', () => {
+                    const username = usernameInput.value.trim();
+                    const password = passwordInput.value;
+
+                    if (!username || !password) {
+                        if (errorDiv) {
+                            errorDiv.textContent = 'Please enter both username and password.';
+                            errorDiv.classList.add('active');
+                        }
+                        return;
+                    }
+
+                    if (login(username, password)) {
+                        // Success
+                        console.log('Login successful');
+                    } else {
+                        // Failed
+                        if (errorDiv) {
+                            errorDiv.textContent = 'Invalid credentials. Please try again.';
+                            errorDiv.classList.add('active');
+                        }
+                        if (passwordInput) passwordInput.value = '';
+                        if (passwordInput) passwordInput.focus();
+                    }
+                });
+            }
+
+            // Cancel login
+            if (loginCancelBtn) {
+                loginCancelBtn.addEventListener('click', closeLoginModal);
+            }
+
+            // Enter key to submit
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        loginSubmitBtn.click();
+                    }
+                });
+            }
+
+            if (usernameInput) {
+                usernameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        passwordInput.focus();
+                    }
+                });
+            }
+
+            // ═══════════════════════════════════════════════════════════
+            // REGISTER & FORGOT PASSWORD LINKS
+            // ═══════════════════════════════════════════════════════════
+
+            const registerLink = document.getElementById('register-link');
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            const registerSubmitBtn = document.getElementById('register-submit-btn');
+            const registerCancelBtn = document.getElementById('register-cancel-btn');
+            const regUsernameInput = document.getElementById('reg-username');
+            const regEmailInput = document.getElementById('reg-email');
+            const regPasswordInput = document.getElementById('reg-password');
+            const regConfirmInput = document.getElementById('reg-confirm');
+            const regPlanSelect = document.getElementById('reg-plan');
+            const registerErrorDiv = document.getElementById('register-error');
+
+            // Open register modal from link
+            if (registerLink) {
+                registerLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    closeLoginModal();
+                    openRegisterModal();
+                });
+            }
+
+            // Open forgot password modal from link
+            if (forgotPasswordLink) {
+                forgotPasswordLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openForgotModal();
+                });
+            }
+
+            // Submit registration
+            if (registerSubmitBtn) {
+                registerSubmitBtn.addEventListener('click', () => {
+                    const username = regUsernameInput.value.trim();
+                    const email = regEmailInput.value.trim();
+                    const password = regPasswordInput.value;
+                    const confirm = regConfirmInput.value;
+                    const plan = regPlanSelect.value;
+
+                    // Validation
+                    if (!username || !email || !password || !confirm) {
+                        registerErrorDiv.textContent = 'Please fill in all fields.';
+                        registerErrorDiv.classList.add('active');
+                        return;
+                    }
+
+                    if (username.length < 3) {
+                        registerErrorDiv.textContent = 'Username must be at least 3 characters.';
+                        registerErrorDiv.classList.add('active');
+                        return;
+                    }
+
+                    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                        registerErrorDiv.textContent = 'Username can only contain letters, numbers, and underscores.';
+                        registerErrorDiv.classList.add('active');
+                        return;
+                    }
+
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                        registerErrorDiv.textContent = 'Please enter a valid email address.';
+                        registerErrorDiv.classList.add('active');
+                        return;
+                    }
+
+                    if (password.length < 8) {
+                        registerErrorDiv.textContent = 'Password must be at least 8 characters.';
+                        registerErrorDiv.classList.add('active');
+                        return;
+                    }
+
+                    if (password !== confirm) {
+                        registerErrorDiv.textContent = 'Passwords do not match.';
+                        registerErrorDiv.classList.add('active');
+                        return;
+                    }
+
+                    // Register user
+                    const result = registerUser(username, email, password, plan);
+
+                    if (result.success) {
+                        alert(`Account created successfully!\n\nUsername: ${username}\n\nYou can now login.\n\nNote: Your account works on BOTH avatars (Male & Female).`);
+                        closeRegisterModal();
+                        openLoginModal();
+                    } else {
+                        registerErrorDiv.textContent = result.error;
+                        registerErrorDiv.classList.add('active');
+                    }
+                });
+            }
+
+            // Cancel registration
+            if (registerCancelBtn) {
+                registerCancelBtn.addEventListener('click', closeRegisterModal);
+            }
+
+            console.log('🔐 Login system initialized');
+            console.log('📝 Registration system initialized');
+        });
+
+
+        // ═══════════════════════════════════════════════════════════
+        // LOGIN/LOGOUT SYSTEM
+        // ═══════════════════════════════════════════════════════════
+
+
+        // ═══════════════════════════════════════════════════════════
+        // LOGIN/LOGOUT SYSTEM
+        // ═══════════════════════════════════════════════════════════
+
+        function login(username, password) {
+            const user = USERS_DB[username];
+
+            if (!user) {
+                console.log('❌ User not found:', username);
+                return false;
+            }
+
+            if (user.password !== password) {
+                console.log('❌ Invalid password');
+                return false;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('nexus_current_user', username);
+            localStorage.setItem('nexus_login_time', new Date().toISOString());
+
+            console.log('✅ Login successful:', username);
+
+            // Update status display
+            updateStatusDisplay(true, username, user.subscription);
+
+            // Start demo countdown if demo user
+            if (user.role === 'demo') {
+                startDemoCountdown();
+            }
+
+            return true;
+        }
+
+        function logout() {
+            const username = localStorage.getItem('nexus_current_user');
+            console.log('👋 Logout:', username);
+
+            localStorage.removeItem('nexus_current_user');
+            localStorage.removeItem('nexus_login_time');
+
+            // Update status display
+            updateStatusDisplay(false);
+
+            // Clear demo countdown
+            if (window.demoCountdownInterval) {
+                clearInterval(window.demoCountdownInterval);
+            }
+        }
+
+        // Make logout available globally
+        window.logout = logout;
+
+        // ═══════════════════════════════════════════════════════════
+        // STATUS DISPLAY SYSTEM
+        // ═══════════════════════════════════════════════════════════
+
+        function updateStatusDisplay(isLoggedIn = false, username = '', subscription = '') {
+            const statusDisplay = document.getElementById('status-display');
+            if (!statusDisplay) return;
+
+            const gender = localStorage.getItem('nexus_avatar_gender') || 'male';
+
+            // 1. CONFIGURARE NUME ȘI CULOARE (NEXUS vs NEMESIS)
+            let systemName = 'NEXUS';
+            let nameColor = '#00f3ff'; // Albastru (Cyan)
+
+            if (String(gender).toLowerCase() === 'female') {
+                systemName = 'NEMESIS';
+                nameColor = '#ff00ff'; // Roz (Magenta)
+            }
+
+            // 2. CONFIGURARE STATUS (OFF vs READY)
+            let statusHtml = '';
+            let borderColor = '';
+
+            if (!isLoggedIn) {
+                // STATUS: OFF (Roșu)
+                borderColor = '#ff0000';
+                statusHtml = `<span style="color: ${nameColor}; font-weight: bold; font-size: 1.1em; text-shadow: 0 0 5px ${nameColor};">${systemName}</span> | SYSTEM: <span style="color: #ff0000; font-weight: bold; text-shadow: 0 0 5px #ff0000;">OFF</span>`;
+            } else {
+                // STATUS: READY (Verde)
+                borderColor = '#00ff00';
+
+                // Gestionare text demo (pentru countdown)
+                let statusText = 'READY';
+                let statusId = '';
+
+                const user = USERS_DB[username];
+                if (user && user.role === 'demo') {
+                    statusId = 'id="demo-status"'; // Păstrăm ID pentru countdown
+                    statusText = 'READY (10:00 left)';
+                }
+
+                statusHtml = `<span style="color: ${nameColor}; font-weight: bold; font-size: 1.1em; text-shadow: 0 0 5px ${nameColor};">${systemName}</span> | SYSTEM: <span ${statusId} style="color: #00ff00; font-weight: bold; text-shadow: 0 0 5px #00ff00;">${statusText}</span>`;
+            }
+
+            // 3. APLICARE
+            statusDisplay.innerHTML = statusHtml;
+            statusDisplay.style.borderColor = borderColor;
+            statusDisplay.style.background = 'rgba(0, 0, 0, 0.8)'; // Background închis standard
+            statusDisplay.style.boxShadow = `0 0 10px ${borderColor}`;
+            statusDisplay.style.color = borderColor; // Text general
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // DEMO COUNTDOWN SYSTEM
+        // ═══════════════════════════════════════════════════════════
+
+        function startDemoCountdown() {
+            const loginTime = new Date(localStorage.getItem('nexus_login_time'));
+            const endTime = new Date(loginTime.getTime() + 10 * 60 * 1000); // +10 min
+
+            // Clear previous interval
+            if (window.demoCountdownInterval) {
+                clearInterval(window.demoCountdownInterval);
+            }
+
+            window.demoCountdownInterval = setInterval(() => {
+                const now = new Date();
+                const timeLeft = endTime - now;
+
+                if (timeLeft <= 0) {
+                    clearInterval(window.demoCountdownInterval);
+                    alert('Demo session expired (10 minutes).\n\nYou have been logged out.\n\nTo continue, please register for a paid plan.');
+                    logout();
+                    return;
+                }
+
+                const minutes = Math.floor(timeLeft / 60000);
+                const seconds = Math.floor((timeLeft % 60000) / 1000);
+                const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                const demoStatus = document.getElementById('demo-status');
+                if (demoStatus) {
+                    demoStatus.textContent = `READY (${timeString} left)`;
+                }
+            }, 1000); // Update every second
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // AUTO-LOGOUT ON AVATAR SWITCH
+        // ═══════════════════════════════════════════════════════════
+
+        // Modifică funcția switchAvatar existentă pentru a include auto-logout
+        const originalSwitchAvatar = window.switchAvatar || switchAvatar;
+
+        window.switchAvatar = function (gender) {
+            const currentUser = localStorage.getItem('nexus_current_user');
+            const currentGender = localStorage.getItem('nexus_avatar_gender');
+
+            // Dacă e logat și schimbă avatar-ul
+            if (currentUser && gender !== currentGender) {
+                console.log('⚠️  Avatar changed - Auto-logout');
+                logout();
+            }
+
+            // Call original function
+            if (typeof originalSwitchAvatar === 'function') {
+                originalSwitchAvatar(gender);
+            }
+
+            // Update status display after switch
+            const user = localStorage.getItem('nexus_current_user');
+            if (user) {
+                const userData = USERS_DB[user];
+                if (userData) {
+                    updateStatusDisplay(true, user, userData.subscription);
+                }
+            } else {
+                updateStatusDisplay(false);
+            }
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        // SIMPLE LOGIN UI (pentru testare rapidă)
+        // ═══════════════════════════════════════════════════════════
+
+        // Adaugă un buton LOGIN simplu în colțul din dreapta sus
+        document.addEventListener('DOMContentLoaded', function () {
+            // Create status display if not exists - CRITICAL FIX
+            if (!document.getElementById('status-display')) {
+                console.log('🔧 Creating missing status-display element...');
+                const statusDiv = document.createElement('div');
+                statusDiv.id = 'status-display';
+                statusDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(0, 0, 0, 0.8);
+                    border: 1px solid #00f3ff;
+                    padding: 10px 20px;
+                    border-radius: 8px;
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 0.9rem;
+                    z-index: 1000;
+                    text-align: center;
+                    color: #00f3ff;
+                    min-width: 300px;
+                    box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+                `;
+                document.body.appendChild(statusDiv);
+            }
+
+            // Verifică dacă există deja un buton login
+            if (document.getElementById('quick-login-btn')) return;
+
+            // Creează buton
+            const loginBtn = document.createElement('button');
+            loginBtn.id = 'quick-login-btn';
+            loginBtn.textContent = 'LOGIN';
+            loginBtn.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: transparent;
+                border: 1px solid #00f3ff;
+                color: #00f3ff;
+                padding: 10px 25px;
+                font-family: 'Orbitron', sans-serif;
+                font-size: 0.9rem;
+                cursor: pointer;
+                border-radius: 6px;
+                z-index: 10000;
+                transition: all 0.3s;
+            `;
+
+            loginBtn.addEventListener('mouseenter', function () {
+                this.style.background = '#00f3ff';
+                this.style.color = '#000';
+                this.style.boxShadow = '0 0 15px #00f3ff';
+            });
+
+            loginBtn.addEventListener('mouseleave', function () {
+                this.style.background = 'transparent';
+                this.style.color = '#00f3ff';
+                this.style.boxShadow = 'none';
+            });
+
+            loginBtn.addEventListener('click', function () {
+                const currentUser = localStorage.getItem('nexus_current_user');
+
+                if (currentUser) {
+                    // Logout
+                    if (confirm('Logout from ' + currentUser + '?')) {
+                        logout();
+                        this.textContent = 'LOGIN';
+                    }
+                } else {
+                    // Login prompt
+                    const username = prompt('Username:\n\nadmin / Andrada_1968!\ndemo / demo\ntest / test123');
+                    if (!username) return;
+
+                    const password = prompt('Password for ' + username + ':');
+                    if (!password) return;
+
+                    if (login(username, password)) {
+                        alert('✅ Login successful!\n\nWelcome, ' + username + '!');
+                        this.textContent = 'LOGOUT';
+                    } else {
+                        alert('❌ Login failed!\n\nInvalid username or password.');
+                    }
+                }
+            });
+
+            document.body.appendChild(loginBtn);
+
+            // Check if already logged in
+            const currentUser = localStorage.getItem('nexus_current_user');
+            if (currentUser) {
+                loginBtn.textContent = 'LOGOUT';
+                const user = USERS_DB[currentUser];
+                if (user) {
+                    updateStatusDisplay(true, currentUser, user.subscription);
+                    if (user.role === 'demo') {
+                        startDemoCountdown();
+                    }
+                }
+            } else {
+                updateStatusDisplay(false);
+            }
+
+            console.log('✅ Login system initialized');
+        });
+        /*
+        const statusDisplay = document.getElementById('status-display');
+        if (!statusDisplay) return;
+
+        const gender = localStorage.getItem('nexus_avatar_gender') || 'male';
+        const isLoggedIn = !!localStorage.getItem('nexus_current_user');
+
+        let systemName = 'NEXUS';
+        let nameColor = '#00f3ff'; // Cyan
+
+        if (String(gender).toLowerCase() === 'female') {
+            systemName = 'NEMESIS';
+            nameColor = '#ff00ff'; // Magenta
+        }
+
+        let statusHtml = '';
+        let borderColor = '';
+
+        if (!isLoggedIn) {
+            // OFF
+            borderColor = '#ff0000';
+            statusHtml = `<span style="color: ${nameColor}; font-weight: bold; font-size: 1.1em; text-shadow: 0 0 5px ${nameColor};">${systemName}</span> | SYSTEM: <span style="color: #ff0000; font-weight: bold; text-shadow: 0 0 5px #ff0000;">OFF</span>`;
+        } else {
+            // READY
+            borderColor = '#00ff00';
+            let statusText = 'READY';
+            let statusId = '';
+
+            const username = localStorage.getItem('nexus_current_user');
+            if (typeof USERS_DB !== 'undefined' && USERS_DB[username] && USERS_DB[username].role === 'demo') {
+                // Dacă există deja un countdown, nu-l suprascrie textul generic, 
+                // dar asigură-te că structura e corectă. 
+                // Nota: Demo counter-ul actualizează textul lui #demo-status separat.
+                statusId = 'id="demo-status"';
+                // Nu suprascriem textul dacă elementul există deja și are conținut dinamic
+                const existingDemo = document.getElementById('demo-status');
+                if (existingDemo) {
+                    statusText = existingDemo.textContent;
+                } else {
+                    statusText = 'READY (10:00 left)';
+                }
+            }
+
+            statusHtml = `<span style="color: ${nameColor}; font-weight: bold; font-size: 1.1em; text-shadow: 0 0 5px ${nameColor};">${systemName}</span> | SYSTEM: <span ${statusId} style="color: #00ff00; font-weight: bold; text-shadow: 0 0 5px #ff0000;">${statusText}</span>`;
+
+            // Corecție culoare text system ready
+            if (statusHtml.includes('READY')) {
+                statusHtml = statusHtml.replace('text-shadow: 0 0 5px #ff0000', 'text-shadow: 0 0 5px #00ff00');
+            }
+        }
+
+        // Actualizăm doar dacă diferă numele sistemului (pentru a nu bloca countdown-ul)
+        // Sau putem actualiza doar prima parte
+
+        // Abordare simplificată: Rescriem tot, dar cu grijă pentru countdown
+        // Pentru cazul "nu merge numele", ne concentrăm pe nume.
+
+        const currentHTML = statusDisplay.innerHTML;
+        // Verificăm dacă numele afișat este corect
+        if (!currentHTML.includes(systemName)) {
+            // Numele e greșit, forțăm update
+            statusDisplay.innerHTML = statusHtml;
+            statusDisplay.style.borderColor = borderColor;
+            statusDisplay.style.boxShadow = `0 0 10px ${borderColor}`;
+        }
+
+        // Verificăm și starea login (OFF vs READY)
+        if (!isLoggedIn && !currentHTML.includes('OFF')) {
+            statusDisplay.innerHTML = statusHtml;
+        }
+
+        */
+    </script>
+
+
+    <script>
+        // ⚡ GUARANTEED STATUS SYNC V3 ⚡
+        // This script runs independently and enforces UI consistency
+        setInterval(() => {
+            const statusDisplay = document.getElementById('status-display');
+            if (!statusDisplay) return;
+
+            // 1. Check Buttons (UI Truth)
+            const btnF = document.getElementById('switch-female');
+            const isFemaleActive = btnF && btnF.classList.contains('active');
+
+            // 2. Determine Gender
+            const isFemale = isFemaleActive; // Trust UI 100%
+
+            // 3. Set Name & Color
+            const systemName = isFemale ? 'NEMESIS' : 'NEXUS';
+            const nameColor = isFemale ? '#ff00ff' : '#00f3ff';
+
+            // 4. Update ONLY name part if needed (surgical update)
+            const currentHTML = statusDisplay.innerHTML;
+
+            // We need to check if the correct name is displayed
+            if (!currentHTML.includes(systemName)) {
+                // Name mismatch! 
+                // We extract the current status (right side) to preserve it
+                let rightSide = '';
+                if (currentHTML.includes('| SYSTEM:')) {
+                    rightSide = currentHTML.split('| SYSTEM:')[1];
+                } else {
+                    // Fallback
+                    const isLoggedIn = !!localStorage.getItem('nexus_current_user');
+                    if (isLoggedIn) {
+                        rightSide = ' <span style="color: #00ff00; font-weight: bold;">READY</span>';
+                    } else {
+                        rightSide = ' <span style="color: #ff0000; font-weight: bold;">OFF</span>';
+                    }
+                }
+
+                const leftSide = `<span style="color: ${nameColor}; font-weight: bold; font-size: 1.1em; text-shadow: 0 0 5px ${nameColor};">${systemName}</span>`;
+                statusDisplay.innerHTML = `${leftSide} | SYSTEM:${rightSide}`;
+            }
+        }, 100);
+    </script>
+</body>
+
+</html>

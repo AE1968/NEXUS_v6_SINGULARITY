@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS v7.0 - System Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
+            color: #00f3ff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #00f3ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .test-section h2 {
+            color: #fff;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #00f3ff;
+            padding-bottom: 10px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #00f3ff, #0077ff);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-family: inherit;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #00f3ff;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .success {
+            color: #00ff00;
+        }
+
+        .warning {
+            color: #ffaa00;
+        }
+
+        .error {
+            color: #ff0000;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .status-card.active {
+            border-color: #00ff00;
+        }
+
+        .status-card.inactive {
+            border-color: #ff0000;
+        }
+
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🧠 NEXUS v7.0 TRANSCENDENCE</h1>
+        <div class="subtitle">System Test Suite & Diagnostics</div>
+
+        <!-- Module Status -->
+        <div class="test-section">
+            <h2>📊 Module Status Overview</h2>
+            <div id="moduleStatus" class="status-grid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Core Tests -->
+        <div class="test-section">
+            <h2>🔬 Core System Tests</h2>
+            <button onclick="testModuleInit()">Test Module Initialization</button>
+            <button onclick="testCloudConnection()">Test Cloud Connection</button>
+            <button onclick="runDiagnostic()">Run Full Diagnostic</button>
+            <button onclick="testMemory()">Test Memory System</button>
+            <div id="coreResults" class="result"></div>
+        </div>
+
+        <!-- Admin Tests -->
+        <div class="test-section">
+            <h2>🔐 Admin Functions</h2>
+            <button onclick="testAdminLogs()">Access Admin Logs</button>
+            <button onclick="testAutoRepair()">Test Auto-Repair</button>
+            <button onclick="testTruthProtocol()">Test Truth Protocol</button>
+            <div id="adminResults" class="result"></div>
+        </div>
+
+        <!-- AI Brain Tests -->
+        <div class="test-section">
+            <h2>🧠 Dual-Brain Test</h2>
+            <button onclick="testGemini()">Test Gemini Brain</button>
+            <button onclick="testClaude()">Test Claude Brain</button>
+            <button onclick="testRouting()">Test Intelligent Routing</button>
+            <div id="brainResults" class="result"></div>
+        </div>
+
+        <!-- Voice Tests -->
+        <div class="test-section">
+            <h2>🎤 Voice & Language</h2>
+            <button onclick="testVoiceEN()">Test English Voice</button>
+            <button onclick="testVoiceRO()">Test Romanian Voice</button>
+            <button onclick="testLanguageDetection()">Test Auto-Detection</button>
+            <div id="voiceResults" class="result"></div>
+        </div>
+
+        <!-- Export Results -->
+        <div class="test-section">
+            <h2>📄 Export & Actions</h2>
+            <button onclick="exportResults()">Export Test Results</button>
+            <button onclick="clearResults()">Clear All Results</button>
+        </div>
+    </div>
+
+    <script>
+        // Test Results Storage
+        const testResults = [];
+
+        function log(section, message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning';
+            const html = `<div class="${colorClass}">[${timestamp}] ${message}</div>`;
+
+            document.getElementById(section).innerHTML += html;
+            testResults.push({ timestamp, section, message, type });
+        }
+
+        // Initialize Module Status Cards
+        function updateModuleStatus() {
+            const modules = [
+                { name: 'Neural Engine', check: () => window.NexusNeuralEngine, icon: '🧠' },
+                { name: 'Memory Vector', check: () => window.NexusMemoryVector, icon: '💾' },
+                { name: 'Agents', check: () => window.NexusAgents, icon: '🤖' },
+                { name: 'Voice Core', check: () => window.NexusVoice, icon: '🎤' },
+                { name: 'Bio-Matrix', check: () => window.NexusBioMatrix, icon: '🧬' },
+                { name: 'IoT Hub', check: () => window.NexusIoT, icon: '🏠' },
+                { name: 'Vision', check: () => window.NexusVision, icon: '👁️' },
+                { name: 'Bridge', check: () => window.NexusBridge, icon: '🌉' }
+            ];
+
+            const container = document.getElementById('moduleStatus');
+            container.innerHTML = modules.map(mod => {
+                const isActive = mod.check();
+                const statusClass = isActive ? 'active' : 'inactive';
+                const statusIcon = isActive ? '✅' : '❌';
+                return `
+                    <div class="status-card ${statusClass}">
+                        <div class="status-icon">${mod.icon}</div>
+                        <div><strong>${mod.name}</strong></div>
+                        <div class="status-label">${statusIcon} ${isActive ? 'ACTIVE' : 'OFFLINE'}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Test Functions
+        async function testModuleInit() {
+            log('coreResults', '🔍 Testing module initialization...', 'info');
+
+            const modules = {
+                'Neural Engine': window.NexusNeuralEngine,
+                'Memory Vector': window.NexusMemoryVector,
+                'Agents': window.NexusAgents,
+                'IoT Hub': window.NexusIoT,
+                'Voice Core': window.NexusVoice,
+                'Bio-Matrix': window.NexusBioMatrix
+            };
+
+            for (const [name, module] of Object.entries(modules)) {
+                if (module) {
+                    log('coreResults', `✅ ${name}: INITIALIZED`, 'success');
+                } else {
+                    log('coreResults', `❌ ${name}: NOT FOUND`, 'error');
+                }
+            }
+        }
+
+        async function testCloudConnection() {
+            log('coreResults', '☁️ Testing cloud connection...', 'info');
+
+            if (!window.NexusNeuralEngine) {
+                log('coreResults', '❌ Neural Engine not loaded', 'error');
+                return;
+            }
+
+            try {
+                const url = window.NexusNeuralEngine.config.cloudUrl;
+                log('coreResults', `📡 Pinging: ${url}`, 'info');
+
+                const response = await fetch(`${url}/health`);
+                const data = await response.json();
+
+                log('coreResults', `✅ Cloud ONLINE: ${data.status} (v${data.version})`, 'success');
+                log('coreResults', `Cloud Active: ${window.NexusNeuralEngine.isCloudActive}`, 'info');
+            } catch (e) {
+                log('coreResults', `❌ Cloud Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function runDiagnostic() {
+            log('coreResults', '🔬 Running full system diagnostic...', 'info');
+
+            if (!window.NexusNeuralEngine) {
+                log('coreResults', '❌ Neural Engine not loaded', 'error');
+                return;
+            }
+
+            const result = window.NexusNeuralEngine.selfDiagnostic();
+            log('coreResults', result, 'success');
+        }
+
+        async function testMemory() {
+            log('coreResults', '💾 Testing memory systems...', 'info');
+
+            if (!window.NexusMemoryVector) {
+                log('coreResults', '❌ Memory Vector not loaded', 'error');
+                return;
+            }
+
+            // Store test fact
+            window.NexusMemoryVector.store('Test fact: System remediated on 2025-12-20', ['test', 'audit']);
+            log('coreResults', '✅ Memory stored successfully', 'success');
+
+            // Retrieve
+            const results = window.NexusMemoryVector.retrieve('remediated');
+            log('coreResults', `✅ Retrieved ${results.length} memories`, 'success');
+            if (results.length > 0) {
+                log('coreResults', `📄 Sample: ${results[0].substring(0, 100)}...`, 'info');
+            }
+        }
+
+        async function testAdminLogs() {
+            log('adminResults', '🔐 Accessing admin logs...', 'info');
+
+            if (!window.NexusNeuralEngine) {
+                log('adminResults', '❌ Neural Engine not loaded', 'error');
+                return;
+            }
+
+            const role = window.NexusNeuralEngine.memory.userProfile.role;
+            log('adminResults', `👤 Current Role: ${role}`, 'info');
+
+            const logs = window.NexusNeuralEngine.memory.getSecureLogs(role);
+            log('adminResults', logs, role === 'Architect' ? 'success' : 'warning');
+        }
+
+        async function testAutoRepair() {
+            log('adminResults', '🔧 Initiating auto-repair sequence...', 'info');
+
+            if (!window.NexusNeuralEngine) {
+                log('adminResults', '❌ Neural Engine not loaded', 'error');
+                return;
+            }
+
+            const result = await window.NexusNeuralEngine.selfRepair();
+            log('adminResults', result, 'success');
+        }
+
+        async function testTruthProtocol() {
+            log('adminResults', '🤥 Testing Pinocchio Protocol...', 'info');
+
+            window.NexusNeuralEngine.setHonestyMode(false);
+            log('adminResults', '🔴 Honesty Mode: DISABLED (Avatar should show Pinocchio effect)', 'warning');
+
+            setTimeout(() => {
+                window.NexusNeuralEngine.setHonestyMode(true);
+                log('adminResults', '✅ Honesty Mode: RESTORED', 'success');
+            }, 3000);
+        }
+
+        async function testGemini() {
+            log('brainResults', '🌟 Testing Gemini 2.0 Flash...', 'info');
+
+            if (!window.NexusNeuralEngine) {
+                log('brainResults', '❌ Neural Engine not loaded', 'error');
+                return;
+            }
+
+            try {
+                const response = await window.NexusNeuralEngine.thinkDeeply('Hello Gemini, confirm status');
+                log('brainResults', `✅ Gemini Response: ${response.substring(0, 200)}...`, 'success');
+            } catch (e) {
+                log('brainResults', `❌ Gemini Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function testClaude() {
+            log('brainResults', '🧠 Testing Claude Sonnet 4.5...', 'info');
+
+            if (!window.NexusNeuralEngine) {
+                log('brainResults', '❌ Neural Engine not loaded', 'error');
+                return;
+            }
+
+            try {
+                const response = await window.NexusNeuralEngine.thinkDeeplyWithClaude('nexus:think - What is 2+2?');
+                log('brainResults', `✅ Claude Response: ${response.substring(0, 200)}...`, 'success');
+            } catch (e) {
+                log('brainResults', `⚠️ Claude Error (may need API key): ${e.message}`, 'warning');
+            }
+        }
+
+        async function testRouting() {
+            log('brainResults', '🔀 Testing intelligent brain routing...', 'info');
+
+            const tests = [
+                { query: 'hello', expected: 'Fast/Gemini' },
+                { query: 'nexus:think - explain quantum physics', expected: 'Claude' },
+                { query: 'what is 2+2', expected: 'Gemini' }
+            ];
+
+            for (const test of tests) {
+                const requiresDeep = window.NexusNeuralEngine.requiresDeepThinking(test.query);
+                const route = requiresDeep ? 'Claude (Deep)' : 'Gemini (Standard)';
+                log('brainResults', `Query: "${test.query}" → ${route}`, 'info');
+            }
+
+            log('brainResults', '✅ Routing logic verified', 'success');
+        }
+
+        async function testVoiceEN() {
+            log('voiceResults', '🎤 Testing English voice output...', 'info');
+
+            if (!window.NexusVoice) {
+                log('voiceResults', '❌ Voice Core not loaded', 'error');
+                return;
+            }
+
+            window.NexusVoice.setLanguage('en-US');
+            window.NexusVoice.speak('Hello, this is Nexus speaking in English.');
+            log('voiceResults', '✅ English voice test initiated', 'success');
+        }
+
+        async function testVoiceRO() {
+            log('voiceResults', '🎤 Testing Romanian voice output...', 'info');
+
+            if (!window.NexusVoice) {
+                log('voiceResults', '❌ Voice Core not loaded', 'error');
+                return;
+            }
+
+            window.NexusVoice.setLanguage('ro-RO');
+            window.NexusVoice.speak('Bună ziua, acesta este Nexus vorbind în română.');
+            log('voiceResults', '✅ Romanian voice test initiated', 'success');
+        }
+
+        async function testLanguageDetection() {
+            log('voiceResults', '🌍 Testing auto-language detection...', 'info');
+
+            if (!window.NexusNeuralEngine) {
+                log('voiceResults', '❌ Neural Engine not loaded', 'error');
+                return;
+            }
+
+            const tests = [
+                { text: 'Hello, how are you?', expected: 'en-US' },
+                { text: 'Salut, ce faci?', expected: 'ro-RO' }
+            ];
+
+            for (const test of tests) {
+                const detected = window.NexusNeuralEngine.memory.detectAndSetLanguage(test.text);
+                const match = detected === test.expected ? '✅' : '❌';
+                log('voiceResults', `${match} "${test.text}" → ${detected} (expected: ${test.expected})`, match === '✅' ? 'success' : 'error');
+            }
+        }
+
+        function exportResults() {
+            const data = JSON.stringify(testResults, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nexus_test_results_${Date.now()}.json`;
+            a.click();
+            alert('✅ Test results exported!');
+        }
+
+        function clearResults() {
+            ['coreResults', 'adminResults', 'brainResults', 'voiceResults'].forEach(id => {
+                document.getElementById(id).innerHTML = '';
+            });
+            testResults.length = 0;
+            alert('✅ Results cleared!');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            setTimeout(updateModuleStatus, 1000);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- NEXUS VIEWPORT SYSTEM (AUTO-ZOOM) -->
+    <script src="js/nexus_viewport.js"></script>
+    <title>Înregistrare | GENEZA NEXUS</title>
+    <meta name="description" content="Creează-ți contul GENEZA NEXUS">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <!-- PayPal SDK -->
+    <script
+        src="https://www.paypal.com/sdk/js?client-id=BAAj-KSC-Y905P1Rzgzc07Tb3Lw_aQPq70H69wTNlTdJWcZWZ-U0e0U9tbbbPsS6EClBsYwfbmWuH8Apd0&vault=true&intent=subscription&currency=GBP"></script>
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --matrix-green: #00ff41;
+            --deep-black: #050505;
+            --gold: #ffd700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a0a0a 100%);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        nav a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 100px 20px 50px;
+        }
+
+        .page-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            text-align: center;
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+
+        /* Tab Switcher */
+        .tab-container {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        /* Forms */
+        .form-section {
+            background: rgba(10, 20, 30, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--neon-purple);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .plan-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .plan-option {
+            padding: 15px 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .plan-option:hover {
+            border-color: var(--neon-cyan);
+        }
+
+        .plan-option.selected {
+            border-color: var(--neon-purple);
+            background: rgba(188, 19, 254, 0.2);
+        }
+
+        .plan-option .plan-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--neon-cyan);
+            margin-bottom: 5px;
+        }
+
+        .plan-option .plan-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(188, 19, 254, 0.4);
+        }
+
+        .demo-notice {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: var(--gold);
+            font-size: 0.9rem;
+        }
+
+        .demo-notice strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--matrix-green);
+            color: var(--matrix-green);
+        }
+
+        .message.error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+        }
+
+        .checkbox-group label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .checkbox-group a {
+            color: var(--neon-cyan);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .login-link a {
+            color: var(--neon-purple);
+        }
+
+        /* Device Info */
+        .device-info {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .device-info h4 {
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+        }
+
+        .qr-code {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .qr-code canvas {
+            max-width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">GENEZA NEXUS</a>
+        <div style="display: flex; gap: 20px;">
+            <a href="index.html" style="color: rgba(255,255,255,0.8);">← Înapoi</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">🔐 Creează-ți Contul</h1>
+        <p class="page-subtitle">Alege tipul de înregistrare</p>
+
+        <!-- Tab Switcher -->
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab('subscription')">💎 Cu Abonament</button>
+            <button class="tab-btn" onclick="switchTab('demo')">🎁 Cod Demo Gratuit</button>
+        </div>
+
+        <!-- Subscription Registration -->
+        <div id="subscriptionForm" class="form-section active">
+            <h3 style="color: var(--neon-cyan); margin-bottom: 20px; font-family: 'Orbitron';">Alege Planul</h3>
+
+            <div class="plan-selector" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="plan-option selected" onclick="selectPlan('1_month', this)">
+                    <div class="plan-name">📦 1 Lună</div>
+                    <div class="plan-price">£10<span style="font-size: 0.7rem; font-weight: normal;">/mo</span></div>
+                    <div style="font-size: 0.8rem; opacity: 0.7;">Total: £10</div>
+                </div>
+                <div class="plan-option" onclick="selectPlan('3_months', this)">
+                    <div class="plan-name">⭐ 3 Luni</div>
+                    <div class="plan-price">£7<span style="font-size: 0.7rem; font-weight: normal;">/mo</span></div>
+                    <div style="font-size: 0.8rem; opacity: 0.7;">Total: £21</div>
+                </div>
+                <div class="plan-option" onclick="selectPlan('6_months', this)">
+                    <div class="plan-name">🔥🔥 6 Luni</div>
+                    <div class="plan-price">£5<span style="font-size: 0.7rem; font-weight: normal;">/mo</span></div>
+                    <div style="font-size: 0.8rem; opacity: 0.7;">Total: £30</div>
+                </div>
+                <div class="plan-option" onclick="selectPlan('1_year', this)">
+                    <div class="plan-name">� 1 An</div>
+                    <div class="plan-price">£3<span style="font-size: 0.7rem; font-weight: normal;">/mo</span></div>
+                    <div style="font-size: 0.8rem; opacity: 0.7;">Total: £36</div>
+                </div>
+            </div>
+
+            <form id="regFormSubscription" onsubmit="handleSubscriptionRegistration(event)">
+                <input type="hidden" id="selectedPlan" value="1_month">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Prenume *</label>
+                        <input type="text" id="subFirstName" required placeholder="Ex: Adrian">
+                    </div>
+                    <div class="form-group">
+                        <label>Nume *</label>
+                        <input type="text" id="subLastName" required placeholder="Ex: Enciulescu">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="subEmail" required placeholder="email@exemplu.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Telefon</label>
+                    <input type="tel" id="subPhone" placeholder="+40 7XX XXX XXX">
+                </div>
+
+                <div class="form-group">
+                    <label>Țara *</label>
+                    <select id="subCountry" required>
+                        <option value="">Selectează</option>
+                        <option value="RO">România</option>
+                        <option value="MD">Moldova</option>
+                        <option value="UK">Regatul Unit</option>
+                        <option value="DE">Germania</option>
+                        <option value="FR">Franța</option>
+                        <option value="OTHER">Altă țară</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Parolă *</label>
+                        <input type="password" id="subPassword" required placeholder="Minim 8 caractere" minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmă Parola *</label>
+                        <input type="password" id="subPasswordConfirm" required placeholder="Repetă parola">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="subTerms" required>
+                    <label for="subTerms">Accept <a href="abonamente.html#terms-modal" target="_blank">Termenii</a> și
+                        <a href="abonamente.html#privacy-modal" target="_blank">Politica de
+                            Confidențialitate</a></label>
+                </div>
+
+                <div class="device-info">
+                    <h4>📱 Informații Dispozitive</h4>
+                    <p>• Primești acces pe <strong>3 dispozitive gratuit</strong></p>
+                    <p>• Dispozitive suplimentare: <strong>£1/dispozitiv</strong></p>
+                    <p>• Poți genera cod QR pentru a adăuga dispozitive noi</p>
+                </div>
+
+                <button type="submit" class="submit-btn" id="subContinueBtn">💳 Continuă la Plată</button>
+
+                <!-- Payment Step -->
+                <div id="paymentSection"
+                    style="display: none; margin-top: 30px; border-top: 1px solid rgba(0, 243, 255, 0.3); padding-top: 20px;">
+                    <h3
+                        style="color: var(--neon-cyan); margin-bottom: 20px; font-family: 'Orbitron'; font-size: 1.1rem; text-align: center;">
+                        Finalizează Plata</h3>
+                    <div id="paypal-button-container_sub"></div>
+                    <p style="text-align: center; font-size: 0.8rem; margin-top: 10px; color: rgba(255,255,255,0.6);">
+                        Plată securizată prin PayPal. Acceptăm carduri de credit/debit și conturi PayPal.
+                    </p>
+                </div>
+            </form>
+
+            <div id="subMessage" class="message"></div>
+        </div>
+
+        <!-- Demo Registration -->
+        <div id="demoForm" class="form-section">
+            <div class="demo-notice">
+                <strong>🎁 Acces Demo Gratuit - 1 Lună</strong>
+                Introdu codul primit de la administrator pentru acces gratuit la toate funcțiile.
+                <br><br>
+                <em>⚠️ Notă: În modul demo nu poți salva date. Pentru salvare, alege un abonament.</em>
+            </div>
+
+            <form id="regFormDemo" onsubmit="handleDemoRegistration(event)">
+                <div class="form-group">
+                    <label>Cod Acces Demo *</label>
+                    <input type="text" id="demoCode" required placeholder="DEMO-XXXXXX"
+                        style="text-transform: uppercase;">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Prenume *</label>
+                        <input type="text" id="demoFirstName" required placeholder="Ex: Adrian">
+                    </div>
+                    <div class="form-group">
+                        <label>Nume *</label>
+                        <input type="text" id="demoLastName" required placeholder="Ex: Enciulescu">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="demoEmail" required placeholder="email@exemplu.com">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Parolă *</label>
+                        <input type="password" id="demoPassword" required placeholder="Minim 8 caractere" minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmă Parola *</label>
+                        <input type="password" id="demoPasswordConfirm" required placeholder="Repetă parola">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="demoTerms" required>
+                    <label for="demoTerms">Accept <a href="abonamente.html#terms-modal" target="_blank">Termenii</a> și
+                        <a href="abonamente.html#privacy-modal" target="_blank">Politica de
+                            Confidențialitate</a></label>
+                </div>
+
+                <button type="submit" class="submit-btn">🎁 Activează Acces Demo</button>
+            </form>
+
+            <div id="demoMessage" class="message"></div>
+        </div>
+
+        <p class="login-link">
+            Ai deja cont? <a href="index.html" onclick="localStorage.setItem('open_login', 'true');">Conectează-te
+                aici</a>
+        </p>
+    </div>
+
+    <script src="js/nexus_user_system.js"></script>
+    <script>
+        let selectedPlan = '1_month';
+
+        const SUBSCRIPTION_PLANS = {
+            '1_month': {
+                id: '1_month',
+                name: '1 Month Plan',
+                duration: 1,
+                price: 10.00,
+                total: 10.00,
+                currency: 'GBP',
+                paypalPlanId: 'P-1MONTH-PLAN-ID'
+            },
+            '3_months': {
+                id: '3_months',
+                name: '3 Months Plan',
+                duration: 3,
+                price: 7.00,
+                total: 21.00,
+                currency: 'GBP',
+                paypalPlanId: 'P-3MONTHS-PLAN-ID'
+            },
+            '6_months': {
+                id: '6_months',
+                name: '6 Months Plan',
+                duration: 6,
+                price: 5.00,
+                total: 30.00,
+                currency: 'GBP',
+                paypalPlanId: 'P-6MONTHS-PLAN-ID'
+            },
+            '1_year': {
+                id: '1_year',
+                name: '1 Year Plan',
+                duration: 12,
+                price: 3.00,
+                total: 36.00,
+                currency: 'GBP',
+                paypalPlanId: 'P-1YEAR-PLAN-ID'
+            }
+        };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
+
+            if (tab === 'subscription') {
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+                document.getElementById('subscriptionForm').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+                document.getElementById('demoForm').classList.add('active');
+            }
+        }
+
+        function selectPlan(plan, element) {
+            selectedPlan = plan;
+            document.getElementById('selectedPlan').value = plan;
+            document.querySelectorAll('.plan-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+
+            // If payment section is already visible, re-init PayPal buttons
+            if (document.getElementById('paymentSection').style.display === 'block') {
+                initPayPalSubscription();
+            }
+        }
+
+        function showMessage(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = 'message ' + type;
+            el.style.display = 'block';
+        }
+
+        async function handleSubscriptionRegistration(e) {
+            e.preventDefault();
+
+            const password = document.getElementById('subPassword').value;
+            const passwordConfirm = document.getElementById('subPasswordConfirm').value;
+
+            if (password !== passwordConfirm) {
+                showMessage('subMessage', '❌ Parolele nu coincid!', 'error');
+                return;
+            }
+
+            // Hide the button and show the payment section
+            document.getElementById('subContinueBtn').style.display = 'none';
+            document.getElementById('paymentSection').style.display = 'block';
+
+            // Scroll to payment section
+            document.getElementById('paymentSection').scrollIntoView({ behavior: 'smooth' });
+
+            // Initialize PayPal buttons for the selected plan
+            initPayPalSubscription();
+        }
+
+        function initPayPalSubscription() {
+            const container = document.getElementById('paypal-button-container_sub');
+            container.innerHTML = ''; // Clear previous buttons
+
+            const plan = SUBSCRIPTION_PLANS[selectedPlan];
+
+            paypal.Buttons({
+                style: {
+                    shape: 'rect',
+                    color: 'gold',
+                    layout: 'vertical',
+                    label: 'subscribe'
+                },
+                createSubscription: function (data, actions) {
+                    return actions.subscription.create({
+                        'plan_id': plan.paypalPlanId,
+                        'application_context': {
+                            'brand_name': 'NEXUS HUMANOID',
+                            'locale': 'en-GB',
+                            'shipping_preference': 'NO_SHIPPING',
+                            'user_action': 'SUBSCRIBE_NOW'
+                        }
+                    });
+                },
+                onApprove: async function (data, actions) {
+                    showMessage('subMessage', '✅ Plată aprobată! Se activează contul...', 'success');
+
+                    const userData = {
+                        email: document.getElementById('subEmail').value,
+                        password: document.getElementById('subPassword').value,
+                        first_name: document.getElementById('subFirstName').value,
+                        last_name: document.getElementById('subLastName').value,
+                        phone: document.getElementById('subPhone').value,
+                        country: document.getElementById('subCountry').value,
+                        subscription: selectedPlan,
+                        paypal_subscription_id: data.subscriptionID
+                    };
+
+                    try {
+                        const response = await fetch('/api/register', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(userData)
+                        });
+
+                        const resData = await response.json();
+
+                        if (resData.success) {
+                            showMessage('subMessage', '✅ Cont activat cu succes! Redirecționare...', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 2000);
+                        } else {
+                            showMessage('subMessage', '❌ ' + (resData.error || 'Activarea a eșuat'), 'error');
+                        }
+                    } catch (err) {
+                        showMessage('subMessage', '❌ Eroare de rețea la activarea contului.', 'error');
+                    }
+                },
+                onError: function (err) {
+                    console.error('PayPal Error:', err);
+                    showMessage('subMessage', '❌ Eroare PayPal. Te rugăm să încerci din nou.', 'error');
+                }
+            }).render('#paypal-button-container_sub');
+        }
+
+        async function handleDemoRegistration(e) {
+            e.preventDefault();
+
+            const password = document.getElementById('demoPassword').value;
+            const passwordConfirm = document.getElementById('demoPasswordConfirm').value;
+            const demoCode = document.getElementById('demoCode').value.toUpperCase().trim();
+
+            if (password !== passwordConfirm) {
+                showMessage('demoMessage', '❌ Parolele nu coincid!', 'error');
+                return;
+            }
+
+            // For now, we'll treat demo registration similarly but set subscription to 'demo'
+            // In a real case, we'd validate the demoCode on backend.
+            const userData = {
+                email: document.getElementById('demoEmail').value,
+                password: password,
+                first_name: document.getElementById('demoFirstName').value,
+                last_name: document.getElementById('demoLastName').value,
+                subscription: 'demo',
+                demo_code: demoCode
+            };
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('demoMessage', '✅ Demo registration successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showMessage('demoMessage', '❌ ' + (data.error || 'Demo registration failed'), 'error');
+                }
+            } catch (err) {
+                showMessage('demoMessage', '❌ Network error. Is the backend running?', 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>

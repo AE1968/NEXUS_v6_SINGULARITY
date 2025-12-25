@@ -1,0 +1,16 @@
+INFO DEPLOYMENT NEXUS
+=====================
+
+Te rog să răspunzi la una dintre următoarele variante pentru a putea începe deployment-ul:
+
+VARIANTA A: AI DEJA HOSTING?
+----------------------------
+1. Ce serviciu de hosting folosești? (Railway / Render / altul?)
+2. Care sunt credențialele? (API Token / Username+Password)
+
+VARIANTA B: NU AI HOSTING?
+--------------------------
+Dacă nu ai dat credențiale de hosting încă:
+1. Nu pot face deployment fără acces la un serviciu cloud.
+2. Pot să te ghidez să creezi un cont GRATUIT (durează 2 minute).
+3. După aceea EU fac tot deployment-ul.

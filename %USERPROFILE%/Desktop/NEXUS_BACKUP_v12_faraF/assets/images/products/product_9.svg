@@ -1,0 +1,6 @@
+<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg">
+            <rect width="800" height="800" fill="#f0f0f0"/>
+            <text x="400" y="400" font-family="Arial" font-size="40" fill="#666" text-anchor="middle">
+                Space Explorer Dog
+            </text>
+        </svg>

@@ -1,0 +1,311 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   GHID COMPLET DE TESTARE - PAS CU PAS                    ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 23:35
+🎯 OBIECTIV: Testare completă sistem login/status
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  ÎNAINTE DE TESTARE - IMPLEMENTARE COD:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASUL 0: Implementează codul
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Deschide fișierul:
+   C:\Users\adria\.gemini\antigravity\scratch\GENEZA_NEXUS_HUMANOID\COD_GATA_DE_IMPLEMENTAT.txt
+
+2. Copiază TOT codul JavaScript (de la "const USERS_DB" până la final)
+
+3. Deschide fișierul:
+   C:\Users\adria\.gemini\antigravity\scratch\GENEZA_NEXUS_HUMANOID\frontend\index.html
+
+4. Caută în fișier: </script>
+
+5. Lipește codul ÎNAINTE de </script>
+
+6. Salvează fișierul (Ctrl+S)
+
+7. Deschide browser: http://localhost:3000/
+
+8. Reîmprospătează pagina (F5 sau Ctrl+F5)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ DUPĂ IMPLEMENTARE - TESTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 1: Verificare Status Default (fără login)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Deschide http://localhost:3000/
+2. Verifică status display (sus, centru)
+
+AȘTEPTAT:
+✅ Text: "AVATAR: MALE | SYSTEM: OFF"
+✅ Culoare: ROȘU
+✅ Buton "LOGIN" în dreapta sus
+
+DACĂ NU FUNCȚIONEAZĂ:
+❌ Verifică dacă ai salvat index.html
+❌ Verifică dacă ai reîmprospătat pagina (Ctrl+F5)
+❌ Verifică Console (F12) pentru erori
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 2: Login DEMO (10 minute cu countdown)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Click pe butonul "LOGIN" (dreapta sus)
+2. Introdu username: demo
+3. Click OK
+4. Introdu password: demo
+5. Click OK
+
+AȘTEPTAT:
+✅ Alert: "✅ Login successful! Welcome, demo!"
+✅ Status: "DEMO [DEMO] | MALE | READY (10:00 left)"
+✅ Culoare: CYAN (albastru deschis)
+✅ Countdown activ: 10:00 → 9:59 → 9:58...
+✅ Buton schimbat în "LOGOUT"
+
+VERIFICĂRI SUPLIMENTARE:
+✅ Deschide Console (F12)
+✅ Verifică mesaj: "✅ Login successful: demo"
+✅ Verifică countdown se actualizează la fiecare secundă
+
+DACĂ NU FUNCȚIONEAZĂ:
+❌ Verifică Console pentru erori
+❌ Verifică dacă USERS_DB este definit (scrie în Console: USERS_DB)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 3: Schimbare Avatar (M → F) cu Auto-Logout
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Asigură-te că ești logat ca demo
+2. Apasă tasta 'F' SAU click pe butonul F
+
+AȘTEPTAT:
+✅ Logout automat
+✅ Status: "AVATAR: FEMALE | SYSTEM: OFF"
+✅ Culoare: ROȘU
+✅ Avatar schimbat la feminin
+✅ Buton revenit la "LOGIN"
+✅ Console: "⚠️ Avatar changed - Auto-logout"
+
+VERIFICĂRI:
+✅ Background imagine schimbată
+✅ Buton F iluminat (pink)
+✅ Buton M stins
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 4: Re-login pe Avatar Feminin
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Avatar pe F (feminin)
+2. Click "LOGIN"
+3. Username: demo
+4. Password: demo
+
+AȘTEPTAT:
+✅ Status: "DEMO [DEMO] | FEMALE | READY (10:00 left)"
+✅ Culoare: CYAN
+✅ Countdown resetat la 10:00
+✅ Avatar rămâne FEMALE
+
+VERIFICĂRI:
+✅ Countdown pornește de la 10:00
+✅ Text conține "FEMALE"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 5: Login ADMIN (permanent, fără countdown)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Dacă ești logat, logout
+2. Click "LOGIN"
+3. Username: admin
+4. Password: Andrada_1968!
+
+AȘTEPTAT:
+✅ Status: "ADMIN [ENTERPRISE] | MALE | READY"
+✅ Culoare: VERDE
+✅ NU există countdown
+✅ Text static "READY"
+
+VERIFICĂRI:
+✅ Fără "(X:XX left)"
+✅ Culoare verde permanentă
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 6: Login TEST (permanent)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Logout
+2. Click "LOGIN"
+3. Username: test
+4. Password: test123
+
+AȘTEPTAT:
+✅ Status: "TEST [BASIC] | MALE | READY"
+✅ Culoare: VERDE
+✅ NU există countdown
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 7: Logout Manual
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Login ca orice user
+2. Click pe butonul "LOGOUT"
+3. Confirmă în dialog
+
+AȘTEPTAT:
+✅ Status: "AVATAR: MALE | SYSTEM: OFF"
+✅ Culoare: ROȘU
+✅ Buton revenit la "LOGIN"
+✅ Console: "👋 Logout: [username]"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 8: Demo Expirare (opțional - durează 10 min)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Login ca demo
+2. Așteaptă 10 minute (sau modifică în cod la 30 secunde)
+
+AȘTEPTAT:
+✅ La 0:00 → Alert: "Demo session expired..."
+✅ Logout automat
+✅ Status: "AVATAR: MALE | SYSTEM: OFF"
+
+PENTRU TESTARE RAPIDĂ:
+Modifică în cod:
+  10 * 60 * 1000  →  30 * 1000  (30 secunde)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 9: Verificare Persistență (refresh pagină)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Login ca admin
+2. Reîmprospătează pagina (F5)
+
+AȘTEPTAT:
+✅ Rămâi logat
+✅ Status: "ADMIN [ENTERPRISE] | MALE | READY"
+✅ Buton: "LOGOUT"
+
+VERIFICĂRI:
+✅ localStorage păstrează: nexus_current_user
+✅ Console: verifică login time
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 10: Credențiale Incorecte
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAȘI:
+1. Click "LOGIN"
+2. Username: wrong
+3. Password: wrong
+
+AȘTEPTAT:
+✅ Alert: "❌ Login failed! Invalid username or password."
+✅ Status rămâne: "SYSTEM: OFF"
+✅ Console: "❌ User not found: wrong"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 CHECKLIST TESTARE COMPLETĂ:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+☐ TEST 1: Status default OFF (roșu)
+☐ TEST 2: Login demo cu countdown (cyan)
+☐ TEST 3: Auto-logout la schimbare avatar
+☐ TEST 4: Re-login pe avatar diferit
+☐ TEST 5: Login admin permanent (verde)
+☐ TEST 6: Login test permanent (verde)
+☐ TEST 7: Logout manual
+☐ TEST 8: Demo expirare (opțional)
+☐ TEST 9: Persistență după refresh
+☐ TEST 10: Credențiale incorecte
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 DEBUGGING:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dacă ceva nu funcționează:
+
+1. Deschide Console (F12)
+2. Verifică erori (roșii)
+3. Scrie în Console:
+   - USERS_DB  (verifică dacă există)
+   - localStorage.getItem('nexus_current_user')
+   - login('demo', 'demo')
+
+4. Verifică dacă codul a fost adăugat corect în index.html
+
+5. Verifică dacă server-ul rulează:
+   http://localhost:3000/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SUCCES AȘTEPTAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dacă toate testele trec:
+
+✅ Sistem login/logout funcțional
+✅ Status display dinamic
+✅ Demo countdown activ
+✅ Auto-logout la avatar switch
+✅ Persistență după refresh
+✅ Validare credențiale
+
+SISTEMUL ESTE COMPLET FUNCȚIONAL! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 RAPORTARE PROBLEME:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dacă întâmpini probleme, notează:
+
+1. Ce test a eșuat?
+2. Ce mesaj de eroare apare în Console?
+3. Ce se întâmplă când faci acțiunea?
+4. Screenshot dacă este posibil
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 GATA DE TESTARE!
+
+URL: http://localhost:3000/
+Credențiale: admin/Andrada_1968!, demo/demo, test/test123
+
+SUCCES! 🚀✅
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,22 @@
+{
+  "name": "Geneza Nexus AI",
+  "short_name": "Nexus",
+  "start_url": "/nexus_core.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#00f3ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/nexus_icon_192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/nexus_icon_512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "description": "Inteligență Artificială Educațională și Creativă pentru Copii și Părinți."
+}

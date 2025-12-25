@@ -1,0 +1,42 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║        GENEZA NEXUS HUMANOID - START INSTRUCTIONS        ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📍 LOCAȚIE PROIECT:
+   c:\Users\adria\.gemini\antigravity\scratch\GENEZA_NEXUS_HUMANOID
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 PORNIRE RAPIDĂ (2 PAȘI):
+
+1️⃣  BACKEND (Terminal 1):
+    python backend/app.py
+
+2️⃣  FRONTEND (Terminal 2):
+    python -m http.server 3000 --directory frontend
+
+3️⃣  BROWSER:
+    http://localhost:3000/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎮 UTILIZARE:
+
+   Tastă 'M' sau Click pe M  →  Avatar MASCULIN (Cyan)
+   Tastă 'F' sau Click pe F  →  Avatar FEMININ (Roz)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ STATUS: FUNCȚIONAL - VERIFICAT 2025-12-21 22:01
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📁 BACKUP CREAT:
+   frontend/index_BACKUP_FUNCTIONAL_2025-12-21.html
+
+📄 DOCUMENTAȚIE COMPLETĂ:
+   VERSIUNE_FUNCTIONALA_README.txt
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

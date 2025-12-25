@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AE Contact Manager - Admin Panel</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00f3ff;
+            border-radius: 12px;
+            padding: 25px 40px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+        }
+
+        header h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00f3ff;
+            font-size: 32px;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.8);
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #00f3ff;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .filters {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #00f3ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 6px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #00f3ff;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .messages-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .message-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .message-card:hover {
+            border-color: #00f3ff;
+            box-shadow: 0 5px 25px rgba(0, 243, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .message-card.new {
+            border-left: 4px solid #00ff00;
+            background: rgba(0, 255, 0, 0.05);
+        }
+
+        .message-card.read {
+            border-left: 4px solid #ffaa00;
+        }
+
+        .message-card.replied {
+            border-left: 4px solid #888;
+            opacity: 0.7;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .message-info {
+            flex: 1;
+        }
+
+        .message-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #00f3ff;
+            margin-bottom: 5px;
+        }
+
+        .message-email {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .message-email a {
+            color: #00f3ff;
+            text-decoration: none;
+        }
+
+        .message-email a:hover {
+            text-decoration: underline;
+        }
+
+        .message-meta {
+            text-align: right;
+        }
+
+        .message-topic {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(255, 0, 255, 0.2);
+            border: 1px solid #ff00ff;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #ff00ff;
+            margin-bottom: 5px;
+        }
+
+        .message-date {
+            font-size: 12px;
+            color: #666;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .message-content {
+            background: rgba(0, 243, 255, 0.05);
+            border-left: 3px solid #00f3ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #ddd;
+            line-height: 1.8;
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .message-content.expanded {
+            max-height: none;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid #00f3ff;
+            background: transparent;
+            color: #00f3ff;
+            border-radius: 6px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #00f3ff;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+        }
+
+        .btn-reply {
+            background: linear-gradient(135deg, #00f3ff, #0080ff);
+            border: none;
+            color: #000;
+        }
+
+        .btn-mark-read {
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .btn-mark-read:hover {
+            background: #ffaa00;
+            color: #000;
+        }
+
+        .btn-delete {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        .btn-delete:hover {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #00f3ff;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-new {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+
+        .status-read {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid #ffaa00;
+        }
+
+        .status-replied {
+            background: rgba(136, 136, 136, 0.2);
+            color: #888;
+            border: 1px solid #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>📧 AE Contact Manager</h1>
+                <p style="color: #888; margin-top: 5px;">Admin Panel - Gestiune Mesaje</p>
+            </div>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="total-messages">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="new-messages" style="color: #00ff00;">0</div>
+                    <div class="stat-label">Noi</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="replied-messages" style="color: #888;">0</div>
+                    <div class="stat-label">Răspunse</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Status</label>
+                <select id="filter-status">
+                    <option value="all">Toate</option>
+                    <option value="new">Noi</option>
+                    <option value="read">Citite</option>
+                    <option value="replied">Răspunse</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Subiect</label>
+                <select id="filter-topic">
+                    <option value="all">Toate</option>
+                    <option value="general">Întrebare Generală</option>
+                    <option value="technical">Suport Tehnic</option>
+                    <option value="business">Colaborare Business</option>
+                    <option value="feedback">Feedback</option>
+                    <option value="bug">Bug</option>
+                    <option value="feature">Feature Request</option>
+                    <option value="other">Altceva</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Căutare</label>
+                <input type="text" id="search-input" placeholder="Nume, email, mesaj...">
+            </div>
+
+            <button class="btn" onclick="loadMessages()" style="margin-left: auto; margin-top: 20px;">
+                🔄 Reîmprospătează
+            </button>
+        </div>
+
+        <div id="messages-container">
+            <div class="loading">
+                <div style="font-size: 24px;">⏳</div>
+                <div>Se încarcă mesajele...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://127.0.0.1:5000'
+            : 'https://kelionai.app';
+
+        let allMessages = [];
+        let currentFilter = { status: 'all', topic: 'all', search: '' };
+        let authToken = null;
+        let currentUser = null;
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuthentication();
+        });
+
+        function checkAuthentication() {
+            // Get token from localStorage
+            authToken = localStorage.getItem('kelion_token');
+            const userDataStr = localStorage.getItem('kelion_user');
+
+            if (!authToken || !userDataStr) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                currentUser = JSON.parse(userDataStr);
+
+                // Check if user is admin
+                if (currentUser.role !== 'admin') {
+                    alert('⛔ Acces interzis! Doar administratorii pot accesa această pagină.');
+                    window.location.href = '/';
+                    return;
+                }
+
+                // User is authenticated as admin
+                initializePage();
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                redirectToLogin();
+            }
+        }
+
+        function redirectToLogin() {
+            alert('🔐 Trebuie să fii autentificat ca administrator pentru a accesa această pagină.');
+            window.location.href = '/?redirect=ae_contact_admin';
+        }
+
+        function initializePage() {
+            loadMessages();
+
+            // Attach filter listeners
+            document.getElementById('filter-status').addEventListener('change', (e) => {
+                currentFilter.status = e.target.value;
+                applyFilters();
+            });
+
+            document.getElementById('filter-topic').addEventListener('change', (e) => {
+                currentFilter.topic = e.target.value;
+                applyFilters();
+            });
+
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                currentFilter.search = e.target.value.toLowerCase();
+                applyFilters();
+            });
+        }
+
+        async function loadMessages() {
+            try {
+                const response = await fetch(`${API_URL}/api/contact/messages`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Token expired or unauthorized
+                    localStorage.removeItem('kelion_token');
+                    localStorage.removeItem('kelion_user');
+                    redirectToLogin();
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    allMessages = data.messages;
+                    updateStats();
+                    applyFilters();
+                } else {
+                    showError('Failed to load messages: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                showError('Connection error - Check if backend is running');
+            }
+        }
+
+        function updateStats() {
+            const total = allMessages.length;
+            const newCount = allMessages.filter(m => m.status === 'new').length;
+            const repliedCount = allMessages.filter(m => m.status === 'replied').length;
+
+            document.getElementById('total-messages').textContent = total;
+            document.getElementById('new-messages').textContent = newCount;
+            document.getElementById('replied-messages').textContent = repliedCount;
+        }
+
+        function applyFilters() {
+            let filtered = allMessages;
+
+            // Filter by status
+            if (currentFilter.status !== 'all') {
+                filtered = filtered.filter(m => m.status === currentFilter.status);
+            }
+
+            // Filter by topic
+            if (currentFilter.topic !== 'all') {
+                filtered = filtered.filter(m => m.topic === currentFilter.topic);
+            }
+
+            // Filter by search
+            if (currentFilter.search) {
+                filtered = filtered.filter(m =>
+                    m.name.toLowerCase().includes(currentFilter.search) ||
+                    m.email.toLowerCase().includes(currentFilter.search) ||
+                    m.message.toLowerCase().includes(currentFilter.search)
+                );
+            }
+
+            renderMessages(filtered);
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('messages-container');
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 48px;">📭</div>
+                        <h2 style="color: #666; margin: 20px 0 10px 0;">Niciun mesaj găsit</h2>
+                        <p>Filtrele tale nu au returnat rezultate.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const messagesHTML = messages.map(msg => `
+                <div class="message-card ${msg.status}" data-id="${msg.id}">
+                    <div class="message-header">
+                        <div class="message-info">
+                            <div class="message-name">${msg.name}</div>
+                            <div class="message-email">
+                                📧 <a href="mailto:${msg.email}">${msg.email}</a>
+                            </div>
+                        </div>
+                        <div class="message-meta">
+                            <div class="message-topic">${msg.topic_label}</div>
+                            <div class="message-date">${formatDate(msg.timestamp)}</div>
+                            <span class="status-badge status-${msg.status}">${msg.status}</span>
+                        </div>
+                    </div>
+                    <div class="message-content" id="content-${msg.id}">
+                        ${msg.message}
+                    </div>
+                    <div class="message-actions">
+                        <button class="btn btn-reply" onclick="replyToMessage('${msg.email}', '${msg.topic_label}')">
+                            📨 Răspunde
+                        </button>
+                        ${msg.status === 'new' ? `
+                            <button class="btn btn-mark-read" onclick="markAsRead(${msg.id})">
+                                ✓ Marchează Citit
+                            </button>
+                        ` : ''}
+                        <button class="btn" onclick="toggleExpand(${msg.id})">
+                            👁️ Detalii
+                        </button>
+                        <button class="btn btn-delete" onclick="deleteMessage(${msg.id})">
+                            🗑️ Șterge
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `<div class="messages-grid">${messagesHTML}</div>`;
+        }
+
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString('ro-RO', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function toggleExpand(id) {
+            const content = document.getElementById(`content-${id}`);
+            content.classList.toggle('expanded');
+        }
+
+        function replyToMessage(email, topic) {
+            window.location.href = `mailto:${email}?subject=Re: ${topic}`;
+        }
+
+        async function markAsRead(id) {
+            try {
+                const response = await fetch(`${API_URL}/api/contact/${id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'read' })
+                });
+
+                if (response.ok) {
+                    loadMessages();
+                } else {
+                    const data = await response.json();
+                    alert('Eroare: ' + (data.error || 'Failed to update status'));
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Eroare de conexiune');
+            }
+        }
+
+        async function deleteMessage(id) {
+            if (!confirm('Sigur vrei să ștergi acest mesaj?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/contact/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    loadMessages();
+                } else {
+                    const data = await response.json();
+                    alert('Eroare: ' + (data.error || 'Failed to delete message'));
+                }
+            } catch (error) {
+                console.error('Error deleting message:', error);
+                alert('Eroare de conexiune');
+            }
+        }
+
+        function showError(message) {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div style="font-size: 48px; color: #ff4444;">❌</div>
+                    <h2 style="color: #ff4444; margin: 20px 0 10px 0;">Eroare</h2>
+                    <p>${message}</p>
+                    <button class="btn" onclick="location.href='/'" style="margin-top: 20px;">
+                        ← Înapoi la Dashboard
+                    </button>
+                </div>
+            `;
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            if (authToken) {
+                loadMessages();
+            }
+        }, 30000);
+    </script>
+</body>
+
+</html>

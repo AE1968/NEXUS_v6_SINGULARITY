@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- NEXUS VIEWPORT SYSTEM (AUTO-ZOOM) -->
+    <script src="js/nexus_viewport.js"></script>
+    <title>NEXUS v1.0 GOLD - CLEAN SLATE</title>
+
+    <!-- CSS (Păstrăm stilurile vizuale frumoase) -->
+    <link rel="stylesheet" href="css/nexus_core.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* MODULE CONTROL PANEL - PERMANENT LEFT SIDEBAR */
+        .module-panel {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: rgba(0, 10, 20, 0.95);
+            border-right: 2px solid #0ff;
+            padding: 20px;
+            z-index: 1000;
+            font-family: 'Courier New', monospace;
+            box-shadow: 5px 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .module-panel h3 {
+            color: #0ff;
+            border-bottom: 1px solid #0ff;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .module-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .module-item {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #333;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .module-item.active {
+            border-color: #0f0;
+            box-shadow: 0 0 10px #0f0;
+        }
+
+        .module-item.inactive {
+            border-color: #f00;
+            opacity: 0.7;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-dot.on {
+            background: #0f0;
+            box-shadow: 0 0 5px #0f0;
+        }
+
+        .status-dot.off {
+            background: #f00;
+            box-shadow: 0 0 5px #f00;
+        }
+
+        .module-name {
+            font-size: 12px;
+            color: #fff;
+        }
+
+        /* Stiluri specifice V1 - Avatar centrat și curat */
+        body {
+            background-color: #000;
+            color: #0ff;
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+        }
+
+        .nexus-container {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .avatar-container {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 50px #0ff;
+            background: url('assets/nexus_avatar.png') no-repeat center center/cover;
+            /* Placeholder visual */
+            margin-bottom: 20px;
+            animation: pulse-glow 3s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 20px #0ff;
+            }
+
+            50% {
+                box-shadow: 0 0 60px #0ff, 0 0 100px rgba(0, 255, 255, 0.3);
+            }
+
+            100% {
+                box-shadow: 0 0 20px #0ff;
+            }
+        }
+
+        .chat-interface {
+            width: 80%;
+            max-width: 600px;
+            background: rgba(0, 20, 40, 0.8);
+            border: 1px solid #0ff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #chat-log {
+            height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .system-msg {
+            color: #f0f;
+            text-shadow: 0 0 5px #f0f;
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #0ff;
+            color: #fff;
+            padding: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PANOU CONTROL MODULE (SOLICITAT DE USER) -->
+    <div class="module-panel">
+        <h3>SISTEM MODULE</h3>
+        <ul class="module-list">
+            <li class="module-item inactive" id="mod_tts">
+                <span class="module-name">1. VOCE (TTS)</span>
+                <span class="status-dot off"></span>
+            </li>
+            <li class="module-item inactive" id="mod_backend">
+                <span class="module-name">2. BACKEND (SERVER)</span>
+                <span class="status-dot off"></span>
+            </li>
+            <li class="module-item inactive" id="mod_brain">
+                <span class="module-name">3. CREIER (AI)</span>
+                <span class="status-dot off"></span>
+            </li>
+            <li class="module-item inactive" id="mod_vision">
+                <span class="module-name">4. VIZUAL (CAM)</span>
+                <span class="status-dot off"></span>
+            </li>
+            <li class="module-item inactive" id="mod_agents">
+                <span class="module-name">5. AGENTI AUTO</span>
+                <span class="status-dot off"></span>
+            </li>
+        </ul>
+        <div style="margin-top: 50px; font-size: 10px; color: #888; text-align: center;">
+            STATUS: RESETAT<br>
+            READY FOR BUILD
+        </div>
+    </div>
+
+    <div class="nexus-container" style="margin-left: 250px;">
+        <!-- AVATAR (Visual Only) -->
+        <div class="avatar-container"></div>
+
+        <h1 style="text-shadow: 0 0 10px #0ff;">GENEZA NEXUS V1.0</h1>
+        <p style="color: #888;">SHELL ACTIVE - NO MODULES LOADED</p>
+
+        <!-- CHAT UI (Inactive initially) -->
+        <div class="chat-interface">
+            <div id="chat-log">
+                <div class="system-msg">[SYSTEM]: Inițializare completă. Aștept module...</div>
+            </div>
+            <input type="text" id="userInput" placeholder="Robotul este în mod STANDBY...">
+        </div>
+    </div>
+
+    <!-- CORE LOGIC MODULES (v6 LEGACY INTEGRATION) -->
+    <script src="js/nexus_neural_engine.js"></script>
+    <script src="js/nexus_vision.js"></script>
+    <script src="js/nexus_bio_matrix.js"></script>
+    <script src="js/nexus_memory_vector.js"></script>
+    <script src="js/nexus_agents.js"></script>
+    <script src="js/nexus_iot.js"></script>
+
+    <!-- MODULE 1: AVATAR (VISUAL) -->
+    <script src="js/modules/nexus_module_avatar.js"></script>
+
+</body>
+
+</html>
+```

@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- NEXUS VIEWPORT SYSTEM (AUTO-ZOOM) -->
+    <script src="js/nexus_viewport.js"></script>
+    <title>Abonamente | GENEZA NEXUS</title>
+    <meta name="description" content="Alege planul potrivit pentru tine și accesează puterea lui Nexus AI">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --matrix-green: #00ff41;
+            --deep-black: #050505;
+            --gold: #ffd700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a0a0a 100%);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(10, 10, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        nav a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        nav .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 50px;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .page-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+        }
+
+        /* Pricing Grid */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .pricing-card {
+            background: rgba(10, 20, 30, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-purple);
+            box-shadow: 0 20px 40px rgba(188, 19, 254, 0.2);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--gold);
+            background: linear-gradient(135deg, rgba(10, 20, 30, 0.95), rgba(50, 30, 60, 0.9));
+        }
+
+        .pricing-card.featured::before {
+            content: '⭐ POPULAR';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: black;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .plan-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+        }
+
+        .plan-price {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .plan-price span {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .plan-features {
+            list-style: none;
+            text-align: left;
+            margin: 30px 0;
+        }
+
+        .plan-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: var(--matrix-green);
+            font-weight: bold;
+        }
+
+        .plan-features li.disabled {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .plan-features li.disabled::before {
+            content: '✗';
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .plan-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .plan-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(188, 19, 254, 0.4);
+        }
+
+        /* Registration Form */
+        .registration-section {
+            background: rgba(10, 20, 30, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--neon-cyan);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 3px;
+        }
+
+        .checkbox-group label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .checkbox-group a {
+            color: var(--neon-cyan);
+        }
+
+        .submit-btn {
+            grid-column: 1 / -1;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(188, 19, 254, 0.4);
+        }
+
+        /* Info Sections */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .info-card {
+            background: rgba(10, 20, 30, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .info-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-purple);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .info-card p,
+        .info-card ul {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+        }
+
+        .info-card ul {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .info-card ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(188, 19, 254, 0.3);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--neon-cyan);
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+        }
+
+        /* Payment Icons */
+        .payment-methods {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            opacity: 0.7;
+        }
+
+        .payment-methods span {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav .nav-links {
+                gap: 15px;
+            }
+
+            .registration-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">GENEZA NEXUS</a>
+        <div class="nav-links">
+            <a href="index.html">Acasă</a>
+            <a href="nexus_story.html">Poveste</a>
+            <a href="nexus_core.html">Nexus Core</a>
+            <a href="inregistrare.html" style="color: var(--matrix-green);">📝 Înregistrare</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="page-header">
+            <h1 class="page-title">💎 Alege Planul Tău</h1>
+            <p class="page-subtitle">Deblocează puterea completă a lui Nexus AI</p>
+        </header>
+
+        <!-- Pricing Cards -->
+        <div class="pricing-grid">
+            <!-- BASIC -->
+            <div class="pricing-card">
+                <h2 class="plan-name">🌟 BASIC</h2>
+                <div class="plan-price">9.99€ <span>/lună</span></div>
+                <ul class="plan-features">
+                    <li>Acces Nexus Core</li>
+                    <li>Poveste completă Geneza</li>
+                    <li>Chat cu Nexus AI</li>
+                    <li>Suport email</li>
+                    <li>Actualizări lunare</li>
+                    <li class="disabled">Protocol Omega</li>
+                    <li class="disabled">Recunoaștere facială</li>
+                    <li class="disabled">Voice Control avansat</li>
+                </ul>
+                <a href="#register" class="plan-btn" onclick="selectPlan('basic')">Alege Basic</a>
+            </div>
+
+            <!-- PREMIUM -->
+            <div class="pricing-card featured">
+                <h2 class="plan-name">👑 PREMIUM</h2>
+                <div class="plan-price">19.99€ <span>/lună</span></div>
+                <ul class="plan-features">
+                    <li>Toate funcțiile Basic</li>
+                    <li>Protocol Omega complet</li>
+                    <li>Recunoaștere facială</li>
+                    <li>Voice Control în 5 limbi</li>
+                    <li>Gesturi faciale AI</li>
+                    <li>Suport prioritar 24/7</li>
+                    <li>Badge VIP</li>
+                    <li class="disabled">API Access</li>
+                </ul>
+                <a href="#register" class="plan-btn" onclick="selectPlan('premium')">Alege Premium</a>
+            </div>
+
+            <!-- ENTERPRISE -->
+            <div class="pricing-card">
+                <h2 class="plan-name">🏢 ENTERPRISE</h2>
+                <div class="plan-price">Contact</div>
+                <ul class="plan-features">
+                    <li>Toate funcțiile Premium</li>
+                    <li>API Access nelimitat</li>
+                    <li>Custom Integration</li>
+                    <li>White-label options</li>
+                    <li>Dedicated Account Manager</li>
+                    <li>SLA garantat 99.9%</li>
+                    <li>Training personalizat</li>
+                    <li>Facturare separată</li>
+                </ul>
+                <a href="mailto:ae1968@kidsdigitalhub.com?subject=Enterprise%20Inquiry"
+                    class="plan-btn">Contactează-ne</a>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="payment-methods">
+            <span>💳 Card Bancar</span>
+            <span>🅿️ PayPal</span>
+            <span>₿ Crypto</span>
+            <span>🏦 Transfer Bancar</span>
+        </div>
+
+        <!-- Registration Form -->
+        <section class="registration-section" id="register">
+            <h2 class="section-title">📝 Formular de Înregistrare</h2>
+            <form id="subscriptionForm" name="subscription" method="POST" data-netlify="true"
+                netlify-honeypot="bot-field">
+                <input type="hidden" name="form-name" value="subscription">
+                <input type="hidden" name="selected-plan" id="selectedPlan" value="basic">
+                <p style="display:none;"><label>Don't fill: <input name="bot-field"></label></p>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Prenume *</label>
+                        <input type="text" name="prenume" required placeholder="Ex: Adrian">
+                    </div>
+                    <div class="form-group">
+                        <label>Nume *</label>
+                        <input type="text" name="nume" required placeholder="Ex: Enciulescu">
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" name="email" required placeholder="email@exemplu.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefon</label>
+                        <input type="tel" name="telefon" placeholder="+40 7XX XXX XXX">
+                    </div>
+                    <div class="form-group">
+                        <label>Țara *</label>
+                        <select name="tara" required>
+                            <option value="">Selectează țara</option>
+                            <option value="RO">România</option>
+                            <option value="MD">Moldova</option>
+                            <option value="UK">Regatul Unit</option>
+                            <option value="DE">Germania</option>
+                            <option value="FR">Franța</option>
+                            <option value="ES">Spania</option>
+                            <option value="IT">Italia</option>
+                            <option value="US">SUA</option>
+                            <option value="OTHER">Altă țară</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Plan Ales *</label>
+                        <select name="plan" id="planSelect" required>
+                            <option value="basic">Basic - 9.99€/lună</option>
+                            <option value="premium">Premium - 19.99€/lună</option>
+                            <option value="enterprise">Enterprise - Contact</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Username dorit *</label>
+                        <input type="text" name="username" required placeholder="Alege un username unic" minlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label>Parolă dorită *</label>
+                        <input type="password" name="parola" required placeholder="Minim 8 caractere" minlength="8">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Cum ai aflat despre noi?</label>
+                        <select name="sursa">
+                            <option value="">Selectează</option>
+                            <option value="google">Căutare Google</option>
+                            <option value="social">Social Media</option>
+                            <option value="friend">Recomandare prieten</option>
+                            <option value="ad">Reclamă</option>
+                            <option value="other">Altfel</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Mesaj (opțional)</label>
+                        <textarea name="mesaj" rows="3"
+                            placeholder="Spune-ne mai multe despre nevoile tale..."></textarea>
+                    </div>
+
+                    <div class="checkbox-group full-width">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">Accept <a href="#terms-modal" onclick="showTerms()">Termenii și
+                                Condițiile</a> și <a href="#privacy-modal" onclick="showPrivacy()">Politica de
+                                Confidențialitate</a> *</label>
+                    </div>
+
+                    <div class="checkbox-group full-width">
+                        <input type="checkbox" id="newsletter" name="newsletter">
+                        <label for="newsletter">Doresc să primesc noutăți și oferte speciale pe email</label>
+                    </div>
+
+                    <button type="submit" class="submit-btn">🚀 Trimite Cererea de Înregistrare</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Info Cards -->
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>🔒 Securitate Garantată</h3>
+                <p>Toate datele tale sunt criptate cu protocoale de ultimă generație. Folosim HTTPS, criptare AES-256 și
+                    autentificare multi-factor.</p>
+            </div>
+            <div class="info-card">
+                <h3>💳 Plăți Sigure</h3>
+                <p>Procesăm plățile prin parteneri certificați PCI-DSS. Nu stocăm niciodată datele cardului tău pe
+                    serverele noastre.</p>
+            </div>
+            <div class="info-card">
+                <h3>🔄 Garanție 30 Zile</h3>
+                <p>Nu ești mulțumit? Îți returnăm banii în primele 30 de zile, fără întrebări. Satisfacția ta e
+                    prioritatea noastră.</p>
+            </div>
+            <div class="info-card">
+                <h3>📞 Suport Dedicat</h3>
+                <ul>
+                    <li>📧 Email: ae1968@kidsdigitalhub.com</li>
+                    <li>💬 Chat Live (Premium+)</li>
+                    <li>📱 WhatsApp Business</li>
+                    <li>⏰ Răspuns în max. 24h</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>📋 Ce Primești</h3>
+                <ul>
+                    <li>✓ Acces instant după plată</li>
+                    <li>✓ Credențiale pe email</li>
+                    <li>✓ Ghid de pornire rapidă</li>
+                    <li>✓ Video tutorial de bun venit</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>❓ Întrebări Frecvente</h3>
+                <ul>
+                    <li>Pot anula oricând? Da!</li>
+                    <li>Pot schimba planul? Desigur!</li>
+                    <li>Există perioadă de probă? 7 zile gratuit!</li>
+                    <li>Sunt taxe ascunse? Nu, niciodată!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#" onclick="showTerms()">Termeni și Condiții</a>
+            <a href="#" onclick="showPrivacy()">Politica de Confidențialitate</a>
+            <a href="#" onclick="showCookies()">Politica Cookies</a>
+            <a href="mailto:ae1968@kidsdigitalhub.com">Contact</a>
+        </div>
+        <p class="footer-text">© 2024 GENEZA NEXUS | Adrian Enciulescu | Toate drepturile rezervate</p>
+        <p class="footer-text" style="margin-top: 10px;">VAT: [Număr TVA] | Reg. Com.: [Număr Registru]</p>
+    </footer>
+
+    <!-- Terms Modal -->
+    <div id="termsModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; overflow-y:auto; padding:50px 20px;">
+        <div
+            style="max-width:800px; margin:0 auto; background:rgba(10,20,30,0.95); border:1px solid var(--neon-cyan); border-radius:15px; padding:40px;">
+            <h2 style="font-family:'Orbitron'; color:var(--neon-cyan); margin-bottom:30px;">📜 Termeni și Condiții</h2>
+            <div style="color:rgba(255,255,255,0.9); line-height:1.8;">
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">1. Acceptarea Termenilor</h3>
+                <p>Prin utilizarea serviciilor GENEZA NEXUS, acceptați acești termeni în totalitate.</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">2. Descrierea Serviciului</h3>
+                <p>GENEZA NEXUS oferă acces la o platformă AI interactivă cu diverse funcționalități în funcție de
+                    planul ales.</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">3. Abonamente și Plăți</h3>
+                <p>Abonamentele se reînnoiesc automat lunar. Puteți anula oricând din contul dvs. Rambursările sunt
+                    disponibile în primele 30 de zile.</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">4. Utilizare Acceptabilă</h3>
+                <p>Nu este permisă utilizarea serviciului pentru activități ilegale, spam, sau încălcarea drepturilor
+                    altora.</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">5. Proprietate Intelectuală</h3>
+                <p>Toate drepturile asupra conținutului și tehnologiei aparțin GENEZA NEXUS și Adrian Enciulescu.</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">6. Limitarea Răspunderii</h3>
+                <p>Serviciul este oferit "ca atare". Nu garantăm disponibilitate 100% sau lipsa erorilor.</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">7. Contact</h3>
+                <p>Pentru întrebări: ae1968@kidsdigitalhub.com</p>
+            </div>
+            <button onclick="closeModal('termsModal')"
+                style="margin-top:30px; padding:15px 40px; background:var(--neon-purple); color:white; border:none; border-radius:8px; cursor:pointer; font-family:'Orbitron';">Închide</button>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div id="privacyModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; overflow-y:auto; padding:50px 20px;">
+        <div
+            style="max-width:800px; margin:0 auto; background:rgba(10,20,30,0.95); border:1px solid var(--neon-cyan); border-radius:15px; padding:40px;">
+            <h2 style="font-family:'Orbitron'; color:var(--neon-cyan); margin-bottom:30px;">🔐 Politica de
+                Confidențialitate</h2>
+            <div style="color:rgba(255,255,255,0.9); line-height:1.8;">
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">1. Date Colectate</h3>
+                <p>Colectăm: nume, email, telefon, țară, date de utilizare a platformei.</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">2. Utilizarea Datelor</h3>
+                <p>Datele sunt folosite pentru: furnizarea serviciului, suport, îmbunătățiri, comunicare.</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">3. Protecția Datelor</h3>
+                <p>Folosim criptare SSL/TLS, stocăm datele în centre de date securizate (EU).</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">4. Drepturile Tale (GDPR)</h3>
+                <p>Ai dreptul la: acces, rectificare, ștergere, portabilitate, opoziție. Contact:
+                    ae1968@kidsdigitalhub.com</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">5. Cookies</h3>
+                <p>Folosim cookies esențiale și de analiză. Poți gestiona preferințele din browser.</p>
+
+                <h3 style="color:var(--neon-purple); margin:20px 0 10px;">6. Terți</h3>
+                <p>Nu vindem datele tale. Partajăm doar cu procesatori de plăți certificați.</p>
+            </div>
+            <button onclick="closeModal('privacyModal')"
+                style="margin-top:30px; padding:15px 40px; background:var(--neon-purple); color:white; border:none; border-radius:8px; cursor:pointer; font-family:'Orbitron';">Închide</button>
+        </div>
+    </div>
+
+    <script>
+        function selectPlan(plan) {
+            document.getElementById('selectedPlan').value = plan;
+            document.getElementById('planSelect').value = plan;
+            document.getElementById('register').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showTerms() {
+            document.getElementById('termsModal').style.display = 'block';
+        }
+
+        function showPrivacy() {
+            document.getElementById('privacyModal').style.display = 'block';
+        }
+
+        function showCookies() {
+            alert('🍪 Politica Cookies\n\nFolosim cookies pentru:\n- Funcționalitatea site-ului\n- Analiză și îmbunătățiri\n- Preferințe utilizator\n\nPoți gestiona cookies din setările browser-ului.');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // Close modals on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('termsModal').style.display = 'none';
+                document.getElementById('privacyModal').style.display = 'none';
+            }
+        });
+
+        // Form submission
+        document.getElementById('subscriptionForm').addEventListener('submit', function (e) {
+            const plan = document.getElementById('planSelect').value;
+            if (plan === 'enterprise') {
+                e.preventDefault();
+                alert('📧 Pentru planul Enterprise, te vom contacta în maximum 24 de ore!\n\nMultumim pentru interesul acordat.');
+            }
+        });
+    </script>
+</body>
+
+</html>

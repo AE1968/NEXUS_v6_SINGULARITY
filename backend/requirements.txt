@@ -1,0 +1,7 @@
+flask
+flask-cors
+openai
+opencv-python
+face-recognition
+numpy
+python-dotenv

@@ -1,0 +1,17 @@
+# Python Dependencies
+flask==2.3.0
+flask-cors==4.0.0
+openai==1.3.0
+requests==2.31.0
+werkzeug==2.3.0
+gunicorn==21.2.0
+
+## Optional Dependencies
+# For enhanced voice synthesis
+elevenlabs==0.2.24
+
+## Development Dependencies
+# For testing and debugging
+pytest==7.4.0
+black==23.7.0
+flake8==6.1.0

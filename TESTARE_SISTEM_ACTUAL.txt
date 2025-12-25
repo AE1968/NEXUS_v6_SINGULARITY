@@ -1,0 +1,169 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║           GHID TESTARE - SISTEM ACTUAL                    ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 22:44
+✅ STATUS: GATA DE TESTARE
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 CE TESTĂM ACUM:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Sistem login funcțional
+✅ Utilizatori cu abonamente
+✅ Status display micșorare
+✅ Auto-logout la schimbare avatar
+✅ Separare date între utilizatori
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧪 TESTE DE EFECTUAT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 1: Deschide aplicația
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Deschide http://localhost:3000/
+2. Verifică:
+   ✅ Particule în spate (cyan)
+   ✅ Avatar masculin vizibil
+   ✅ Buton "LOGIN" în dreapta sus
+   ✅ Status display: "AVATAR: MALE | SYSTEM: READY"
+   ✅ Butoane M/F în control bar
+
+TEST 2: Login ca ADMIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Click pe "LOGIN"
+2. Username: admin
+3. Password: Andrada_1968!
+4. Click "LOGIN"
+
+Verifică:
+✅ Modal se închide
+✅ Buton devine "LOGOUT (ADMIN)" (verde)
+✅ Status display SE MICȘOREAZĂ
+✅ Text: "ADMIN [ENTERPRISE] | MALE"
+✅ Console: "✅ User "admin" logged in successfully"
+
+TEST 3: Schimbare Avatar (Auto-Logout)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ești logat ca admin pe avatar M
+2. Apasă tasta 'F'
+
+Verifică:
+✅ Console: "🔄 Avatar changed - Auto logout triggered"
+✅ Console: "🔓 User "admin" logged out"
+✅ Modal de login se deschide AUTOMAT
+✅ Avatar schimbat la FEMININ
+✅ Particule schimbate la magenta
+
+TEST 4: Re-login pe avatar F
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. În modal, login din nou:
+   - Username: admin
+   - Password: Andrada_1968!
+2. Click "LOGIN"
+
+Verifică:
+✅ Logat pe avatar FEMININ
+✅ Status: "ADMIN [ENTERPRISE] | FEMALE"
+✅ Particule magenta în spate
+
+TEST 5: Logout Manual
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Click pe "LOGOUT (ADMIN)"
+
+Verifică:
+✅ Modal se deschide
+✅ Status display revine la mărime normală
+✅ Text: "AVATAR: FEMALE | SYSTEM: READY"
+✅ Buton revine la "LOGIN"
+
+TEST 6: Login ca DEMO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. În modal:
+   - Username: demo
+   - Password: demo
+2. Click "LOGIN"
+
+Verifică:
+✅ Logat cu succes
+✅ Status: "DEMO [DEMO] | FEMALE"
+✅ Console: "Subscription: demo"
+✅ Console: "Permissions: view"
+
+TEST 7: Separare Utilizatori
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Logout ca demo
+2. Login ca admin
+3. Verifică console: "Total logins" pentru admin
+4. Logout
+5. Login ca demo
+6. Verifică console: "Total logins" pentru demo
+
+Verifică:
+✅ Fiecare user are propriile statistici
+✅ Numerele sunt DIFERITE
+✅ NU se amestecă datele
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 CHECKLIST TESTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+□ Aplicația se încarcă corect
+□ Particule în spate (nu peste avatar)
+□ Login admin funcționează
+□ Status display se micșorează
+□ Auto-logout la schimbare avatar
+□ Re-login pe avatar diferit
+□ Logout manual funcționează
+□ Login demo funcționează
+□ Separare date între useri
+□ Console logs corecte
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 PORNIRE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Serverele rulează deja:
+- Backend: python backend/app.py
+- Frontend: python -m http.server 3000 --directory frontend
+
+Deschide: http://localhost:3000/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏭️ DUPĂ TESTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dacă toate testele trec:
+✅ Sistemul de bază funcționează perfect
+✅ Putem continua cu:
+   - Buton REGISTER
+   - Modal înregistrare
+   - Selectare plan abonament
+   - Integrare PayPal
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: CURRENT - READY FOR TESTING
+📅 DATA: 2025-12-21 22:44
+✅ STATUS: TESTEAZĂ ACUM
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

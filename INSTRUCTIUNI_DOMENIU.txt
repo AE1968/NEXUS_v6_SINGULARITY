@@ -1,0 +1,33 @@
+
+URGENT: ACTUALIZARE DOMENIU KELIONAI.APP
+
+Problema:
+Domeniul tău (kelionai.app) încă trimite vizitatorii către vechiul link ngrok de pe PC-ul tău, care este acum OPRIT.
+
+Soluția:
+Trebuie să intri în contul Namecheap și să schimbi destinația spre noul server CLOUD (Netlify), care este mereu online.
+
+PASI DE URMAT ACUM:
+
+1. Intră pe: https://www.namecheap.com/myaccount/login/
+   - User: [Userul tău, verifică email-ul de confirmare Namecheap]
+   - Parola: [Parola ta]
+
+2. Mergi la "Domain List" -> "kelionai.app" -> butonul "Manage".
+
+3. Caută secțiunea "Redirect Domain" sau "Advanced DNS".
+
+4. ȘTERGE vechiul redirect către "...ngrok-free.dev".
+
+5. ADAUGĂ un nou redirect (sau record CNAME) către:
+   >>> https://chipper-melba-0f3b83.netlify.app
+
+   Setare recomandată (URL Redirect Record):
+   Host: @
+   Value: https://chipper-melba-0f3b83.netlify.app
+   Type: Unmasked (sau Masked dacă vrei să rămână kelionai.app în bară)
+
+6. Salvează.
+
+NOTA: Schimbarea poate dura între 5 minute și 1 oră să se propage pe tot internetul.
+Până atunci, folosește link-ul direct: https://chipper-melba-0f3b83.netlify.app

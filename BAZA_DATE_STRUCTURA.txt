@@ -1,0 +1,272 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║        BAZĂ DE DATE UTILIZATORI - STRUCTURĂ               ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 22:31
+🗄️  TIP: Bază de date unificată
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 PRINCIPIU IMPORTANT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ O SINGURĂ BAZĂ DE DATE pentru TOȚI utilizatorii
+✅ Datele se salvează la nivel de USER, NU la nivel de AVATAR
+✅ Același user poate accesa datele sale pe AMBII avatari (M/F)
+✅ Schimbarea avatarului NU șterge datele
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 STRUCTURĂ BAZĂ DE DATE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+USERS_DB = {
+    'admin': {
+        // Credențiale
+        password: 'Andrada_1968!',
+        role: 'admin',
+        subscription: 'enterprise',
+        permissions: ['view', 'chat', 'voice', 'admin', 'manage_users'],
+        
+        // Date utilizator (PERSISTENTE)
+        profile: {
+            email: 'admin@nexus.com',
+            fullName: 'Administrator',
+            registeredDate: '2025-01-01',
+            lastLogin: '2025-12-21T22:31:00Z',
+            preferredAvatar: 'male'  // Preferință, dar poate schimba
+        },
+        
+        // Istoric conversații (COMUN pentru ambii avatari)
+        chatHistory: [
+            { timestamp: '...', avatar: 'male', message: '...' },
+            { timestamp: '...', avatar: 'female', message: '...' },
+            // etc.
+        ],
+        
+        // Setări (COMUNE)
+        settings: {
+            language: 'ro',
+            voiceEnabled: true,
+            notifications: true,
+            theme: 'dark'
+        },
+        
+        // Statistici (CUMULATIVE)
+        stats: {
+            totalLogins: 150,
+            totalMessages: 1250,
+            loginsByAvatar: {
+                male: 80,
+                female: 70
+            },
+            messagesByAvatar: {
+                male: 650,
+                female: 600
+            }
+        }
+    },
+    
+    'demo': {
+        password: 'demo',
+        role: 'demo',
+        subscription: 'demo',
+        permissions: ['view'],
+        
+        profile: {
+            email: null,
+            fullName: 'Demo User',
+            registeredDate: '2025-01-01',
+            lastLogin: null,
+            preferredAvatar: 'male'
+        },
+        
+        // Demo user nu salvează istoric
+        chatHistory: [],
+        
+        settings: {
+            language: 'ro',
+            voiceEnabled: false,  // Blocat pentru demo
+            notifications: false,
+            theme: 'dark'
+        },
+        
+        stats: {
+            totalLogins: 0,
+            totalMessages: 0,
+            loginsByAvatar: { male: 0, female: 0 },
+            messagesByAvatar: { male: 0, female: 0 }
+        }
+    },
+    
+    // ... alți utilizatori
+};
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 FLUX DE LUCRU:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SCENARIUL 1: User se loghează pe avatar MASCULIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. User "admin" se loghează
+2. Selectează avatar MASCULIN
+3. Conversează cu AI
+4. Mesajele se salvează în:
+   - USERS_DB['admin'].chatHistory
+   - Cu flag: avatar: 'male'
+5. Statistici se actualizează:
+   - loginsByAvatar.male++
+   - messagesByAvatar.male++
+
+SCENARIUL 2: Același user schimbă la avatar FEMININ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. User "admin" apasă 'F'
+2. Se face AUTO-LOGOUT (pentru securitate)
+3. User se re-loghează cu aceleași credențiale
+4. Selectează avatar FEMININ
+5. Conversează cu AI
+6. Mesajele se salvează în:
+   - ACEEAȘI bază: USERS_DB['admin'].chatHistory
+   - Cu flag: avatar: 'female'
+7. Statistici se actualizează:
+   - loginsByAvatar.female++
+   - messagesByAvatar.female++
+
+SCENARIUL 3: User revine la avatar MASCULIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. User "admin" apasă 'M'
+2. Se face AUTO-LOGOUT
+3. User se re-loghează
+4. Selectează avatar MASCULIN
+5. TOATE datele anterioare sunt DISPONIBILE:
+   - Istoric complet (M + F)
+   - Setări
+   - Statistici cumulative
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💾 SALVARE DATE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LOCAȚIE:
+- Frontend: localStorage (temporar, sesiune)
+- Backend: Fișier JSON sau SQLite database
+
+STRUCTURĂ FIȘIER:
+{
+    "users": {
+        "admin": { ... },
+        "demo": { ... },
+        "user_basic": { ... },
+        "user_premium": { ... },
+        "user_enterprise": { ... }
+    },
+    "metadata": {
+        "version": "2.0",
+        "lastUpdate": "2025-12-21T22:31:00Z",
+        "totalUsers": 5
+    }
+}
+
+SALVARE AUTOMATĂ:
+- La fiecare mesaj trimis
+- La fiecare schimbare de setări
+- La logout
+- Periodic (auto-save la 5 minute)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 SECURITATE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Fiecare user are acces DOAR la propriile date
+✅ Admin poate vedea date ale tuturor utilizatorilor
+✅ Demo user NU salvează istoric (privacy)
+✅ Parolele sunt hash-uite (în producție)
+✅ Sesiunile expiră după 24h
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 AVANTAJE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Continuitate: User-ul își păstrează datele
+✅ Flexibilitate: Poate schimba avatarul oricând
+✅ Statistici: Poate vedea activitatea pe ambii avatari
+✅ Simplitate: O singură sursă de adevăr
+✅ Scalabilitate: Ușor de extins cu noi funcții
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 EXEMPLU PRACTIC:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User "admin" în 3 zile:
+
+Ziua 1 (Avatar MASCULIN):
+- Login: 09:00
+- Mesaje: 50
+- Logout: 17:00
+
+Ziua 2 (Avatar FEMININ):
+- Login: 09:00
+- Mesaje: 30
+- Logout: 17:00
+
+Ziua 3 (Avatar MASCULIN):
+- Login: 09:00
+- Poate vedea:
+  ✅ Toate cele 80 de mesaje (50 + 30)
+  ✅ Istoricul complet
+  ✅ Statistici: 80 mesaje total
+    - 50 pe avatar masculin
+    - 30 pe avatar feminin
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ IMPLEMENTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Backend (Python):
+- SQLite database: nexus_users.db
+- Tabele: users, chat_history, settings, stats
+- API endpoints pentru CRUD operations
+
+Frontend (JavaScript):
+- localStorage pentru cache local
+- Sincronizare cu backend la fiecare acțiune
+- Offline support cu queue de sincronizare
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 CONCLUZIE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+O SINGURĂ bază de date pentru TOȚI utilizatorii.
+Datele sunt legate de USER, NU de AVATAR.
+Schimbarea avatarului NU afectează datele salvate.
+
+GATA DE IMPLEMENTARE! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: v2.2 - UNIFIED DATABASE
+📅 DATA: 2025-12-21 22:31
+✅ STATUS: DOCUMENTAT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,232 @@
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║          USER TEST - DOCUMENTAȚIE                         ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+📅 DATA: 2025-12-21 23:01
+👤 USER: TEST
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 SCOP:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User TEST simulează un utilizator NOU care tocmai s-a înregistrat
+și a plătit pentru abonamentul de 1 LUNĂ.
+
+Acest user este folosit pentru TESTARE:
+✅ Flux înregistrare
+✅ Abonament plătit
+✅ Expirare după 30 zile
+✅ Notificare la 3 zile
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 CREDENȚIALE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Username: test
+Password: test123
+Email:    test@example.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 DETALII ABONAMENT:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Plan:         1 Month Plan (Basic)
+Preț/lună:    £10.00
+Total plătit: £10.00
+Monedă:       GBP
+
+Start Date:   ACUM (când rulează aplicația)
+End Date:     +30 zile de la start
+Status:       active
+
+Permisiuni:
+  ✅ view      - Vizualizare
+  ✅ chat      - Chat text
+  ❌ voice     - Voce (blocat pentru Basic)
+  ❌ advanced  - Funcții avansate (blocat)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 STRUCTURĂ COD:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+'test': {
+    password: 'test123',
+    email: 'test@example.com',
+    role: 'user',
+    subscription: 'basic',
+    
+    subscriptionDetails: {
+        startDate: new Date().toISOString(),  // ACUM
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),  // +30 zile
+        status: 'active',
+        notifiedAt3Days: false,
+        planName: '1 Month Plan',
+        pricePerMonth: 10.00,
+        totalPrice: 10.00,
+        currency: 'GBP'
+    },
+    
+    permissions: ['view', 'chat'],
+    chatHistory: [],
+    settings: { language: 'en', voiceEnabled: false },
+    stats: { totalLogins: 0, totalMessages: 0 }
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧪 TESTARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TEST 1: Login Basic
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Deschide http://localhost:3000/
+2. Click "LOGIN"
+3. Username: test
+4. Password: test123
+5. Click "LOGIN"
+
+Verifică:
+✅ Login reușit
+✅ Status display: "TEST [BASIC] | MALE"
+✅ Console: "Subscription: basic"
+✅ Console: "Permissions: view, chat"
+✅ Console: "Total logins: 1"
+
+TEST 2: Verificare Expirare (Simulare)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pentru a testa rapid expirarea:
+
+1. În cod, schimbă temporar:
+   endDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+   (2 zile în loc de 30)
+
+2. Refresh pagină
+3. Login ca "test"
+4. Verifică console:
+   "⚠️ Subscription expiring in 2 days for test"
+5. Primești alert cu notificare
+
+TEST 3: Verificare Expirare Completă
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Schimbă endDate la o dată trecută:
+   endDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+   (ieri)
+
+2. Refresh pagină
+3. Încearcă login ca "test"
+4. Verifică:
+   ❌ Login blocat
+   Alert: "Your subscription has expired. Please renew to login."
+   Console: "🔒 Login blocked for test - subscription expired"
+
+TEST 4: Schimbare Avatar
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Login ca "test"
+2. Apasă 'F'
+3. Verifică:
+   ✅ Auto-logout
+   ✅ Modal se deschide
+   ✅ Avatar schimbat la FEMININ
+
+4. Re-login ca "test"
+5. Verifică:
+   ✅ Status: "TEST [BASIC] | FEMALE"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 COMPARAȚIE CU ALȚI USERI:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User            | Plan       | Durată  | Expirare
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+admin           | Enterprise | ∞       | NU
+demo            | Demo       | 10 min  | Session only
+test            | Basic      | 30 zile | DA
+user_basic      | Basic      | 1 lună  | DA
+user_premium    | Premium    | 3 luni  | DA
+user_enterprise | Enterprise | 1 an    | DA
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏰ TIMELINE USER TEST:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ziua 1:   Înregistrare + Plată £10
+          Status: active
+          Permisiuni: view, chat
+
+Ziua 27:  (3 zile înainte de expirare)
+          Notificare: "Your subscription will expire in 3 days"
+          Status: expiring_soon
+
+Ziua 28:  Reminder: "2 days left"
+
+Ziua 29:  Final reminder: "1 day left"
+
+Ziua 30:  EXPIRARE
+          Status: expired
+          Permisiuni: view only
+          Login blocat
+          Mesaj: "Please renew to continue"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ AVANTAJE USER TEST:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Date dinamice (startDate = ACUM)
+✅ Expirare realistă (30 zile)
+✅ Simulează user nou înregistrat
+✅ Perfect pentru testare flux complet
+✅ Ușor de modificat pentru teste rapide
+✅ Email inclus (pentru viitoare notificări)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 UTILIZARE:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User TEST este ideal pentru:
+- Testare sistem login
+- Testare verificare expirare
+- Testare notificări
+- Demonstrații clienți
+- Training echipă
+- QA testing
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ GATA DE UTILIZARE!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Login acum cu:
+Username: test
+Password: test123
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VERSIUNE: USER TEST ADDED
+📅 DATA: 2025-12-21 23:01
+✅ STATUS: IMPLEMENTAT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
