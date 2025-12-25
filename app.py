@@ -20,11 +20,22 @@ from email.mime.multipart import MIMEMultipart
 # Adaugam folderul curent la path pentru a asigura importul configurarii
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Configuration Loading with Fallback
 try:
     from config_kelion import PAYPAL_CLIENT_ID, PAYPAL_SECRET, SECRET_KEY, DB_NAME, SMTP_EMAIL, SMTP_PASSWORD, SMTP_SERVER, SMTP_PORT, ALLOWED_ORIGINS, OPENAI_API_KEY, ELEVENLABS_API_KEY
 except ImportError:
-    print("ERROR: config_kelion.py not found in backend folder!")
-    sys.exit(1)
+    print("WARNING: config_kelion.py not found. Using environment variables/defaults.")
+    PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "default_client_id")
+    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET", "default_secret")
+    SECRET_KEY = os.getenv("SECRET_KEY", "kelion_super_secret_key_v6")
+    DB_NAME = os.getenv("DB_NAME", "nexus.db")
+    SMTP_EMAIL = os.getenv("SMTP_EMAIL", "test@example.com")
+    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+    SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+    SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
+    ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+    ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 
 # ==============================================================================
 #  INIT
