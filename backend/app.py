@@ -448,5 +448,7 @@ if __name__ == '__main__':
             db.session.commit()
             print("✓ Database and default accounts created.")
     
-    print(f"🚀 KELION READY: http://localhost:8000")
-    app.run(port=8000, debug=False, host='127.0.0.1')
+    # Get port from environment (Render provides PORT variable)
+    port = int(os.getenv('PORT', 8000))
+    print(f"🚀 KELION READY: http://0.0.0.0:{port}")
+    app.run(port=port, debug=False, host='0.0.0.0')
