@@ -38,71 +38,35 @@
             overflow: hidden;
             font-family: 'Rajdhani', sans-serif;
             color: var(--cyan);
-            background: #050510 url("assets/kelion_hero_bg.png") no-repeat center center / contain;
+            background: #050505;
             position: relative;
         }
 
-        /* Overlay Animat Breathing */
-        body::before {
-            content: "";
-            position: absolute;
+        #bg-image {
+            position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 50% 40%, rgba(0, 243, 255, 0.12), transparent 55%);
-            animation: breathe 4s ease-in-out infinite;
+            background: url("assets/humanoid_male.png") no-repeat center 15% / cover;
+            z-index: -1;
             pointer-events: none;
-            z-index: 1;
+            transform: translate3d(0, 0, 0);
         }
 
-        @keyframes breathe {
-
-            0%,
-            100% {
-                opacity: 0.6;
-            }
-
-            50% {
-                opacity: 0.9;
-            }
-        }
-
-        #bg-canvas {
-            display: none !important;
-            visibility: hidden !important;
-        }
-
-        /* Twinkling Stars Overlay */
-        body::after {
+        /* Subtle breathing overlay - no animation */
+        body::before {
             content: "";
             position: fixed;
             inset: 0;
-            background-image:
-                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
-                radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
-                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
-                radial-gradient(2px 2px at 160px 120px, rgba(0, 243, 255, 0.9), transparent),
-                radial-gradient(1px 1px at 230px 80px, #fff, transparent),
-                radial-gradient(2px 2px at 300px 150px, rgba(255, 255, 255, 0.7), transparent),
-                radial-gradient(1px 1px at 370px 200px, #fff, transparent),
-                radial-gradient(2px 2px at 450px 50px, rgba(0, 243, 255, 0.8), transparent),
-                radial-gradient(1px 1px at 520px 180px, #fff, transparent),
-                radial-gradient(2px 2px at 600px 100px, rgba(255, 255, 255, 0.9), transparent);
-            background-size: 650px 250px;
-            animation: twinkle 4s ease-in-out infinite;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
             z-index: 1;
             pointer-events: none;
-            opacity: 0.6;
         }
 
-        @keyframes twinkle {
-
-            0%,
-            100% {
-                opacity: 0.4;
-            }
-
-            50% {
-                opacity: 0.8;
-            }
+        #bg-canvas {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
         }
 
         /* Top Status Bar */
@@ -657,6 +621,7 @@
 <body>
 
     <canvas id="bg-canvas"></canvas>
+    <div id="bg-image"></div>
 
     <div id="header">
         <div id="status-display">
