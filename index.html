@@ -42,30 +42,12 @@
             position: relative;
         }
 
+        /* Single background image - robot + galaxy combined */
         #bg-image {
             position: fixed;
             inset: 0;
-            background: url("assets/humanoid_male.png") no-repeat center 15% / cover;
+            background: url("assets/kelion_robot_galaxy.png") no-repeat center center / cover;
             z-index: -1;
-            pointer-events: none;
-            transform: translate3d(0, 0, 0);
-        }
-
-        /* Subtle breathing overlay - no animation */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        #bg-canvas {
-            display: block;
-            position: fixed;
-            inset: 0;
-            z-index: -2;
             pointer-events: none;
         }
 
