@@ -5,4 +5,4 @@ nixPkgs = ["nodejs-18_x"]
 cmds = ["npm install"]
 
 [start]
-cmd = "npx serve -s . -l $PORT"
+cmd = "npx http-server . -p $PORT --cors"

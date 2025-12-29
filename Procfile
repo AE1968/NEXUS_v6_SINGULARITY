@@ -1,1 +1,1 @@
-web: npx serve -s . -l $PORT
+web: npx http-server . -p $PORT --cors
