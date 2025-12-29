@@ -25,14 +25,13 @@ RUN mkdir -p /app/data
 EXPOSE 5000
 
 # Environment variables (defaults, override with docker-compose or -e)
-ENV FLASK_APP=backend.py
+ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
-ENV PORT=5000
 ENV DATABASE_PATH=/app/data/nexus.db
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:5000/health')"
 
-# Run with gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "--workers", "4", "--timeout", "120", "backend:app"]
+# Run with gunicorn - shell form for $PORT expansion
+CMD gunicorn -b 0.0.0.0:$PORT --workers 2 --timeout 120 app:app
