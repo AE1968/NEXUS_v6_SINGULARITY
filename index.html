@@ -86,7 +86,7 @@
         #bg-image {
             position: fixed;
             inset: 0;
-            background: url("https://raw.githubusercontent.com/AE1968/NEXUS_v6_SINGULARITY/main/assets/kelion_robot_galaxy.png") no-repeat center top / contain;
+            background: url("https://raw.githubusercontent.com/AE1968/NEXUS_v6_SINGULARITY/main/assets/kelion_robot_galaxy.png") no-repeat center bottom 30px / auto 75vh;
             background-color: #050505;
             z-index: -1;
             pointer-events: none;
@@ -204,12 +204,16 @@
             gap: 2px;
             height: 1.2em;
             overflow: hidden;
+            min-width: 65px;
+            justify-content: center;
         }
 
         .clock-part {
             position: relative;
             display: flex;
             flex-direction: column;
+            width: 1.5em;
+            text-align: center;
             transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
@@ -1682,7 +1686,7 @@ Instructions: Be precise, professional and sophisticated. After getting search r
 
             // Update Version
             const vTag = document.querySelector('.version-tag');
-            if (vTag) vTag.textContent = "v142.0";
+            if (vTag) vTag.textContent = "v142.1";
 
             // initThreeJS(); // DISABLED - shows robot background instead
         });
