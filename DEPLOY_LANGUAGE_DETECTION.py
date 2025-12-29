@@ -3,7 +3,7 @@ from datetime import datetime
 
 SFTP_HOST = 'fs-cygni.easywp.com'
 SFTP_USER = 'geneza-kelion-129030d'
-SFTP_PASS = 'vAMhj455TYdCtTUd1dM8'
+SFTP_PASS = 'WUzxy7ZBROvOPW6zlqNr'
 
 def deploy_language_detection():
     """Deploy updated index.html with language detection logic"""

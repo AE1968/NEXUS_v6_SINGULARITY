@@ -13,6 +13,9 @@ RAILWAY_KEYS.txt
 *_KEYS.txt
 server_log*.txt
 start_kelion.ps1
+ss.txt
+kelionai.app.php
+today_files.txt
 
 # Files with hardcoded API keys
 KELION_*.php

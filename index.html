@@ -38,7 +38,7 @@
             overflow: hidden;
             font-family: 'Rajdhani', sans-serif;
             color: var(--cyan);
-            background: var(--bg) url("assets/humanoid_male.png") no-repeat center 15% / cover;
+            background: #050510 url("assets/kelion_hero_bg.png") no-repeat center center / contain;
             position: relative;
         }
 
@@ -66,10 +66,43 @@
         }
 
         #bg-canvas {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        /* Twinkling Stars Overlay */
+        body::after {
+            content: "";
             position: fixed;
             inset: 0;
-            z-index: 0;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(2px 2px at 160px 120px, rgba(0, 243, 255, 0.9), transparent),
+                radial-gradient(1px 1px at 230px 80px, #fff, transparent),
+                radial-gradient(2px 2px at 300px 150px, rgba(255, 255, 255, 0.7), transparent),
+                radial-gradient(1px 1px at 370px 200px, #fff, transparent),
+                radial-gradient(2px 2px at 450px 50px, rgba(0, 243, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 520px 180px, #fff, transparent),
+                radial-gradient(2px 2px at 600px 100px, rgba(255, 255, 255, 0.9), transparent);
+            background-size: 650px 250px;
+            animation: twinkle 4s ease-in-out infinite;
+            z-index: 1;
             pointer-events: none;
+            opacity: 0.6;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
         }
 
         /* Top Status Bar */
@@ -654,6 +687,9 @@
         <div class="indicator storage" title="Encrypted Database">💾</div>
     </div>
 
+    <!-- NEXUS ROBOT IMAGE -->
+    <!-- NEXUS ROBOT INTEGRATED IN BACKGROUND -->
+
     <div id="chat-container">
         <div id="chat-header">
             <span>NEURAL INTERFACE v142.0</span>
@@ -834,7 +870,7 @@
             isAdmin: false,
             user: "N/A",
             voice: true,
-            language: null  // Auto-detected from user input
+            language: 'en'  // English default
         };
 
         const $ = id => document.getElementById(id);
@@ -1455,42 +1491,10 @@ Instructions: Be precise, professional and sophisticated. After getting search r
             const vTag = document.querySelector('.version-tag');
             if (vTag) vTag.textContent = "v142.0";
 
-            initThreeJS();
+            // initThreeJS(); // DISABLED - shows robot background instead
         });
 
-        function initThreeJS() {
-            const canvas = document.getElementById('bg-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let width, height;
-
-            function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            }
-            window.onresize = resize;
-            resize();
-
-            const columns = Math.floor(width / 20);
-            const drops = [];
-            for (let x = 0; x < columns; x++) drops[x] = 1;
-
-            function drawBg() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, width, height);
-                ctx.fillStyle = '#0F0';
-                ctx.font = '15px monospace';
-                for (let i = 0; i < drops.length; i++) {
-                    const text = String.fromCharCode(0x30A0 + Math.random() * 96);
-                    ctx.fillStyle = `rgba(0, 243, 255, ${Math.random()})`;
-                    ctx.fillText(text, i * 20, drops[i] * 20);
-                    if (drops[i] * 20 > height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
-                }
-                requestAnimationFrame(drawBg);
-            }
-            drawBg();
-        }
+        // Matrix effect removed - keeping clean background
 
         // 🌟 GREETING HELPER (Time-based, Multilingual)
         function greetUser(username) {

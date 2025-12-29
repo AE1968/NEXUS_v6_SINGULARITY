@@ -1239,22 +1239,6 @@ def debug_health():
         "version": "v142.0"
     })
 
-# --- STATIC FILES ---
-@app.route('/assets/<path:filename>')
-def serve_assets(filename):
-    assets_folder = os.path.join(app.static_folder, 'assets')
-    return send_from_directory(assets_folder, filename)
-
-@app.route('/')
-def index():
-    return send_from_directory(BASE_DIR, 'index.html')
-
-@app.route('/<path:path>')
-def assets(path):
-    if not os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, 'index.html')
-    return send_from_directory(app.static_folder, path)
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all() # Ensure all tables exist (including new ChatHistory)
