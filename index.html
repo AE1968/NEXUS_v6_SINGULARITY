@@ -86,7 +86,7 @@
         #bg-image {
             position: fixed;
             inset: 0;
-            background: url("https://raw.githubusercontent.com/AE1968/NEXUS_v6_SINGULARITY/main/assets/kelion_robot_galaxy.png") no-repeat center center / contain;
+            background: url("https://raw.githubusercontent.com/AE1968/NEXUS_v6_SINGULARITY/main/assets/kelion_robot_galaxy.png") no-repeat center top / contain;
             background-color: #050505;
             z-index: -1;
             pointer-events: none;
@@ -220,9 +220,11 @@
         }
 
         #system-date {
-            font-weight: 800;
+            font-weight: 900;
             color: var(--cyan);
-            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
         }
 
         .header-actions {
@@ -1467,17 +1469,24 @@ Instructions: Be precise, professional and sophisticated. After getting search r
                 next.textContent = val;
                 container.appendChild(next);
 
-                if (container.children.length > 1) {
-                    container.style.transform = `translateY(-${(container.children.length - 1) * 1.2}em)`;
-                    setTimeout(() => {
-                        while (container.children.length > 1) {
-                            container.removeChild(container.firstChild);
-                        }
+                // Ensure transition is active
+                container.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+
+                // Force layout reflow
+                container.offsetHeight;
+
+                const offset = (container.children.length - 1) * 1.2;
+                container.style.transform = `translateY(-${offset}em)`;
+
+                setTimeout(() => {
+                    if (container.children.length > 1) {
+                        const last = container.lastElementChild;
                         container.style.transition = 'none';
                         container.style.transform = 'translateY(0)';
-                        setTimeout(() => container.style.transition = '', 50);
-                    }, 600);
-                }
+                        container.innerHTML = '';
+                        container.appendChild(last);
+                    }
+                }, 650);
             }
 
             function updateClock() {
