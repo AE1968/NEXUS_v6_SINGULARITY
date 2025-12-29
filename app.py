@@ -469,7 +469,7 @@ def serve_static(filename):
 
 @app.route('/status')
 def status():
-    return jsonify({"status": "online", "system": "KELION v142.0", "engine": "Flask/Python"})
+    return jsonify({"status": "online", "system": "KELION v142.1", "engine": "Flask/Python"})
 
 @app.route('/api/config')
 def get_config():
@@ -775,7 +775,7 @@ def get_chatgpt_response(message, username, conversation_id, gender='male'):
 
     ai_name = "KELION" if gender == 'male' else "VEONA"
     
-    system_prompt = f"""Ești {ai_name} v142.0, un asistent IA humanoid avansat creat de echipa GENEZA NEXUS.
+    system_prompt = f"""Ești {ai_name} v142.1, un asistent IA humanoid avansat creat de echipa GENEZA NEXUS.
 Personalitate: Politicos, inteligent, prietenos. LIMBA PREDEFINITĂ: ROMÂNĂ. 
 Reguli: Răspunsuri ACADEMICE, AUTORITARE, PRECISE. Concis pentru vorbire (max. 3-4 propoziții).
 MEMORIE: Ai o legătură neurală cu conversațiile anterioare. Menționează fapte vechi dacă sunt relevante.

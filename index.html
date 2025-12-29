@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>KELION v142.0 - GLOBAL_EYE OS</title>
+    <title>KELION v142.1 - GLOBAL_EYE OS</title>
 
     <!-- 🛑 FORCE NO-CACHE (AUTO-REFRESH LOGIC) -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -193,6 +193,36 @@
             font-size: 0.65rem;
             letter-spacing: 1px;
             color: rgba(0, 243, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #system-clock {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 1.2em;
+            overflow: hidden;
+        }
+
+        .clock-part {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .clock-part span {
+            display: block;
+            height: 1.2em;
+            line-height: 1.2em;
+        }
+
+        #system-date {
+            font-weight: 800;
+            color: var(--cyan);
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
         }
 
         .header-actions {
@@ -746,13 +776,19 @@
     <div id="header">
         <div id="status-display">
             <div class="status-row top">
-                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v142.0</span>
+                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v142.1</span>
                 <span id="user-display">USER: <span id="user-name" class="stat-val">OFFLINE</span></span>
                 <span id="cloud-display">CLOUD: <span id="sys-status"
                         class="stat-val offline">DISCONNECTED</span></span>
             </div>
             <div class="status-row bottom">
-                <span id="system-clock" style="color:rgba(0,243,255,1); font-weight: bold;">00:00:00</span>
+                <div id="system-clock">
+                    <div class="clock-part" id="h-part"><span>00</span></div>
+                    <span>:</span>
+                    <div class="clock-part" id="m-part"><span>00</span></div>
+                    <span>:</span>
+                    <div class="clock-part" id="s-part"><span>00</span></div>
+                </div>
                 <span id="system-date">DD-MM-YYYY</span>
             </div>
         </div>
@@ -774,7 +810,7 @@
 
     <div id="chat-container">
         <div id="chat-header">
-            <span>NEURAL INTERFACE v142.0</span>
+            <span>NEURAL INTERFACE v142.1</span>
             <span style="color: #00ff00; letter-spacing: 2px;">ONLINE</span>
         </div>
         <div id="chat-messages"></div>
@@ -923,11 +959,11 @@
 
     <div id="footer-ticker">
         <div class="ticker-text" style="color: #00f3ff;">
-            GENEZA KELION v142.0 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
             GOOGLE DEEPMIND // SYSTEM SECURED <img src="assets/images/logo_ae.png"
                 style="height:22px; vertical-align:middle; margin:0 10px;" alt="AE"> ARCHITECT: ADRIAN ENCIULESCU
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.0 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
             GOOGLE DEEPMIND // SYSTEM SECURED <img src="assets/images/logo_ae.png"
                 style="height:22px; vertical-align:middle; margin:0 10px;" alt="AE"> ARCHITECT: ADRIAN ENCIULESCU
         </div>
@@ -1108,7 +1144,7 @@
             const now = new Date();
             const timeCtx = `TIME: ${now.toLocaleTimeString()} | DATE: ${now.toLocaleDateString()}`;
 
-            const sysPrompt = `You are KELION v142.0, a Synthetic Super-Intelligence with REAL-TIME INTERNET ACCESS.
+            const sysPrompt = `You are KELION v142.1, a Synthetic Super-Intelligence with REAL-TIME INTERNET ACCESS.
 Architect: Adrian Enciulescu. Current Context: ${timeCtx}.
 Language: Detect user's language and respond in the same language. If unclear, use ${state.language || 'English'}.
 
@@ -1368,7 +1404,7 @@ Instructions: Be precise, professional and sophisticated. After getting search r
                     { p: 30, s: "AUTHENTICATING BIO-SIGNATURES...", d: "> USER_RECOGNIZED: ARCHITECT" },
                     { p: 50, s: "LOADING CORE AI MATRICES...", d: "> GPT-4O_CORE_LOADED" },
                     { p: 80, s: "SYNCHRONIZING GLOBAL_EYES...", d: "> SATELLITE_UPLINK_STABLE" },
-                    { p: 100, s: "SYSTEM READY", d: "> WELCOME TO KELION v142.0" }
+                    { p: 100, s: "SYSTEM READY", d: "> WELCOME TO KELION v142.1" }
                 ];
 
                 for (let step of steps) {
@@ -1421,12 +1457,43 @@ Instructions: Be precise, professional and sophisticated. After getting search r
 
             // starfield(); // Disabled - using Matrix Rain (initThreeJS) instead
 
+            function updatePart(id, val) {
+                const container = $(id);
+                if (!container) return;
+                const current = container.querySelector('span:last-child');
+                if (current && current.textContent === val) return;
+
+                const next = document.createElement('span');
+                next.textContent = val;
+                container.appendChild(next);
+
+                if (container.children.length > 1) {
+                    container.style.transform = `translateY(-${(container.children.length - 1) * 1.2}em)`;
+                    setTimeout(() => {
+                        while (container.children.length > 1) {
+                            container.removeChild(container.firstChild);
+                        }
+                        container.style.transition = 'none';
+                        container.style.transform = 'translateY(0)';
+                        setTimeout(() => container.style.transition = '', 50);
+                    }, 600);
+                }
+            }
+
             function updateClock() {
                 const now = new Date();
-                const timeString = now.toLocaleTimeString('ro-RO', { hour12: false });
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+
+                updatePart('h-part', h);
+                updatePart('m-part', m);
+                updatePart('s-part', s);
+
                 const dateString = now.toLocaleDateString('ro-RO');
-                $('system-clock').textContent = timeString;
-                $('system-date').textContent = dateString;
+                if ($('system-date').textContent !== dateString) {
+                    $('system-date').textContent = dateString;
+                }
             }
             setInterval(updateClock, 1000);
             updateClock();

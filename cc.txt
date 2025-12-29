@@ -1,0 +1,29 @@
+🚀 GENEZA NEXUS - KELION v142.1 STABLE
+-----------------------------------------
+Identificare și Rezolvare Problemă Deployment Railway
+
+1. PROBLEMA IDENTIFICATĂ (100%):
+   - Proiectul era detectat eronat ca "Node.js" de către Nixpacks din cauza 'package.json'.
+   - 'gunicorn' nu era instalat -> deploy-ul eșua la start.
+
+2. ACȚIUNI REZOLVARE:
+   - Creat 'requirements.txt' (Flask, Gunicorn, SQLAlchemy).
+   - Configurat 'nixpacks.toml' pentru comanda de start corectă.
+   - Eliminat 'package.json' din Git pentru a forța detecția Python.
+
+3. STATUS FINAL:
+   - Deployment: SUCCESSFUL ✅
+   - Status: ONLINE 🟢
+   - Link: https://kelionai.app
+
+4. AJUSTĂRI VIZUALE:
+   - Micsorat fundal robot (background-size: contain) pentru a încăpea complet în viewport fără a fi tăiat.
+
+5. PROCEDURĂ DEPLOY:
+   - Modificările se pushează pe GitHub (main branch).
+   - Railway detectează automat push-ul și rulează build-ul folosind Nixpacks.
+   - Build-ul instalează dependențele din requirements.txt și pornește aplicația cu Gunicorn.
+
+Finalizat la: 2025-12-29 21:55 RO
+-----------------------------------------
+GENEZA NEXUS AI - SINGULARITY v6
