@@ -42,39 +42,145 @@
             position: relative;
         }
 
+        /* Neural Loading Sequence */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            transition: opacity 1s ease-out, visibility 1s;
+        }
+
+        .loading-loader {
+            width: 300px;
+            height: 2px;
+            background: rgba(0, 243, 255, 0.1);
+            position: relative;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--cyan);
+            box-shadow: 0 0 15px var(--cyan);
+            transition: width 0.5s ease;
+        }
+
+        .loading-text {
+            color: var(--cyan);
+            letter-spacing: 5px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--cyan);
+        }
+
         /* Single background image - robot + galaxy combined */
         #bg-image {
             position: fixed;
             inset: 0;
-            background: url("https://raw.githubusercontent.com/AE1968/NEXUS_v6_SINGULARITY/main/assets/kelion_robot_galaxy.png") no-repeat center center / cover;
+            background: url("https://raw.githubusercontent.com/AE1968/NEXUS_v6_SINGULARITY/main/assets/kelion_robot_galaxy.png") no-repeat center center / contain;
+            background-color: #050505;
             z-index: -1;
             pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        #bg-image.active {
+            opacity: 1;
+            animation: robotActivate 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes robotActivate {
+            0% {
+                filter: brightness(0) blur(20px);
+                transform: scale(1.05);
+            }
+
+            50% {
+                filter: brightness(1.5) contrast(1.2) blur(5px);
+            }
+
+            100% {
+                filter: brightness(1) blur(0);
+                transform: scale(1);
+            }
+        }
+
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    transparent 50%,
+                    rgba(0, 243, 255, 0.05) 50%,
+                    rgba(0, 243, 255, 0.05) 51%,
+                    transparent 51%);
+            background-size: 100% 4px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        #header,
+        #side-indicators,
+        #ae-contact-btn,
+        #footer-ticker {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        body.ready #header,
+        body.ready #side-indicators,
+        body.ready #ae-contact-btn,
+        body.ready #footer-ticker {
+            opacity: 1;
         }
 
         /* Top Status Bar */
         #header {
             position: fixed;
-            top: 0;
+            top: 20px;
             left: 0;
             width: 100%;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 30px;
             z-index: 1000;
         }
 
         #status-display {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 10, 20, 0.9);
             border: 1px solid var(--cyan);
-            padding: 10px 25px;
-            border-radius: 8px;
+            padding: 6px 15px;
+            border-radius: 4px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
+            font-size: 0.72rem;
+            letter-spacing: 1px;
             display: flex;
+            align-items: center;
             gap: 20px;
-            box-shadow: var(--glow);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            backdrop-filter: blur(8px);
+        }
+
+        .header-actions {
+            position: absolute;
+            right: 30px;
+            top: 0;
+            display: flex;
+            gap: 10px;
         }
 
         .stat-val {
@@ -602,26 +708,35 @@
 
 <body>
 
+    <div id="loading-screen">
+        <div class="loading-text" id="load-status">NEURAL LINK INITIALIZING...</div>
+        <div class="loading-loader">
+            <div class="loading-bar" id="load-bar"></div>
+        </div>
+        <div style="margin-top:20px; font-size: 0.6rem; color: rgba(0,243,255,0.4); font-family: monospace;"
+            id="load-detail">
+            > EXECUTING CORE_V142_PROTOCOLS...
+        </div>
+    </div>
+
     <canvas id="bg-canvas"></canvas>
     <div id="bg-image"></div>
+    <div class="scan-line"></div>
 
     <div id="header">
         <div id="status-display">
             <div
-                style="display:flex; flex-direction:column; line-height:1.2; padding-right:20px; border-right:1px solid rgba(0,243,255,0.3); margin-right:15px; text-align:right;">
-                <span class="version-tag" style="font-size:1.1em; font-weight:bold; letter-spacing:3px;"
-                    id="version-tag">v142.0</span>
-                <span id="system-clock"
-                    style="font-size:0.85em; color:rgba(0,243,255,0.7); letter-spacing:1px;">00:00:00</span>
-                <span id="system-date"
-                    style="font-size:0.75em; color:rgba(0,243,255,0.5); letter-spacing:1px;">DD-MM-YYYY</span>
+                style="display:flex; align-items:center; gap:15px; border-right:1px solid rgba(0,243,255,0.2); padding-right:15px;">
+                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v142.0</span>
+                <span id="system-clock" style="color:rgba(0,243,255,0.7);">00:00:00</span>
+                <span id="system-date" style="color:rgba(0,243,255,0.4); font-size: 0.6rem;">DD-MM-YYYY</span>
             </div>
-            <div style="display:flex; gap:20px; align-items:center;">
+            <div style="display:flex; gap:15px; align-items:center;">
                 <span>USER: <span id="user-name" class="stat-val">OFFLINE</span></span>
                 <span>CLOUD: <span id="sys-status" class="stat-val offline">DISCONNECTED</span></span>
             </div>
         </div>
-        <div style="display:flex; gap:10px;">
+        <div class="header-actions">
             <button id="traffic-btn">TRAFFIC</button>
             <button id="login-btn">LOGIN</button>
         </div>
@@ -1223,17 +1338,46 @@ Instructions: Be precise, professional and sophisticated. After getting search r
 
         // 🚀 INITIALIZATION
         document.addEventListener('DOMContentLoaded', () => {
-            // 🔓 SESSION-BASED LOGIN: Logged out when browser closes, persists on refresh
-            const savedUser = sessionStorage.getItem('kelion_user');
-            const savedAdmin = sessionStorage.getItem('kelion_admin') === 'true';
+            // 🚀 NEURAL INITIALIZATION SEQUENCE
+            const initSequence = async () => {
+                const bar = $('load-bar');
+                const status = $('load-status');
+                const detail = $('load-detail');
+                const steps = [
+                    { p: 10, s: "CONNECTING TO NEURAL HUB...", d: "> HANDSHAKE_REQUEST_SENT" },
+                    { p: 30, s: "AUTHENTICATING BIO-SIGNATURES...", d: "> USER_RECOGNIZED: ARCHITECT" },
+                    { p: 50, s: "LOADING CORE AI MATRICES...", d: "> GPT-4O_CORE_LOADED" },
+                    { p: 80, s: "SYNCHRONIZING GLOBAL_EYES...", d: "> SATELLITE_UPLINK_STABLE" },
+                    { p: 100, s: "SYSTEM READY", d: "> WELCOME TO KELION v142.0" }
+                ];
 
-            if (savedUser) {
-                // Restore session
-                state.user = savedUser;
+                for (let step of steps) {
+                    await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
+                    bar.style.width = step.p + "%";
+                    status.textContent = step.s;
+                    detail.textContent = step.d;
+                }
+
+                await new Promise(r => setTimeout(r, 800));
+                $('loading-screen').style.opacity = '0';
+                setTimeout(() => {
+                    $('loading-screen').style.visibility = 'hidden';
+                    $('bg-image').classList.add('active');
+                    document.body.classList.add('ready');
+                }, 1000);
+            };
+
+            initSequence();
+
+            // 🔓 RESTORE SESSION: Check both session and local storage
+            let sessionUser = sessionStorage.getItem('kelion_user') || localStorage.getItem('kelion_user');
+            let sessionAdmin = (sessionStorage.getItem('kelion_admin') === 'true') || (localStorage.getItem('kelion_admin') === 'true');
+
+            if (sessionUser) {
+                state.user = sessionUser;
                 state.isLogged = true;
-                state.isAdmin = savedAdmin;
+                state.isAdmin = sessionAdmin;
 
-                // Update UI to show logged in state
                 $('user-name').textContent = state.user.toUpperCase();
                 $('sys-status').textContent = "CONNECTED";
                 $('sys-status').className = "stat-val online";
@@ -1250,6 +1394,9 @@ Instructions: Be precise, professional and sophisticated. After getting search r
                         tb.style.pointerEvents = 'auto';
                     }
                 }
+            } else {
+                $('input-bar').style.display = 'none';
+                write('bot', "SYSTEM STANDBY. PLEASE AUTHENTICATE.");
             }
 
             // starfield(); // Disabled - using Matrix Rain (initThreeJS) instead
@@ -1272,6 +1419,8 @@ Instructions: Be precise, professional and sophisticated. After getting search r
                     state.isAdmin = false;
                     sessionStorage.removeItem('kelion_user');
                     sessionStorage.removeItem('kelion_admin');
+                    localStorage.removeItem('kelion_user');
+                    localStorage.removeItem('kelion_admin');
                     location.reload(); // Hard reset on logout
                 } else {
                     $('login-modal').style.display = 'flex';
@@ -1292,6 +1441,8 @@ Instructions: Be precise, professional and sophisticated. After getting search r
                 state.isLogged = true;
                 sessionStorage.setItem('kelion_user', user);
                 sessionStorage.setItem('kelion_admin', state.isAdmin);
+                localStorage.setItem('kelion_user', user);
+                localStorage.setItem('kelion_admin', state.isAdmin);
 
                 // UI UPDATE (NO RELOAD)
                 $('login-modal').style.display = 'none';
@@ -1430,34 +1581,8 @@ Instructions: Be precise, professional and sophisticated. After getting search r
                 micBtn.onclick = null;
             }
 
-
             $('chat-input').onkeypress = e => { if (e.key === "Enter") execute(); };
 
-            // SECURITY CHECK
-            const savedUser = localStorage.getItem('kelion_user');
-            const savedAdmin = localStorage.getItem('kelion_admin') === 'true';
-            if (savedUser) {
-                state.user = savedUser;
-                state.isLogged = true;
-                state.isAdmin = savedAdmin;
-
-                $('user-name').textContent = state.user.toUpperCase();
-                $('sys-status').textContent = "CONNECTED";
-                $('sys-status').className = "stat-val online";
-                $('login-btn').textContent = "LOG OFF";
-                $('login-btn').classList.add('logged');
-                $('input-bar').style.display = 'flex';
-                $('chat-container').style.display = 'flex';
-
-                if (state.isAdmin) {
-                    $('traffic-btn').style.display = 'inline-block';
-                    $('traffic-btn').style.opacity = '1';
-                    $('traffic-btn').style.pointerEvents = 'auto';
-                }
-            } else {
-                $('input-bar').style.display = 'none';
-                write('bot', "SYSTEM STANDBY. PLEASE AUTHENTICATE.");
-            }
 
             // Update Version
             const vTag = document.querySelector('.version-tag');
