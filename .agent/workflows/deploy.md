@@ -1,75 +1,75 @@
 ---
-description: Deploy KELION to Railway and verify it works correctly
+description: OBLIGATORIU - Procedură Deploy KELION (Railway)
 ---
 
-# KELION Deployment & Verification Workflow
+# 🚨 REGULĂ OBLIGATORIE PENTRU TOȚI AGENȚII AI 🚨
 
-## Step 1: Commit Changes
-// turbo
-```bash
-git add -A && git commit -m "Update KELION"
+Această procedură TREBUIE urmată la fiecare deploy. Orice încălcare va cauza erori!
+
+## REGULI DE AUR
+
+### 1. ❌ NICIODATĂ chei API în cod!
+API keys (OPENAI_API_KEY, SERPER_API_KEY, etc.) se scriu DOAR în:
+**Railway Dashboard → Settings → Variables**
+
+NU în:
+- app.py
+- config_kelion.py
+- start_kelion.ps1
+- Niciun alt fișier din repository!
+
+### 2. ✅ Verifică ÎNAINTE de commit
+```powershell
+# Verifică că nu există chei în cod
+Get-ChildItem -Recurse -Include *.py,*.html,*.txt,*.md,*.ps1 | Select-String -Pattern "sk-proj" | Select-Object -First 5
 ```
+Dacă returnează ceva, ELIMINĂ cheile înainte de commit!
 
-## Step 2: Push to Railway
-// turbo
-```bash
+### 3. ✅ Procfile OBLIGATORIU
+Fișierul `Procfile` TREBUIE să conțină:
+```
+web: gunicorn app:app --bind 0.0.0.0:$PORT
+```
+FĂRĂ asta, Railway nu știe pe ce port să asculte și dă "Healthcheck Failed"!
+
+### 4. ✅ Secvența de Deploy
+```powershell
+# 1. Verifică sintaxa Python
+python -m py_compile app.py
+
+# 2. Stage changes
+git add .
+
+# 3. Commit
+git commit -m "Deploy: <descriere>"
+
+# 4. Push
 git push origin main
+
+# 5. Verifică deploy (asteapta 2 min)
+Invoke-WebRequest -Uri "https://kelionai.app/debug-health" -Method GET
 ```
 
-## Step 3: Wait for Railway Build
-Wait 60-90 seconds for Railway to build and deploy. You can check status at:
-https://railway.app/project/YOUR_PROJECT_ID
-
-## Step 4: Hard Refresh & Verify
-Open browser to https://kelionai.app/ and:
-1. Press Ctrl+Shift+R (hard refresh to clear cache)
-2. Wait 5 seconds for full page load
-3. Check the version number in top-left (should match latest)
-
-## Step 5: Test Login Flow
-1. Click LOGIN button
-2. Enter "demo" for username
-3. Enter "demo" for password
-4. Click INITIALIZE
-5. Verify the welcome message appears correctly
-
-## Step 6: If Changes Not Visible
-If the site still shows old content:
-
-### Option A: Force Railway Redeploy
-Go to Railway dashboard → Click "Deploy" → "Redeploy"
-
-### Option B: Check Build Logs
-```bash
-# View recent commits
-git log -3 --oneline
-
-# Verify remote is correct
-git remote -v
+### 5. ✅ Verificare după Deploy
+Endpoint-ul `/debug-health` TREBUIE să răspundă cu:
+```json
+{"status": "alive", "environment": {...}}
 ```
+Dacă returnează HTML, deploy-ul NU s-a finalizat!
 
-### Option C: Clear Cloudflare Cache (if using)
-If using Cloudflare, purge cache from dashboard.
+## VARIABILE DE MEDIU NECESARE (Railway)
+Setează în Railway Dashboard → Variables:
+- `OPENAI_API_KEY` = cheia ta OpenAI
+- `SERPER_API_KEY` = cheia ta Serper
+- `AZURE_SPEECH_KEY` = (opțional) pentru voce Azure
+- `AZURE_SPEECH_REGION` = westeurope (dacă ai Azure)
 
-## Step 7: Verify Bot Response
-After login, the bot should display:
-- Welcome message with user greeting
-- Proper formatting (not raw HTML/markdown)
-- Interactive buttons if applicable
+## ORDINE DE PRIORITATE TTS (Voce)
+1. Azure (dacă AZURE_SPEECH_KEY există)
+2. Google TTS (gTTS) - gratuit, funcționează mereu
+3. OpenAI TTS (fallback final)
 
-## Troubleshooting
-
-### Deploy Failed
-1. Check Railway logs for errors
-2. Run locally to test: `python backend/server.py`
-3. Fix any Python syntax errors
-
-### Changes Not Updating
-1. Verify commit was pushed: `git log origin/main -1`
-2. Check Railway build status
-3. Try incognito window to bypass cache
-
-### CORS/API Errors
-1. Check browser console for errors
-2. Verify server is running
-3. Check Railway environment variables
+## LIMBĂ
+- Robotul detectează automat limba utilizatorului
+- Răspunde în aceeași limbă
+- Limba se păstrează până la logout

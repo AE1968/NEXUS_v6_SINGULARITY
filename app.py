@@ -20,22 +20,31 @@ from email.mime.multipart import MIMEMultipart
 # Adaugam folderul curent la path pentru a asigura importul configurarii
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Configuration Loading with Fallback
-try:
-    from config_kelion import PAYPAL_CLIENT_ID, PAYPAL_SECRET, SECRET_KEY, DB_NAME, SMTP_EMAIL, SMTP_PASSWORD, SMTP_SERVER, SMTP_PORT, ALLOWED_ORIGINS, OPENAI_API_KEY, ELEVENLABS_API_KEY
-except ImportError:
-    print("WARNING: config_kelion.py not found. Using environment variables/defaults.")
-    PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "default_client_id")
-    PAYPAL_SECRET = os.getenv("PAYPAL_SECRET", "default_secret")
-    SECRET_KEY = os.getenv("SECRET_KEY", "kelion_super_secret_key_v135")
-    DB_NAME = os.getenv("DB_NAME", "nexus.db")
-    SMTP_EMAIL = os.getenv("SMTP_EMAIL", "test@example.com")
-    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-    SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
-    SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
-    ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-    ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
+# Configuration Loading (Cloud Native - Environment Variables)
+def get_env(key, default=""):
+    return os.getenv(key, default)
+
+# CORE SECRETS
+SECRET_KEY = get_env("SECRET_KEY", "kelion_super_secret_key_v142")
+DB_NAME = get_env("DB_NAME", "nexus.db")
+
+# API KEYS - Set these in Railway Variables!
+OPENAI_API_KEY = get_env("OPENAI_API_KEY", "")
+SERPER_API_KEY = get_env("SERPER_API_KEY", "")
+ELEVENLABS_API_KEY = get_env("ELEVENLABS_API_KEY", "")
+AZURE_SPEECH_KEY = get_env("AZURE_SPEECH_KEY", "")
+AZURE_SPEECH_REGION = get_env("AZURE_SPEECH_REGION", "westeurope")
+
+# EMAIL / PAYMENT (Defaults)
+PAYPAL_CLIENT_ID = get_env("PAYPAL_CLIENT_ID", "default_client_id")
+PAYPAL_SECRET = get_env("PAYPAL_SECRET", "default_secret")
+SMTP_EMAIL = get_env("SMTP_EMAIL", "test@example.com")
+SMTP_PASSWORD = get_env("SMTP_PASSWORD", "")
+SMTP_SERVER = get_env("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(get_env("SMTP_PORT", "587"))
+
+# CORS
+ALLOWED_ORIGINS = get_env("ALLOWED_ORIGINS", "*").split(",")
 
 # ==============================================================================
 #  INIT
@@ -59,6 +68,41 @@ limiter = Limiter(
     default_limits=["200 per day"],
     storage_uri="memory://",
 )
+
+# ==============================================================================
+# WEB SEARCH (SERPER API)
+# ==============================================================================
+def search_web(query, num_results=5):
+    """Search the web using Serper API for real-time information"""
+    if not SERPER_API_KEY:
+        return {"error": "SERPER_API_KEY not configured"}
+    
+    try:
+        url = "https://google.serper.dev/search"
+        headers = {
+            "X-API-KEY": SERPER_API_KEY,
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "q": query,
+            "num": num_results
+        }
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = []
+            for item in data.get("organic", [])[:num_results]:
+                results.append({
+                    "title": item.get("title", ""),
+                    "snippet": item.get("snippet", ""),
+                    "link": item.get("link", "")
+                })
+            return {"success": True, "results": results}
+        else:
+            return {"error": f"Serper API error: {response.status_code}"}
+    except Exception as e:
+        return {"error": str(e)}
 
 # ==============================================================================
 # MODELS
@@ -1177,6 +1221,23 @@ def delete_contact_message(message_id):
         db.session.rollback()
         return jsonify({"success": False, "error": str(e)}), 500
 
+
+# --- DEBUG HEALTH CHECK ---
+@app.route('/debug-health')
+def debug_health():
+    """Diagnostic endpoint to check system status on Railway"""
+    import sys
+    env_status = {
+        "OPENAI_API_KEY": "SET" if OPENAI_API_KEY else "MISSING",
+        "SERPER_API_KEY": "SET" if SERPER_API_KEY else "MISSING",
+        "PORT": os.environ.get("PORT", "5000 (default)"),
+        "PYTHON_VERSION": sys.version
+    }
+    return jsonify({
+        "status": "alive",
+        "environment": env_status,
+        "version": "v142.0"
+    })
 
 # --- STATIC FILES ---
 @app.route('/assets/<path:filename>')
