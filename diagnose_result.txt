@@ -1,0 +1,94 @@
+============================================================
+[DIAGNOSTIC] REMOTE SERVER - kelionai.app
+============================================================
+
+[FILES] ALL FILES IN ROOT:
+  [FILE] .htaccess: 871 bytes
+  [FILE] KELION_BRAIN_V140.php: 11139 bytes
+  [FILE] KELION_CORE_V142.php: 11250 bytes
+  [FILE] KELION_ENGINE_PARTER.php: 11000 bytes
+  [FILE] KELION_FAST_VOICE.php: 55907 bytes
+  [FILE] KELION_NO_CACHE_V140.php: 57628 bytes
+  [FILE] KELION_PARTER.php: 60302 bytes
+  [FILE] KELION_SERVER_V142.php: 59881 bytes
+  [FILE] KELION_V142_CLEAN.php: 55692 bytes
+  [FILE] KELION_V142_CLEAN_20251227_185715.php: 54602 bytes
+  [FILE] KELION_V142_CLEAN_20251227_190406.php: 52517 bytes
+  [FILE] KELION_V142_CLEAN_20251227_190735.php: 52517 bytes
+  [FILE] KELION_V142_CLEAN_20251227_191519.php: 58104 bytes
+  [FILE] KELION_V142_CLEAN_20251227_192344.php: 58126 bytes
+  [FILE] KELION_V142_CLEAN_20251227_192823.php: 58749 bytes
+  [FILE] KELION_V142_CLEAN_20251227_193216.php: 58749 bytes
+  [FILE] KELION_V142_CLEAN_20251227_204955.php: 58749 bytes
+  [FILE] api_proxy.php: 1733 bytes
+  [FILE] app.py: 50966 bytes
+  [DIR] assets: 4096 bytes
+  [FILE] index.php: 57260 bytes
+  [FILE] index_check.php: 60072 bytes
+  [FILE] kelion_engine.php: 8359 bytes
+  [FILE] kelion_fix_final.php: 56847 bytes
+  [FILE] kelion_master.php: 56847 bytes
+  [FILE] kelion_root.php: 57385 bytes
+  [DIR] test: 4096 bytes
+  [FILE] v143_bypass.php: 57260 bytes
+  [FILE] verify_me.txt: 113 bytes
+  [DIR] wptbox: 4096 bytes
+
+[CHECK] INDEX FILES:
+  [OK] index.php: EXISTS (57260 bytes)
+       -> Title: KELION v143.0 - GLOBAL_EYE OS
+  [MISSING] index.html: NOT FOUND
+  [MISSING] index.htm: NOT FOUND
+
+[HTACCESS] CONTENT:
+  # KELION NUCLEAR CACHE PREVENTION (v143)
+  <IfModule mod_headers.c>
+      # FORCE NO CACHE for everything
+      Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0, post-check=0, pre-check=0"
+      Header set Pragma "no-cache"
+      Header set Expires "Sat, 26 Jul 1997 05:00:00 GMT"
+      Header unset ETag
+  </IfModule>
+  
+  # DISABLE CACHING FOR SPECIFIC EXTENSIONS
+  <FilesMatch "\.(html|htm|js|css|php)$">
+      FileETag None
+      <IfModule mod_headers.c>
+          Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+          Header set Pragma "no-cache"
+          Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+      </IfModule>
+  </FilesMatch>
+  
+  # PRIORITY: PHP FIRST
+  DirectoryIndex index.php index.html
+  
+  # CORS (Just in case)
+  <IfModule mod_headers.c>
+      Header set Access-Control-Allow-Origin "*"
+  </IfModule>
+
+[ROOT PHP] kelion_root.php:
+  <?php
+  header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+  header("Cache-Control: post-check=0, pre-check=0", false);
+  header("Pragma: no-cache");
+  ?>
+  <!doctype html>
+  <html lang="en">
+  
+  <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>KELION v142.0 - GLOBAL_EYE OS</title>
+  
+      <!-- 🛑 FORCE NO-CACHE (AUTO-REFRESH LOGIC) -->
+      <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+      <meta http-equiv="Pragma" content="no-cache" />
+      <meta http-equiv="Expires" content="0" />
+  
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+============================================================
+[DONE] DIAGNOSTIC COMPLETE

@@ -1,0 +1,28 @@
+🕵️ EXTRAGERE DOVADA DIRECT DE PE SERVER (SFTP)...
+
+📂 FISIERE PE SERVER: ['kelion_engine.php', 'KELION_BRAIN_V140.php', 'KELION_V142_CLEAN_20251227_190735.php', 'KELION_V142_CLEAN_20251227_192823.php', 'wptbox', 'app.py', 'KELION_V142_CLEAN_20251227_193216.php', 'KELION_SERVER_V142.php', 'KELION_ENGINE_PARTER.php', 'KELION_V142_CLEAN.php', 'sw.js', 'kelion_master.php', 'KELION_V142_CLEAN_20251227_190406.php', 'manifest.json', 'verify_me.txt', 'index_check.php', 'KELION_V142_CLEAN_20251227_191519.php', 'KELION_V142_CLEAN_20251227_185715.php', 'index.php', 'KELION_V142_CLEAN_20251227_192344.php', 'KELION_V142_CLEAN_20251227_204955.php', 'api_proxy.php', '.htaccess', 'KELION_CORE_V142.php', 'KELION_NO_CACHE_V140.php', 'KELION_PARTER.php', 'kelion_root.php', 'assets', 'KELION_FAST_VOICE.php', 'test', 'kelion_fix_final.php']
+✅ CONFIRMAT: index.html NU exista.
+
+------------------------------------------------
+PAGE SOURCE (index.php) - Primele 500 caractere:
+<?php
+// KELION v143 UNIVERSAL DEPLOY - 20251227214414
+// Forced Network First Headers
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+?>
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>KELION v143.0 - GLOBAL_EYE OS</title>
+
+    <!-- 🛑 FORCE NO-CACHE (AUTO-REFRESH LOGIC) -->
+    <
+
+------------------------------------------------
+🔎 CAUTARE VERSIUNE IN CODUL DE PE SERVER:
+✅ GASIT: 'v143.0' este prezent in fisierul de pe server!

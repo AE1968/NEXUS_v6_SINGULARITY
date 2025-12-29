@@ -1,0 +1,89 @@
+# Credentials and sensitive data - ADMIN ONLY
+# ⚠️ API KEYS GO ONLY IN: Railway Dashboard -> Variables ⚠️
+# NEVER write keys in code files!
+
+config_kelion.py
+KELIONAI_APP_INFO.md
+*CREDENTIALS*.md
+*credentials*.txt
+*.env
+.env.local
+.env.production
+RAILWAY_KEYS.txt
+*_KEYS.txt
+server_log*.txt
+start_kelion.ps1
+
+# Files with hardcoded API keys
+KELION_*.php
+kelion_*.php
+v143_bypass.php
+v135_STABLE.html
+KELION_V143_SOURCE.html
+index.php
+BACKUP_PARTER_V142.php
+MIGRATION_PACKAGE_V142/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+kelion.db
+kelion_mainframe.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Backups
+backups/
+*.backup
+*.bak
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Large Binaries
+*.zip
+*.exe
+*.dll
+*.iso
+ngrok.exe
+ngrok.zip
+backup_6.zip
+BACKUP_*
+GENEZA_NEXUS_BACKUP_*
+*.mp4
+*.avi
+*.mov
+*.mp3
+*.wav
+assets/video/
+assets/audio/
+tts_cache/
+assets/videos/
+node_modules/

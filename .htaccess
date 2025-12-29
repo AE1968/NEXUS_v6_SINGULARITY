@@ -1,0 +1,26 @@
+# KELION NUCLEAR CACHE PREVENTION (v143)
+<IfModule mod_headers.c>
+    # FORCE NO CACHE for everything
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0, post-check=0, pre-check=0"
+    Header set Pragma "no-cache"
+    Header set Expires "Sat, 26 Jul 1997 05:00:00 GMT"
+    Header unset ETag
+</IfModule>
+
+# DISABLE CACHING FOR SPECIFIC EXTENSIONS
+<FilesMatch "\.(html|htm|js|css|php)$">
+    FileETag None
+    <IfModule mod_headers.c>
+        Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+    </IfModule>
+</FilesMatch>
+
+# PRIORITY: PHP FIRST
+DirectoryIndex index.php index.html
+
+# CORS (Just in case)
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>

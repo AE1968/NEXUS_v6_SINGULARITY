@@ -1,0 +1,38 @@
+============================================================
+[DEPLOY] KELION v142.0 - CLEANUP & DEPLOY
+[TIME] 2025-12-28 09:06:09
+============================================================
+
+[STEP 1] Deleting v143 files...
+  [DELETED] v143_bypass.php
+
+[STEP 2] Cleaning old backups...
+  [DELETED] KELION_V142_CLEAN_20251227_190735.php
+  [DELETED] KELION_V142_CLEAN_20251227_192823.php
+  [DELETED] KELION_V142_CLEAN_20251227_193216.php
+  [DELETED] KELION_V142_CLEAN_20251227_190406.php
+  [DELETED] KELION_V142_CLEAN_20251227_191519.php
+  [DELETED] KELION_V142_CLEAN_20251227_185715.php
+  [DELETED] KELION_V142_CLEAN_20251227_192344.php
+  [DELETED] KELION_V142_CLEAN_20251227_204955.php
+  Total backups deleted: 8
+
+[STEP 3] Removing old index.php...
+  [DELETED] index.php (was v143)
+
+[STEP 4] Deploying KELION_PARTER.php as index.php...
+  [OK] Version v142.0 confirmed in source file
+  [UPLOADED] index.php - 58864 bytes
+
+[STEP 5] Updating .htaccess...
+  [UPDATED] .htaccess
+
+[STEP 6] Verification...
+  [SUCCESS] index.php contains v142.0
+
+============================================================
+[COMPLETE] KELION v142.0 DEPLOYED SUCCESSFULLY
+============================================================
+
+URL: https://kelionai.app
+NOTE: Clear browser cache or use incognito to verify
