@@ -1241,9 +1241,34 @@ Instructions: Be precise, professional and sophisticated. After getting search r
 
         // 🚀 INITIALIZATION
         document.addEventListener('DOMContentLoaded', () => {
-            // 🔓 CLEAR LOGIN STATE ON PAGE LOAD (Start logged out)
-            localStorage.removeItem('kelion_user');
-            localStorage.removeItem('kelion_admin');
+            // 🔓 SESSION-BASED LOGIN: Logged out when browser closes, persists on refresh
+            const savedUser = sessionStorage.getItem('kelion_user');
+            const savedAdmin = sessionStorage.getItem('kelion_admin') === 'true';
+
+            if (savedUser) {
+                // Restore session
+                state.user = savedUser;
+                state.isLogged = true;
+                state.isAdmin = savedAdmin;
+
+                // Update UI to show logged in state
+                $('user-name').textContent = state.user.toUpperCase();
+                $('sys-status').textContent = "CONNECTED";
+                $('sys-status').className = "stat-val online";
+                $('login-btn').textContent = "LOG OFF";
+                $('login-btn').classList.add('logged');
+                $('input-bar').style.display = 'flex';
+                $('chat-container').style.display = 'flex';
+
+                if (state.isAdmin) {
+                    const tb = $('traffic-btn');
+                    if (tb) {
+                        tb.style.display = 'inline-block';
+                        tb.style.opacity = '1';
+                        tb.style.pointerEvents = 'auto';
+                    }
+                }
+            }
 
             // starfield(); // Disabled - using Matrix Rain (initThreeJS) instead
 
@@ -1263,8 +1288,8 @@ Instructions: Be precise, professional and sophisticated. After getting search r
                     state.isLogged = false;
                     state.user = "N/A";
                     state.isAdmin = false;
-                    localStorage.removeItem('kelion_user');
-                    localStorage.removeItem('kelion_admin');
+                    sessionStorage.removeItem('kelion_user');
+                    sessionStorage.removeItem('kelion_admin');
                     location.reload(); // Hard reset on logout
                 } else {
                     $('login-modal').style.display = 'flex';
@@ -1283,8 +1308,8 @@ Instructions: Be precise, professional and sophisticated. After getting search r
 
                 state.user = user;
                 state.isLogged = true;
-                localStorage.setItem('kelion_user', user);
-                localStorage.setItem('kelion_admin', state.isAdmin);
+                sessionStorage.setItem('kelion_user', user);
+                sessionStorage.setItem('kelion_admin', state.isAdmin);
 
                 // UI UPDATE (NO RELOAD)
                 $('login-modal').style.display = 'none';
