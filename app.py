@@ -122,15 +122,47 @@ class User(db.Model):
     account_status = db.Column(db.String(20), default='active')
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     billing_history = db.Column(db.Text, default='[]')
+    
+    # === CÂMPURI NOI v143 ===
+    # Adresă completă
+    address_line1 = db.Column(db.String(255))
+    address_line2 = db.Column(db.String(255))
+    city = db.Column(db.String(100))
+    postal_code = db.Column(db.String(20))
+    phone_country_code = db.Column(db.String(5))  # +40, +44, etc.
+    
+    # Verificări securitate
+    email_verified = db.Column(db.Boolean, default=False)
+    phone_verified = db.Column(db.Boolean, default=False)
+    bank_verified = db.Column(db.Boolean, default=False)
+    
+    # SMS Verification
+    sms_verification_code = db.Column(db.String(6))
+    sms_code_sent_at = db.Column(db.DateTime)
+    
+    # PayPal recurring
+    paypal_subscription_id = db.Column(db.String(100))
+    
+    # Password reset
+    reset_token = db.Column(db.String(100))
+    reset_token_expires = db.Column(db.DateTime)
+    
+    # Voucher usage count
+    vouchers_used_count = db.Column(db.Integer, default=0)
 
     def is_subscription_active(self):
         if self.role == 'admin':
             return True
         if self.subscription == 'demo':
-            return True # Demo accounts handle expiration differently or are temporary
+            return True
         if not self.subscription_end_date:
             return False
         return datetime.datetime.utcnow() < self.subscription_end_date
+    
+    def can_use_voucher(self):
+        """Check if user can use more vouchers (max 3)"""
+        return self.vouchers_used_count < 3
+
 
 class ChatHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -140,17 +172,21 @@ class ChatHistory(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     gender = db.Column(db.String(10), default='male')
 
+
 class DemoTracking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ip_address = db.Column(db.String(50), nullable=False)
     last_access = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     total_seconds_used = db.Column(db.Integer, default=0)
 
+
 class OTP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), nullable=False)
     code = db.Column(db.String(6), nullable=False)
+    otp_type = db.Column(db.String(20), default='registration')  # registration, password_reset, phone_verify
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
 
 class ContactMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -162,8 +198,112 @@ class ContactMessage(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     user_agent = db.Column(db.String(255))
     source = db.Column(db.String(255))
-    status = db.Column(db.String(20), default='new')  # new, read, replied
+    status = db.Column(db.String(20), default='new')
     admin_notes = db.Column(db.Text)
+
+
+# ==============================================================================
+# MODELE NOI v143: Vouchere, Plăți, Trafic
+# ==============================================================================
+
+class VoucherCode(db.Model):
+    """Coduri voucher pentru abonamente gratuite"""
+    __tablename__ = 'voucher_codes'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(20), unique=True, nullable=False)
+    value_months = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_by = db.Column(db.String(80))
+    
+    # Alocare
+    allocated_to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    allocated_at = db.Column(db.DateTime, nullable=True)
+    
+    # Utilizare
+    is_used = db.Column(db.Boolean, default=False)
+    used_at = db.Column(db.DateTime, nullable=True)
+    used_by_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    
+    expires_at = db.Column(db.DateTime, nullable=True)
+
+
+class PaymentRecord(db.Model):
+    """Evidența tuturor plăților"""
+    __tablename__ = 'payment_records'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    amount_gbp = db.Column(db.Float, nullable=False)
+    currency = db.Column(db.String(3), default='GBP')
+    payment_method = db.Column(db.String(50))  # paypal, stripe, voucher
+    
+    paypal_order_id = db.Column(db.String(100))
+    paypal_subscription_id = db.Column(db.String(100))
+    voucher_code = db.Column(db.String(20))
+    
+    plan_id = db.Column(db.String(20))  # 1_month, 6_months, 12_months
+    subscription_start = db.Column(db.DateTime)
+    subscription_end = db.Column(db.DateTime)
+    
+    status = db.Column(db.String(20), default='pending')  # pending, completed, failed, refunded
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    completed_at = db.Column(db.DateTime)
+    
+    confirmation_email_sent = db.Column(db.Boolean, default=False)
+
+
+class VisitorLog(db.Model):
+    """Tracking trafic pentru admin"""
+    __tablename__ = 'visitor_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    ip_address = db.Column(db.String(50))
+    user_agent = db.Column(db.String(500))
+    page_visited = db.Column(db.String(255))
+    referrer = db.Column(db.String(500))
+    
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    year = db.Column(db.Integer)
+    month = db.Column(db.Integer)
+    day = db.Column(db.Integer)
+    hour = db.Column(db.Integer)
+    
+    country = db.Column(db.String(100))
+    city = db.Column(db.String(100))
+    
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    username = db.Column(db.String(80), nullable=True)
+
+
+class ExpiryNotification(db.Model):
+    """Tracking notificări expirare"""
+    __tablename__ = 'expiry_notifications'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    notification_type = db.Column(db.String(20))  # 2_days_before, expired, reactivation
+    sent_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    email_sent = db.Column(db.Boolean, default=False)
+
+
+# ==============================================================================
+# PLANURI ABONAMENT (Hardcoded)
+# ==============================================================================
+SUBSCRIPTION_PLANS = {
+    '1_month': {'name': '1 Month', 'days': 30, 'price': 10.00, 'per_month': 10.00},
+    '6_months': {'name': '6 Months', 'days': 180, 'price': 42.00, 'per_month': 7.00},
+    '12_months': {'name': '12 Months', 'days': 365, 'price': 60.00, 'per_month': 5.00}
+}
+
+# Coduri țări pentru telefon
+COUNTRY_PHONE_CODES = {
+    'RO': '+40', 'UK': '+44', 'US': '+1', 'DE': '+49', 'FR': '+33',
+    'IT': '+39', 'ES': '+34', 'NL': '+31', 'BE': '+32', 'AT': '+43',
+    'CH': '+41', 'PL': '+48', 'CZ': '+420', 'HU': '+36', 'BG': '+359',
+    'GR': '+30', 'PT': '+351', 'SE': '+46', 'NO': '+47', 'DK': '+45'
+}
 
 # ==============================================================================
 # PAYPAL UTILS
@@ -893,31 +1033,100 @@ def vision_analyze():
 
 @app.route('/api/forgot-password', methods=['POST'])
 def forgot_password():
+    """Inițiază recuperarea parolei - trimite cod pe email"""
     data = request.json
-    username = data.get('username')
-    email = data.get('email')
+    email = data.get('email', '').strip()
     
-    if not username or not email:
-        return jsonify({"success": False, "error": "Username and email are required"}), 400
+    if not email:
+        return jsonify({"success": False, "error": "Email is required"}), 400
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        # Security: Don't reveal if email exists
+        return jsonify({"success": True, "message": "If email exists, reset code was sent."})
+    
+    # Generate 6-digit OTP
+    code = f"{random.randint(100000, 999999)}"
+    
+    # Save OTP to database
+    OTP.query.filter_by(email=email, otp_type='password_reset').delete()
+    new_otp = OTP(email=email, code=code, otp_type='password_reset')
+    db.session.add(new_otp)
+    db.session.commit()
+    
+    # Send reset email
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = '🔐 KELION Password Reset Code'
+        msg['From'] = SMTP_EMAIL
+        msg['To'] = email
         
-    user = User.query.filter_by(username=username, email=email).first()
-    if user:
-        # Generate a temporary password
-        chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#%'
-        temp_password = 'Temp' + ''.join(random.choice(chars) for _ in range(8)) + '!'
+        html = f'''
+        <div style="font-family: Arial, sans-serif; background: #050505; color: #fff; padding: 30px; border: 2px solid #00f3ff; border-radius: 12px; max-width: 500px;">
+            <h1 style="color: #00f3ff; text-align: center;">🔐 Password Reset</h1>
+            <p style="text-align: center;">Hello <strong>{user.first_name or user.username}</strong>,</p>
+            <p style="text-align: center;">Your password reset code is:</p>
+            <div style="font-size: 2.5rem; letter-spacing: 8px; color: #ff00ff; text-align: center; margin: 30px 0; font-weight: bold; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px;">
+                {code}
+            </div>
+            <p style="text-align: center; color: #888;">This code expires in <strong>10 minutes</strong>.</p>
+            <p style="text-align: center; color: #666; font-size: 12px;">If you didn't request this, please ignore this email.</p>
+            <hr style="border-color: #00f3ff; opacity: 0.3; margin: 20px 0;">
+            <p style="text-align: center; font-size: 11px; color: #555;">KELION AI - kelionai.app</p>
+        </div>
+        '''
+        msg.attach(MIMEText(html, 'html'))
         
-        # Update user's password
-        user.password_hash = generate_password_hash(temp_password)
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            server.sendmail(SMTP_EMAIL, email, msg.as_string())
+            
+        print(f"✅ Password reset code sent to {email}")
+        return jsonify({"success": True, "message": "Reset code sent to your email."})
+        
+    except Exception as e:
+        print(f"❌ Email error: {e}")
+        return jsonify({"success": False, "error": "Failed to send email. Try again later."}), 500
+
+
+@app.route('/api/reset-password', methods=['POST'])
+def reset_password():
+    """Finalizează resetarea parolei cu cod OTP"""
+    data = request.json
+    email = data.get('email', '').strip()
+    code = data.get('code', '').strip()
+    new_password = data.get('new_password', '')
+    
+    if not email or not code or not new_password:
+        return jsonify({"success": False, "error": "Email, code, and new password required"}), 400
+    
+    if len(new_password) < 8:
+        return jsonify({"success": False, "error": "Password must be at least 8 characters"}), 400
+    
+    # Verify OTP
+    otp = OTP.query.filter_by(email=email, code=code, otp_type='password_reset').first()
+    if not otp:
+        return jsonify({"success": False, "error": "Invalid or expired code"}), 400
+    
+    # Check expiry (10 mins)
+    if (datetime.datetime.utcnow() - otp.created_at).total_seconds() > 600:
+        db.session.delete(otp)
         db.session.commit()
-        
-        # In production, send email here. For now, we return it for the user to see.
-        return jsonify({
-            "success": True, 
-            "message": "A new password has been generated.",
-            "temp_password": temp_password
-        })
+        return jsonify({"success": False, "error": "Code expired. Request a new one."}), 400
     
-    return jsonify({"success": False, "error": "User not found or email mismatch"}), 404
+    # Update password
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"success": False, "error": "User not found"}), 404
+    
+    user.password_hash = generate_password_hash(new_password)
+    db.session.delete(otp)
+    db.session.commit()
+    
+    print(f"✅ Password reset successful for {email}")
+    return jsonify({"success": True, "message": "Password reset successful. You can now login."})
+
 
 @app.route('/api/tts', methods=['POST'])
 def tts_endpoint():
@@ -1294,8 +1503,434 @@ def debug_health():
     return jsonify({
         "status": "alive",
         "environment": env_status,
-        "version": "v142.0"
+        "version": "v143.0"
     })
+
+
+# ==============================================================================
+# v143: SISTEM ABONAMENTE ȘI PLANURI
+# ==============================================================================
+
+@app.route('/api/plans', methods=['GET'])
+def get_plans():
+    """Returnează toate planurile de abonament disponibile"""
+    return jsonify({
+        "success": True,
+        "plans": SUBSCRIPTION_PLANS,
+        "currency": "GBP"
+    })
+
+
+@app.route('/api/countries', methods=['GET'])
+def get_countries():
+    """Returnează codurile de țară pentru telefon"""
+    return jsonify({
+        "success": True,
+        "countries": COUNTRY_PHONE_CODES
+    })
+
+
+# ==============================================================================
+# v143: SISTEM VOUCHERE
+# ==============================================================================
+
+@app.route('/api/voucher/validate', methods=['POST'])
+def validate_voucher():
+    """Validează un cod voucher fără a-l folosi"""
+    data = request.json
+    code = data.get('code', '').strip().upper()
+    
+    if not code:
+        return jsonify({"success": False, "error": "Code is required"}), 400
+    
+    voucher = VoucherCode.query.filter_by(code=code).first()
+    
+    if not voucher:
+        return jsonify({"success": False, "error": "Invalid voucher code"}), 404
+    
+    if voucher.is_used:
+        return jsonify({"success": False, "error": "Voucher already used"}), 400
+    
+    if voucher.expires_at and datetime.datetime.utcnow() > voucher.expires_at:
+        return jsonify({"success": False, "error": "Voucher expired"}), 400
+    
+    return jsonify({
+        "success": True,
+        "voucher": {
+            "code": voucher.code,
+            "value_months": voucher.value_months,
+            "valid": True
+        }
+    })
+
+
+@app.route('/api/voucher/redeem', methods=['POST'])
+def redeem_voucher():
+    """Folosește un voucher pentru a activa abonament"""
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    
+    try:
+        token = auth_header.split(" ")[1]
+        decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        username = decoded['username']
+    except:
+        return jsonify({"success": False, "error": "Invalid token"}), 401
+    
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"success": False, "error": "User not found"}), 404
+    
+    # Check voucher limit (max 3)
+    if not user.can_use_voucher():
+        return jsonify({"success": False, "error": "Maximum 3 vouchers per account reached"}), 403
+    
+    data = request.json
+    code = data.get('code', '').strip().upper()
+    
+    voucher = VoucherCode.query.filter_by(code=code, is_used=False).first()
+    if not voucher:
+        return jsonify({"success": False, "error": "Invalid or already used voucher"}), 400
+    
+    if voucher.expires_at and datetime.datetime.utcnow() > voucher.expires_at:
+        return jsonify({"success": False, "error": "Voucher expired"}), 400
+    
+    # Apply voucher
+    now = datetime.datetime.utcnow()
+    if user.subscription_end_date and user.subscription_end_date > now:
+        # Extend existing subscription
+        new_end = user.subscription_end_date + datetime.timedelta(days=30 * voucher.value_months)
+    else:
+        # New subscription
+        new_end = now + datetime.timedelta(days=30 * voucher.value_months)
+    
+    user.subscription_end_date = new_end
+    user.subscription = 'active'
+    user.vouchers_used_count += 1
+    
+    voucher.is_used = True
+    voucher.used_at = now
+    voucher.used_by_user_id = user.id
+    
+    # Record payment
+    payment = PaymentRecord(
+        user_id=user.id,
+        amount_gbp=0.00,
+        payment_method='voucher',
+        voucher_code=code,
+        plan_id=f'{voucher.value_months}_month',
+        subscription_start=now,
+        subscription_end=new_end,
+        status='completed',
+        completed_at=now
+    )
+    db.session.add(payment)
+    db.session.commit()
+    
+    return jsonify({
+        "success": True,
+        "message": f"Voucher applied! Subscription extended by {voucher.value_months} month(s).",
+        "new_expiry": new_end.strftime('%Y-%m-%d')
+    })
+
+
+@app.route('/api/admin/voucher/generate', methods=['POST'])
+def admin_generate_voucher():
+    """Admin: Generează coduri voucher noi"""
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    
+    try:
+        token = auth_header.split(" ")[1]
+        decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        admin = User.query.filter_by(username=decoded['username']).first()
+        if not admin or admin.role != 'admin':
+            return jsonify({"success": False, "error": "Admin access required"}), 403
+    except:
+        return jsonify({"success": False, "error": "Invalid token"}), 401
+    
+    data = request.json
+    count = min(data.get('count', 1), 100)  # Max 100 at a time
+    value_months = data.get('value_months', 1)
+    expires_days = data.get('expires_days', 90)
+    
+    generated = []
+    for _ in range(count):
+        # Generate unique code
+        code = 'KEL-' + ''.join(random.choices('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', k=8))
+        while VoucherCode.query.filter_by(code=code).first():
+            code = 'KEL-' + ''.join(random.choices('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', k=8))
+        
+        voucher = VoucherCode(
+            code=code,
+            value_months=value_months,
+            created_by=admin.username,
+            expires_at=datetime.datetime.utcnow() + datetime.timedelta(days=expires_days)
+        )
+        db.session.add(voucher)
+        generated.append(code)
+    
+    db.session.commit()
+    
+    return jsonify({
+        "success": True,
+        "generated_codes": generated,
+        "count": len(generated)
+    })
+
+
+@app.route('/api/admin/vouchers', methods=['GET'])
+def admin_list_vouchers():
+    """Admin: Lista toate voucherele"""
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    
+    try:
+        token = auth_header.split(" ")[1]
+        decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        admin = User.query.filter_by(username=decoded['username']).first()
+        if not admin or admin.role != 'admin':
+            return jsonify({"success": False, "error": "Admin access required"}), 403
+    except:
+        return jsonify({"success": False, "error": "Invalid token"}), 401
+    
+    vouchers = VoucherCode.query.order_by(VoucherCode.created_at.desc()).all()
+    
+    return jsonify({
+        "success": True,
+        "vouchers": [{
+            "id": v.id,
+            "code": v.code,
+            "value_months": v.value_months,
+            "created_at": v.created_at.isoformat() if v.created_at else None,
+            "created_by": v.created_by,
+            "is_used": v.is_used,
+            "used_at": v.used_at.isoformat() if v.used_at else None,
+            "used_by_user_id": v.used_by_user_id,
+            "expires_at": v.expires_at.isoformat() if v.expires_at else None
+        } for v in vouchers]
+    })
+
+
+# ==============================================================================
+# v143: TRAFIC LIVE PENTRU ADMIN
+# ==============================================================================
+
+@app.route('/api/track', methods=['POST'])
+def track_visitor():
+    """Înregistrează vizită (apelat de frontend)"""
+    try:
+        data = request.json or {}
+        now = datetime.datetime.utcnow()
+        
+        log = VisitorLog(
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent', '')[:500],
+            page_visited=data.get('page', '/'),
+            referrer=request.headers.get('Referer', '')[:500],
+            timestamp=now,
+            year=now.year,
+            month=now.month,
+            day=now.day,
+            hour=now.hour,
+            username=data.get('username')
+        )
+        db.session.add(log)
+        db.session.commit()
+        return jsonify({"success": True})
+    except:
+        return jsonify({"success": False}), 500
+
+
+@app.route('/api/admin/traffic', methods=['GET'])
+def admin_traffic():
+    """Admin: Statistici trafic"""
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    
+    try:
+        token = auth_header.split(" ")[1]
+        decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        admin = User.query.filter_by(username=decoded['username']).first()
+        if not admin or admin.role != 'admin':
+            return jsonify({"success": False, "error": "Admin access required"}), 403
+    except:
+        return jsonify({"success": False, "error": "Invalid token"}), 401
+    
+    # Parametri opționali
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    day = request.args.get('day', type=int)
+    
+    query = VisitorLog.query
+    
+    if year:
+        query = query.filter_by(year=year)
+    if month:
+        query = query.filter_by(month=month)
+    if day:
+        query = query.filter_by(day=day)
+    
+    logs = query.order_by(VisitorLog.timestamp.desc()).limit(500).all()
+    
+    # Stats
+    total = query.count()
+    unique_ips = db.session.query(db.func.count(db.distinct(VisitorLog.ip_address))).scalar() or 0
+    
+    return jsonify({
+        "success": True,
+        "stats": {
+            "total_visits": total,
+            "unique_visitors": unique_ips
+        },
+        "logs": [{
+            "timestamp": l.timestamp.isoformat(),
+            "ip": l.ip_address,
+            "page": l.page_visited,
+            "username": l.username
+        } for l in logs]
+    })
+
+
+@app.route('/api/admin/traffic/live', methods=['GET'])
+def admin_traffic_live():
+    """Admin: Vizitatori din ultimele 5 minute"""
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    
+    try:
+        token = auth_header.split(" ")[1]
+        decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        admin = User.query.filter_by(username=decoded['username']).first()
+        if not admin or admin.role != 'admin':
+            return jsonify({"success": False, "error": "Admin access required"}), 403
+    except:
+        return jsonify({"success": False, "error": "Invalid token"}), 401
+    
+    five_min_ago = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+    
+    live = VisitorLog.query.filter(VisitorLog.timestamp >= five_min_ago).all()
+    
+    return jsonify({
+        "success": True,
+        "live_visitors": len(live),
+        "visitors": [{
+            "timestamp": l.timestamp.isoformat(),
+            "ip": l.ip_address,
+            "page": l.page_visited,
+            "username": l.username
+        } for l in live]
+    })
+
+
+# ==============================================================================
+# v143: NOTIFICĂRI EXPIRARE ABONAMENT
+# ==============================================================================
+
+@app.route('/api/admin/check-expiring', methods=['POST'])
+def check_expiring_subscriptions():
+    """Admin: Verifică și trimite notificări pentru abonamente care expiră"""
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    
+    try:
+        token = auth_header.split(" ")[1]
+        decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        admin = User.query.filter_by(username=decoded['username']).first()
+        if not admin or admin.role != 'admin':
+            return jsonify({"success": False, "error": "Admin access required"}), 403
+    except:
+        return jsonify({"success": False, "error": "Invalid token"}), 401
+    
+    now = datetime.datetime.utcnow()
+    two_days = now + datetime.timedelta(days=2)
+    
+    # Users expiring in 2 days
+    expiring = User.query.filter(
+        User.subscription_end_date != None,
+        User.subscription_end_date <= two_days,
+        User.subscription_end_date > now,
+        User.role != 'admin'
+    ).all()
+    
+    notifications_sent = 0
+    
+    for user in expiring:
+        # Check if we already notified
+        existing = ExpiryNotification.query.filter_by(
+            user_id=user.id,
+            notification_type='2_days_before'
+        ).first()
+        
+        if not existing:
+            # Send email
+            try:
+                msg = MIMEMultipart('alternative')
+                msg['Subject'] = '⚠️ Your KELION Subscription Expires Soon!'
+                msg['From'] = SMTP_EMAIL
+                msg['To'] = user.email
+                
+                html = f'''
+                <div style="font-family: Arial; background: #050505; color: #fff; padding: 30px; border: 2px solid #ff9900; border-radius: 12px;">
+                    <h1 style="color: #ff9900;">⚠️ Subscription Expiring</h1>
+                    <p>Hello {user.first_name or user.username},</p>
+                    <p>Your KELION subscription expires on <strong>{user.subscription_end_date.strftime('%d %B %Y')}</strong>.</p>
+                    <p>Renew now to continue enjoying all features!</p>
+                    <p style="text-align: center; margin: 30px 0;">
+                        <a href="https://kelionai.app" style="background: #ff9900; color: #000; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">Renew Now</a>
+                    </p>
+                </div>
+                '''
+                msg.attach(MIMEText(html, 'html'))
+                
+                with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+                    server.starttls()
+                    server.login(SMTP_EMAIL, SMTP_PASSWORD)
+                    server.sendmail(SMTP_EMAIL, user.email, msg.as_string())
+                
+                # Record notification
+                notif = ExpiryNotification(
+                    user_id=user.id,
+                    notification_type='2_days_before',
+                    email_sent=True
+                )
+                db.session.add(notif)
+                notifications_sent += 1
+            except Exception as e:
+                print(f"Email error for {user.email}: {e}")
+    
+    db.session.commit()
+    
+    return jsonify({
+        "success": True,
+        "expiring_users": len(expiring),
+        "notifications_sent": notifications_sent
+    })
+
+
+# ==============================================================================
+# v143: CONFORMITATE LEGALĂ AI
+# ==============================================================================
+
+AI_SAFETY_KEYWORDS = [
+    'hack', 'exploit', 'malware', 'virus', 'phishing',
+    'child', 'minor', 'underage', 'copil', 'minor',
+    'personal data', 'date personale', 'cnp', 'ssn', 'credit card'
+]
+
+def check_ai_safety(message):
+    """Verifică dacă mesajul încalcă regulile de siguranță"""
+    msg_lower = message.lower()
+    for keyword in AI_SAFETY_KEYWORDS:
+        if keyword in msg_lower:
+            return False, keyword
+    return True, None
 
 if __name__ == '__main__':
     with app.app_context():
