@@ -1574,26 +1574,16 @@
 
         // Matrix effect removed - keeping clean background
 
-        // 🌟 GREETING HELPER (Time-based, Multilingual)
+        // 🌟 GREETING HELPER (After Login)
         function greetUser(username) {
-            const hour = new Date().getHours();
-            const lang = state.language || 'en';
-
-            let greeting, welcomeMsg;
-
-            if (lang === 'ro' || lang === 'română' || lang === 'Romanian') {
-                // Romanian greetings
-                if (hour >= 5 && hour < 12) greeting = "Bună dimineața";
-                else if (hour >= 12 && hour < 18) greeting = "Bună ziua";
-                else greeting = "Bună seara";
-                welcomeMsg = `${greeting}, ${username}. Sunt KELION AI. Cu ce te pot ajuta astăzi?`;
-            } else {
-                // English (default)
-                if (hour >= 5 && hour < 12) greeting = "Good Morning";
-                else if (hour >= 12 && hour < 18) greeting = "Good Afternoon";
-                else greeting = "Good Evening";
-                welcomeMsg = `${greeting}, ${username}. I am KELION AI. How can I assist you today?`;
+            // Clear chat history - keep only the last message (this one)
+            const chatMessages = $('chat-messages');
+            if (chatMessages) {
+                chatMessages.innerHTML = ''; // Clear all previous messages
             }
+
+            // Simple, direct greeting in English
+            const welcomeMsg = `Hello, ${username}. I am KELION AI. How can I assist you today?`;
 
             console.log("Greeting:", welcomeMsg);
             write('bot', welcomeMsg);
@@ -1605,11 +1595,11 @@
             const hour = new Date().getHours();
             let greeting;
 
-            if (hour >= 5 && hour < 12) greeting = "Bună dimineața";
-            else if (hour >= 12 && hour < 18) greeting = "Bună ziua";
-            else greeting = "Bună seara";
+            if (hour >= 5 && hour < 12) greeting = "Good morning";
+            else if (hour >= 12 && hour < 18) greeting = "Good afternoon";
+            else greeting = "Good evening";
 
-            const welcomeText = `${greeting}! Bine ați venit la KELIONAI - Asistentul Vostru Inteligent. Apăsați LOGIN pentru a continua.`;
+            const welcomeText = `${greeting}, visitor! Welcome to KELIONAI - Your Intelligent Assistant. Please click LOGIN to continue.`;
 
             write('bot', welcomeText);
             speak(welcomeText);
