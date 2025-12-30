@@ -782,20 +782,22 @@
     <div id="header">
         <div id="status-display">
             <div class="status-row top">
-                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v142.1</span>
+                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v142.2</span>
                 <span id="user-display">USER: <span id="user-name" class="stat-val">OFFLINE</span></span>
                 <span id="cloud-display">CLOUD: <span id="sys-status"
                         class="stat-val offline">DISCONNECTED</span></span>
             </div>
             <div class="status-row bottom">
-                <div id="system-clock">
+                <div id="system-clock"
+                    style="color: #39FF14; font-weight: bold; text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14;">
                     <div class="clock-part" id="h-part"><span>00</span></div>
                     <span>:</span>
                     <div class="clock-part" id="m-part"><span>00</span></div>
                     <span>:</span>
                     <div class="clock-part" id="s-part"><span>00</span></div>
                 </div>
-                <span id="system-date">DD-MM-YYYY</span>
+                <span id="system-date"
+                    style="color: #39FF14; font-weight: bold; text-shadow: 0 0 10px #39FF14;">DD-MM-YYYY</span>
             </div>
         </div>
         <div class="header-actions">
@@ -1192,7 +1194,8 @@
 
             try {
                 // Check if user wants to search the web
-                const searchPatterns = /\b(search|google|find|look up|cauta|cautare|what is|who is|latest|news|weather|current)\b/i;
+                // Includes Romanian with diacritics: caută, căutare AND without: cauta, cautare
+                const searchPatterns = /\b(search|google|find|look up|what is|who is|latest|news|weather|current)\b|caut[aăAĂ]|c[aăAĂ]utar|internet|stir[ie]/i;
                 const isSearchQuery = searchPatterns.test(msg);
 
                 if (isSearchQuery) {
