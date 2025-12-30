@@ -39,9 +39,14 @@ AZURE_SPEECH_KEY = get_env("AZURE_SPEECH_KEY", "")
 AZURE_SPEECH_REGION = get_env("AZURE_SPEECH_REGION", "westeurope")
 
 # EMAIL / PAYMENT (Defaults)
-PAYPAL_CLIENT_ID = get_env("PAYPAL_CLIENT_ID", "default_client_id")
-PAYPAL_SECRET = get_env("PAYPAL_SECRET", "default_secret")
-SMTP_EMAIL = get_env("SMTP_EMAIL", "test@example.com")
+PAYPAL_CLIENT_ID = get_env("PAYPAL_CLIENT_ID", "")
+PAYPAL_SECRET = get_env("PAYPAL_SECRET", "")
+PAYPAL_MODE = get_env("PAYPAL_MODE", "live")  # "sandbox" sau "live" - DEFAULT: LIVE
+
+# PayPal URLs based on mode
+PAYPAL_API_BASE = "https://api-m.paypal.com" if PAYPAL_MODE == "live" else "https://api-m.sandbox.paypal.com"
+
+SMTP_EMAIL = get_env("SMTP_EMAIL", "contact@kelionai.app")
 SMTP_PASSWORD = get_env("SMTP_PASSWORD", "")
 SMTP_SERVER = get_env("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(get_env("SMTP_PORT", "587"))
@@ -417,10 +422,13 @@ def chat():
     })
 
 def get_paypal_access_token():
+    """Obține token de acces PayPal (funcționează atât sandbox cât și live)"""
+    if not PAYPAL_CLIENT_ID or not PAYPAL_SECRET:
+        print("⚠️ PayPal credentials not configured")
+        return None
+    
     try:
-        # Switch to sandbox for testing, live for production
-        # Assuming sandbox for now as per conventional development
-        url = "https://api-m.sandbox.paypal.com/v1/oauth2/token"
+        url = f"{PAYPAL_API_BASE}/v1/oauth2/token"
         res = requests.post(
             url,
             auth=(PAYPAL_CLIENT_ID, PAYPAL_SECRET),
@@ -433,12 +441,13 @@ def get_paypal_access_token():
         return None
 
 def verify_paypal_subscription(subscription_id):
+    """Verifică starea unei subscripții PayPal"""
     token = get_paypal_access_token()
     if not token:
         return False, "Gateway Offline"
     
     try:
-        url = f"https://api-m.sandbox.paypal.com/v1/billing/subscriptions/{subscription_id}"
+        url = f"{PAYPAL_API_BASE}/v1/billing/subscriptions/{subscription_id}"
         res = requests.get(
             url,
             headers={"Authorization": f"Bearer {token}"},
@@ -452,12 +461,13 @@ def verify_paypal_subscription(subscription_id):
         return False, str(e)
 
 def verify_paypal_order(order_id):
+    """Verifică starea unei comenzi PayPal"""
     token = get_paypal_access_token()
     if not token:
         return False, "Gateway Offline"
     
     try:
-        url = f"https://api-m.sandbox.paypal.com/v1/checkout/orders/{order_id}"
+        url = f"{PAYPAL_API_BASE}/v1/checkout/orders/{order_id}"
         res = requests.get(
             url,
             headers={"Authorization": f"Bearer {token}"},
@@ -593,6 +603,98 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
         return True
     except Exception as e:
         print(f"âŒ Admin notification error: {e}")
+        return False
+
+
+def send_payment_confirmation_email(to_email, username, first_name, plan_name, amount, currency, subscription_end):
+    """Trimite email de confirmare plată cu factura"""
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = '✅ Payment Confirmed - KELION AI Subscription'
+        msg['From'] = SMTP_EMAIL
+        msg['To'] = to_email
+        # BCC pentru admin (clientul nu vede)
+        
+        # Generează număr factură
+        invoice_number = f"KEL-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+        payment_date = datetime.datetime.now().strftime('%d %B %Y at %H:%M')
+        
+        html = f'''
+        <html>
+        <body style="font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; padding: 30px; margin: 0;">
+            <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #050510, #0a0a1a); border: 2px solid #00f3ff; border-radius: 15px; padding: 40px;">
+                
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #00f3ff; margin: 0; font-size: 28px;">🚀 KELION AI</h1>
+                    <p style="color: #888; margin: 5px 0;">Payment Confirmation</p>
+                </div>
+                
+                <div style="background: rgba(0, 255, 0, 0.1); border: 1px solid #00ff00; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 25px;">
+                    <h2 style="color: #00ff00; margin: 0;">✅ Payment Successful!</h2>
+                </div>
+                
+                <p style="margin-bottom: 20px;">Hello <strong style="color: #00f3ff;">{first_name or username}</strong>,</p>
+                <p>Thank you for your purchase! Your KELION AI subscription is now active.</p>
+                
+                <hr style="border-color: #00f3ff; opacity: 0.2; margin: 25px 0;">
+                
+                <h3 style="color: #ff00ff; margin-bottom: 15px;">📋 Invoice Details</h3>
+                
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr style="border-bottom: 1px solid rgba(0,243,255,0.1);">
+                        <td style="padding: 12px 0; color: #888;">Invoice Number:</td>
+                        <td style="padding: 12px 0; text-align: right; font-weight: bold;">{invoice_number}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(0,243,255,0.1);">
+                        <td style="padding: 12px 0; color: #888;">Date:</td>
+                        <td style="padding: 12px 0; text-align: right;">{payment_date}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(0,243,255,0.1);">
+                        <td style="padding: 12px 0; color: #888;">Plan:</td>
+                        <td style="padding: 12px 0; text-align: right; color: #00f3ff;">{plan_name}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(0,243,255,0.1);">
+                        <td style="padding: 12px 0; color: #888;">Amount Paid:</td>
+                        <td style="padding: 12px 0; text-align: right; font-weight: bold; font-size: 1.2em; color: #00ff00;">£{amount:.2f} {currency}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px 0; color: #888;">Valid Until:</td>
+                        <td style="padding: 12px 0; text-align: right; font-weight: bold; color: #ff00ff;">{subscription_end}</td>
+                    </tr>
+                </table>
+                
+                <hr style="border-color: #00f3ff; opacity: 0.2; margin: 25px 0;">
+                
+                <p style="text-align: center; margin: 30px 0;">
+                    <a href="https://kelionai.app" style="display: inline-block; background: linear-gradient(135deg, #00f3ff, #ff00ff); color: #000; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold;">Access KELION AI</a>
+                </p>
+                
+                <p style="font-size: 12px; color: #666; text-align: center; margin-top: 30px;">
+                    This is an automated payment confirmation.<br>
+                    For support, contact us at <a href="mailto:contact@kelionai.app" style="color: #00f3ff;">contact@kelionai.app</a>
+                </p>
+                
+                <p style="font-size: 11px; color: #444; text-align: center; margin-top: 20px;">
+                    KELION AI © 2025 | kelionai.app
+                </p>
+            </div>
+        </body>
+        </html>
+        '''
+        
+        msg.attach(MIMEText(html, 'html'))
+        
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            # Trimite la client + CC la admin
+            recipients = [to_email, 'contact@kelionai.app']
+            server.sendmail(SMTP_EMAIL, recipients, msg.as_string())
+        
+        print(f"✅ Payment confirmation sent to {to_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Payment email error: {e}")
         return False
 
 
