@@ -2035,8 +2035,53 @@ def admin_traffic_live():
     })
 
 
+@app.route('/api/admin/traffic/export', methods=['GET'])
+def admin_traffic_export():
+    """Admin: Export trafic în format CSV"""
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    
+    try:
+        token = auth_header.split(" ")[1]
+        decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        admin = User.query.filter_by(username=decoded['username']).first()
+        if not admin or admin.role != 'admin':
+            return jsonify({"success": False, "error": "Admin access required"}), 403
+    except:
+        return jsonify({"success": False, "error": "Invalid token"}), 401
+    
+    # Parametri opționali pentru filtrare
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    
+    query = VisitorLog.query.order_by(VisitorLog.timestamp.desc())
+    
+    if year:
+        query = query.filter(VisitorLog.year == year)
+    if month:
+        query = query.filter(VisitorLog.month == month)
+    
+    logs = query.limit(10000).all()  # Max 10k records
+    
+    # Generează CSV
+    csv_lines = ["Timestamp,IP Address,User Agent,Page,Referrer,Username,Country,City"]
+    for l in logs:
+        line = f'"{l.timestamp}","{l.ip_address or ""}","{(l.user_agent or "")[:100]}","{l.page_visited or ""}","{l.referrer or ""}","{l.username or ""}","{l.country or ""}","{l.city or ""}"'
+        csv_lines.append(line)
+    
+    csv_content = "\n".join(csv_lines)
+    
+    from flask import Response
+    return Response(
+        csv_content,
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename=kelion_traffic_{datetime.datetime.now().strftime("%Y%m%d")}.csv'}
+    )
+
+
 # ==============================================================================
-# v143: NOTIFICÄ‚RI EXPIRARE ABONAMENT
+# v143: NOTIFICĂRI EXPIRARE ABONAMENT
 # ==============================================================================
 
 @app.route('/api/admin/check-expiring', methods=['POST'])
