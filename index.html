@@ -858,8 +858,7 @@
                     </div>
                 </div>
 
-                <form id="ae-contact-form"
-                    onsubmit="event.preventDefault(); alert('Message sent! (Simulation)'); document.getElementById('ae-contact-modal').classList.remove('active');">
+                <form id="ae-contact-form" onsubmit="submitContactForm(event)">
                     <div class="ae-form-group">
                         <label>📧 Your Email</label>
                         <input type="email" id="ae-email" placeholder="example@email.com" required>
@@ -888,9 +887,10 @@
                             required></textarea>
                     </div>
 
-                    <button type="submit" class="ae-submit-btn">
+                    <button type="submit" class="ae-submit-btn" id="ae-submit-btn">
                         📨 Send Message
                     </button>
+                    <div id="ae-status" style="text-align:center; margin-top:10px; font-size:14px;"></div>
                 </form>
             </div>
         </div>
@@ -990,10 +990,81 @@
             isAdmin: false,
             user: "N/A",
             voice: true,
-            language: 'en'  // English default
+            language: sessionStorage.getItem('kelion_language') || 'en'  // Persist language until logout
         };
 
         const $ = id => document.getElementById(id);
+
+        // 🌐 LANGUAGE DETECTION HELPER
+        function detectLanguage(text) {
+            // Simple detection based on common words
+            const romanianPatterns = /\b(sunt|este|pentru|care|sau|dar|mai|foarte|bine|salut|buna|multumesc|te rog)\b/i;
+            const englishPatterns = /\b(the|is|are|for|what|how|can|you|please|thank|hello|good)\b/i;
+
+            if (romanianPatterns.test(text)) return 'ro';
+            if (englishPatterns.test(text)) return 'en';
+            return state.language; // Keep current if uncertain
+        }
+
+        // 📧 CONTACT FORM SUBMISSION (REAL)
+        async function submitContactForm(event) {
+            event.preventDefault();
+
+            const submitBtn = $('ae-submit-btn');
+            const statusDiv = $('ae-status');
+            const originalText = submitBtn.innerHTML;
+
+            // Get form data
+            const formData = {
+                email: $('ae-email').value.trim(),
+                name: $('ae-name').value.trim() || 'Anonymous',
+                topic: $('ae-topic').value,
+                topicLabel: $('ae-topic').options[$('ae-topic').selectedIndex].text,
+                message: $('ae-message').value.trim(),
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                source: window.location.href
+            };
+
+            // Validate
+            if (!formData.email || !formData.topic || !formData.message) {
+                statusDiv.innerHTML = '<span style="color:#ff4444;">⚠️ Please fill all required fields</span>';
+                return;
+            }
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '⏳ Sending...';
+                statusDiv.innerHTML = '';
+
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    statusDiv.innerHTML = '<span style="color:#00ff00;">✅ Message sent successfully! We will reply soon.</span>';
+                    // Reset form
+                    $('ae-contact-form').reset();
+                    // Close modal after 2 seconds
+                    setTimeout(() => {
+                        $('ae-contact-modal').classList.remove('active');
+                        statusDiv.innerHTML = '';
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Failed to send message');
+                }
+            } catch (err) {
+                console.error('Contact form error:', err);
+                statusDiv.innerHTML = `<span style="color:#ff4444;">❌ Error: ${err.message}</span>`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
 
         // 📝 CHAT SYSTEM
         function write(who, text, isError = false) {
@@ -1103,48 +1174,92 @@
             const msg = input.value.trim();
             if (!msg) return;
 
+            // Detect user's language and persist it
+            const detectedLang = detectLanguage(msg);
+            if (detectedLang !== state.language) {
+                state.language = detectedLang;
+                sessionStorage.setItem('kelion_language', detectedLang);
+                console.log('Language switched to:', detectedLang);
+            }
+
+            // Ensure chat container is visible
+            $('chat-container').style.display = 'flex';
+
             write('user', msg);
             input.value = "";
 
             const thinking = write('bot', "Synapsing...");
 
             try {
-                // Use backend /api/chat endpoint (has API keys configured)
-                thinking.textContent = "Connecting to neural core...";
+                // Check if user wants to search the web
+                const searchPatterns = /\b(search|google|find|look up|cauta|cautare|what is|who is|latest|news|weather|current)\b/i;
+                const isSearchQuery = searchPatterns.test(msg);
 
-                const response = await fetch("/api/chat", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: msg,
-                        username: state.user,
-                        gender: "male",
-                        conversation_id: state.user
-                    })
-                });
+                if (isSearchQuery) {
+                    thinking.textContent = "🌐 Searching the web...";
+                    const searchResults = await searchWeb(msg);
 
-                if (!response.ok) throw new Error("Chat API Error");
+                    // Now send to AI with search context
+                    const enrichedMessage = `User asked: "${msg}"\n\nHere are real-time web search results:\n${searchResults}\n\nPlease provide a helpful response based on this information. Respond in ${state.language === 'ro' ? 'Romanian' : 'English'}.`;
 
-                const data = await response.json();
+                    thinking.textContent = "Processing search results...";
 
-                if (data.success) {
-                    const reply = data.response;
-                    thinking.remove();
-                    write('bot', reply);
-                    speak(reply);
+                    const response = await fetch("/api/chat", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: enrichedMessage,
+                            username: state.user,
+                            gender: "male",
+                            conversation_id: state.user,
+                            language: state.language
+                        })
+                    });
 
-                    // Detect language from response for future use
-                    if (data.lang) state.language = data.lang;
+                    if (!response.ok) throw new Error("Chat API Error");
+                    const data = await response.json();
+
+                    if (data.success) {
+                        thinking.remove();
+                        write('bot', data.response);
+                        speak(data.response);
+                    } else {
+                        throw new Error(data.error || "Unknown error");
+                    }
                 } else {
-                    throw new Error(data.error || "Unknown error");
+                    // Regular chat without web search
+                    thinking.textContent = "Connecting to neural core...";
+
+                    const response = await fetch("/api/chat", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: msg + (state.language === 'ro' ? ' (Please respond in Romanian)' : ''),
+                            username: state.user,
+                            gender: "male",
+                            conversation_id: state.user,
+                            language: state.language
+                        })
+                    });
+
+                    if (!response.ok) throw new Error("Chat API Error");
+                    const data = await response.json();
+
+                    if (data.success) {
+                        thinking.remove();
+                        write('bot', data.response);
+                        speak(data.response);
+                    } else {
+                        throw new Error(data.error || "Unknown error");
+                    }
                 }
 
             } catch (err) {
                 console.error("AI Processor Error:", err);
                 thinking.remove();
-                const errStatus = "Neural Link unstable. Please try again.";
+                const errStatus = state.language === 'ro'
+                    ? "Conexiune instabilă. Încearcă din nou."
+                    : "Neural Link unstable. Please try again.";
                 write('bot', errStatus);
                 speak(errStatus);
             }
@@ -1377,8 +1492,10 @@
                     state.isLogged = false;
                     state.user = "N/A";
                     state.isAdmin = false;
+                    state.language = 'en'; // Reset language on logout
                     sessionStorage.removeItem('kelion_user');
                     sessionStorage.removeItem('kelion_admin');
+                    sessionStorage.removeItem('kelion_language'); // Clear language persistence
                     localStorage.removeItem('kelion_user');
                     localStorage.removeItem('kelion_admin');
                     location.reload(); // Hard reset on logout
