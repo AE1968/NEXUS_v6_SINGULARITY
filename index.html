@@ -628,6 +628,56 @@
             }
         }
 
+        /* ROBOT LIP-SYNC VISUALIZER */
+        #voice-visualizer {
+            position: fixed;
+            bottom: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4px;
+            height: 60px;
+            z-index: 500;
+            pointer-events: none;
+        }
+
+        #voice-visualizer.active {
+            display: flex;
+        }
+
+        .voice-bar {
+            width: 6px;
+            background: linear-gradient(to top, var(--cyan), var(--pink));
+            border-radius: 3px;
+            transition: height 0.05s ease;
+            box-shadow: 0 0 10px var(--cyan);
+        }
+
+        /* Robot glow effect when speaking */
+        body.speaking #bg-image {
+            filter: drop-shadow(0 0 30px rgba(0, 243, 255, 0.4));
+        }
+
+        body.speaking #bg-image::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(0, 243, 255, 0.1), transparent 50%);
+            animation: robotGlow 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes robotGlow {
+            0% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 0.7;
+            }
+        }
+
         /* AE CONTACT SYSTEM STYLES */
         #ae-contact-btn {
             position: fixed;
@@ -813,6 +863,19 @@
 
     <!-- NEXUS ROBOT IMAGE -->
     <!-- NEXUS ROBOT INTEGRATED IN BACKGROUND -->
+
+    <!-- VOICE VISUALIZER (Lip-sync Animation) -->
+    <div id="voice-visualizer">
+        <div class="voice-bar" style="height: 10px;"></div>
+        <div class="voice-bar" style="height: 15px;"></div>
+        <div class="voice-bar" style="height: 20px;"></div>
+        <div class="voice-bar" style="height: 25px;"></div>
+        <div class="voice-bar" style="height: 30px;"></div>
+        <div class="voice-bar" style="height: 25px;"></div>
+        <div class="voice-bar" style="height: 20px;"></div>
+        <div class="voice-bar" style="height: 15px;"></div>
+        <div class="voice-bar" style="height: 10px;"></div>
+    </div>
 
     <div id="chat-container">
         <div id="chat-header">
@@ -1174,6 +1237,10 @@
 
         // ðŸ”Š VOICE SYSTEM (OPENAI TTS)
         let currentAudio = null;
+        let audioCtx = null;
+        let analyser = null;
+        let dataArray = null;
+        let visualizerID = null;
 
         async function speak(text) {
             if (!state.voice) return;
@@ -1183,6 +1250,9 @@
                 currentAudio.pause();
                 currentAudio = null;
             }
+            if (visualizerID) {
+                cancelAnimationFrame(visualizerID);
+            }
 
             // Cancel any browser synthesis
             window.speechSynthesis.cancel();
@@ -1190,6 +1260,8 @@
             try {
                 // Visual indicator start
                 document.body.classList.add('speaking');
+                const visualizer = $('voice-visualizer');
+                if (visualizer) visualizer.classList.add('active');
 
                 // Use backend /api/tts endpoint (has API key configured)
                 const response = await fetch("/api/tts", {
@@ -1210,9 +1282,46 @@
                 const url = URL.createObjectURL(blob);
 
                 currentAudio = new Audio(url);
+                currentAudio.crossOrigin = "anonymous";
+
+                // Setup Audio Visualizer
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = 32;
+                    dataArray = new Uint8Array(analyser.frequencyBinCount);
+                }
+
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const source = audioCtx.createMediaElementSource(currentAudio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+
+                function updateVisualizer() {
+                    analyser.getByteFrequencyData(dataArray);
+                    const bars = document.querySelectorAll('.voice-bar');
+                    bars.forEach((bar, i) => {
+                        // Map frequency data to height (10px to 60px)
+                        const val = dataArray[i % dataArray.length];
+                        const height = 10 + (val / 255) * 50;
+                        bar.style.height = height + 'px';
+                    });
+                    visualizerID = requestAnimationFrame(updateVisualizer);
+                }
+
+                currentAudio.onplay = () => {
+                    updateVisualizer();
+                };
+
                 currentAudio.onended = () => {
                     document.body.classList.remove('speaking');
+                    if (visualizer) visualizer.classList.remove('active');
+                    if (visualizerID) cancelAnimationFrame(visualizerID);
                 };
+
                 currentAudio.play();
 
             } catch (err) {
@@ -1221,7 +1330,16 @@
                 const voices = window.speechSynthesis.getVoices();
                 // Try to find a male/romanian voice
                 utterance.voice = voices.find(v => v.lang.includes('ro') || v.name.includes('Male')) || voices[0];
-                utterance.onend = () => document.body.classList.remove('speaking');
+                utterance.onstart = () => {
+                    document.body.classList.add('speaking');
+                    const visualizer = $('voice-visualizer');
+                    if (visualizer) visualizer.classList.add('active');
+                };
+                utterance.onend = () => {
+                    document.body.classList.remove('speaking');
+                    const visualizer = $('voice-visualizer');
+                    if (visualizer) visualizer.classList.remove('active');
+                };
                 window.speechSynthesis.speak(utterance);
             }
         }
