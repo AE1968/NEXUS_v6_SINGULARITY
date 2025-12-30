@@ -1,75 +1,83 @@
 ---
-description: OBLIGATORIU - Procedură Deploy KELION (Railway)
+description: Deploy KELION to Railway with automatic verification and PASS/FAIL report
 ---
 
-# 🚨 REGULĂ OBLIGATORIE PENTRU TOȚI AGENȚII AI 🚨
+# KELION Deployment Workflow
 
-Această procedură TREBUIE urmată la fiecare deploy. Orice încălcare va cauza erori!
+This workflow deploys changes to kelionai.app via Railway and provides a final PASS/FAIL report.
 
-## REGULI DE AUR
+## Prerequisites
+- All code changes must be saved
+- Git repository must be configured
 
-### 1. ❌ NICIODATĂ chei API în cod!
-API keys (OPENAI_API_KEY, SERPER_API_KEY, etc.) se scriu DOAR în:
-**Railway Dashboard → Settings → Variables**
+## Deployment Steps
 
-NU în:
-- app.py
-- config_kelion.py
-- start_kelion.ps1
-- Niciun alt fișier din repository!
+// turbo-all
 
-### 2. ✅ Verifică ÎNAINTE de commit
-```powershell
-# Verifică că nu există chei în cod
-Get-ChildItem -Recurse -Include *.py,*.html,*.txt,*.md,*.ps1 | Select-String -Pattern "sk-proj" | Select-Object -First 5
+### Step 1: Check for uncommitted changes
+```bash
+git status --porcelain
 ```
-Dacă returnează ceva, ELIMINĂ cheile înainte de commit!
+- If output is empty: No changes to deploy → SKIP to verification
+- If output has files: Continue to Step 2
 
-### 3. ✅ Procfile OBLIGATORIU
-Fișierul `Procfile` TREBUIE să conțină:
+### Step 2: Stage all changes
+```bash
+git add -A
 ```
-web: gunicorn app:app --bind 0.0.0.0:$PORT
+
+### Step 3: Commit with timestamp
+```bash
+git commit -m "Deploy: [DESCRIPTION] - $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
 ```
-FĂRĂ asta, Railway nu știe pe ce port să asculte și dă "Healthcheck Failed"!
+- Replace [DESCRIPTION] with brief change description
 
-### 4. ✅ Secvența de Deploy
-```powershell
-# 1. Verifică sintaxa Python
-python -m py_compile app.py
-
-# 2. Stage changes
-git add .
-
-# 3. Commit
-git commit -m "Deploy: <descriere>"
-
-# 4. Push
+### Step 4: Push to GitHub (triggers Railway auto-deploy)
+```bash
 git push origin main
+```
+- If FAIL: Check network connection and GitHub credentials
+- If SUCCESS: Continue to Step 5
 
-# 5. Verifică deploy (asteapta 2 min)
-Invoke-WebRequest -Uri "https://kelionai.app/debug-health" -Method GET
+### Step 5: Wait for Railway deployment (3 minutes)
+```bash
+Start-Sleep -Seconds 180
 ```
 
-### 5. ✅ Verificare după Deploy
-Endpoint-ul `/debug-health` TREBUIE să răspundă cu:
-```json
-{"status": "alive", "environment": {...}}
+### Step 6: Verify deployment on live site
+Use browser to navigate to https://kelionai.app and check:
+1. Page loads successfully (HTTP 200)
+2. Version number matches expected version
+3. All expected text/features are present
+
+## Final Report Format
+
 ```
-Dacă returnează HTML, deploy-ul NU s-a finalizat!
+╔════════════════════════════════════════════════════════════╗
+║                  DEPLOYMENT REPORT                         ║
+╠════════════════════════════════════════════════════════════╣
+║ Date/Time:    [TIMESTAMP]                                  ║
+║ Target:       kelionai.app                                 ║
+║ Commit:       [COMMIT_HASH]                                ║
+║ Changes:      [FILES_CHANGED] files                        ║
+╠════════════════════════════════════════════════════════════╣
+║ STEP 1 - Git Status:        [PASS/FAIL]                    ║
+║ STEP 2 - Git Add:           [PASS/FAIL]                    ║
+║ STEP 3 - Git Commit:        [PASS/FAIL]                    ║
+║ STEP 4 - Git Push:          [PASS/FAIL]                    ║
+║ STEP 5 - Wait Deploy:       [DONE]                         ║
+║ STEP 6 - Site Verification: [PASS/FAIL]                    ║
+╠════════════════════════════════════════════════════════════╣
+║ FINAL STATUS:  [✅ PASS / ❌ FAIL]                          ║
+║ FAILURE CAUSE: [None / Description of failure]             ║
+╚════════════════════════════════════════════════════════════╝
+```
 
-## VARIABILE DE MEDIU NECESARE (Railway)
-Setează în Railway Dashboard → Variables:
-- `OPENAI_API_KEY` = cheia ta OpenAI
-- `SERPER_API_KEY` = cheia ta Serper
-- `AZURE_SPEECH_KEY` = (opțional) pentru voce Azure
-- `AZURE_SPEECH_REGION` = westeurope (dacă ai Azure)
+## Troubleshooting
 
-## ORDINE DE PRIORITATE TTS (Voce)
-1. Azure (dacă AZURE_SPEECH_KEY există)
-2. Google TTS (gTTS) - gratuit, funcționează mereu
-3. OpenAI TTS (fallback final)
-
-## LIMBĂ
-- Robotul detectează automat limba utilizatorului
-- Răspunde în aceeași limbă
-- Limba se păstrează până la logout
+| Error | Cause | Solution |
+|-------|-------|----------|
+| Git push rejected | Remote has newer commits | Run `git pull --rebase` then push again |
+| Site not updated | Railway cache | Wait 5 more minutes or trigger manual redeploy |
+| 502 Bad Gateway | App crash on Railway | Check Railway logs for error |
+| SSL Error | DNS propagation | Wait 10-15 minutes |
