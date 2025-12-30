@@ -1274,6 +1274,10 @@
 
         // 🚀 INITIALIZATION
         document.addEventListener('DOMContentLoaded', () => {
+            // 🛑 SECURITY: Force logout on every access (Requested by Architect)
+            localStorage.clear();
+            sessionStorage.clear();
+
             // 🚀 NEURAL INITIALIZATION SEQUENCE
             const initSequence = async () => {
                 const bar = $('load-bar');
@@ -1301,46 +1305,21 @@
                     $('bg-image').classList.add('active');
                     document.body.classList.add('ready');
 
-                    // 🎤 Play welcome message AFTER robot appears (only if not logged in)
-                    if (!sessionStorage.getItem('kelion_user') && !localStorage.getItem('kelion_user')) {
-                        setTimeout(() => {
-                            showKelionaiWelcome();
-                        }, 1500); // 1.5s after robot appears
-                    }
+                    // 🎤 Play welcome message AFTER robot appears (always visitor since we clear session)
+                    setTimeout(() => {
+                        showKelionaiWelcome();
+                    }, 1500); // 1.5s after robot appears
                 }, 1000);
             };
 
             initSequence();
 
-            // 🔓 RESTORE SESSION: Check both session and local storage
-            let sessionUser = sessionStorage.getItem('kelion_user') || localStorage.getItem('kelion_user');
-            let sessionAdmin = (sessionStorage.getItem('kelion_admin') === 'true') || (localStorage.getItem('kelion_admin') === 'true');
+            // 🔓 PRE-POPULATE DEMO
+            $('u-input').value = "demo";
+            $('p-input').value = "demo";
 
-            if (sessionUser) {
-                state.user = sessionUser;
-                state.isLogged = true;
-                state.isAdmin = sessionAdmin;
-
-                $('user-name').textContent = state.user.toUpperCase();
-                $('sys-status').textContent = "CONNECTED";
-                $('sys-status').className = "stat-val online";
-                $('login-btn').textContent = "LOG OFF";
-                $('login-btn').classList.add('logged');
-                $('input-bar').style.display = 'flex';
-                $('chat-container').style.display = 'flex';
-
-                if (state.isAdmin) {
-                    const tb = $('traffic-btn');
-                    if (tb) {
-                        tb.style.display = 'inline-block';
-                        tb.style.opacity = '1';
-                        tb.style.pointerEvents = 'auto';
-                    }
-                }
-            } else {
-                $('input-bar').style.display = 'none';
-                // Welcome message is now triggered in initSequence() after robot appears
-            }
+            // No session restoration - user must login every time
+            $('input-bar').style.display = 'none';
 
             // starfield(); // Disabled - using Matrix Rain (initThreeJS) instead
 
@@ -1408,44 +1387,69 @@
                 }
             };
 
-            $('do-login').onclick = () => {
-                const user = $('u-input').value || "Architect";
-                const pass = $('p-input').value;
-                if (user.toLowerCase() === "admin" && pass === "Andrada_1968!") {
-                    state.isAdmin = true;
-                    alert("⚠️ ADMINISTRATOR RECOGNIZED");
-                } else if (user.toLowerCase() === "admin") {
-                    alert("⚠️ ACCESS DENIED"); return;
+            $('do-login').onclick = async () => {
+                const username = $('u-input').value.trim();
+                const password = $('p-input').value.trim();
+
+                if (!username || !password) {
+                    alert("⚠️ Please enter both Architect ID and Security Key.");
+                    return;
                 }
 
-                state.user = user;
-                state.isLogged = true;
-                sessionStorage.setItem('kelion_user', user);
-                sessionStorage.setItem('kelion_admin', state.isAdmin);
-                localStorage.setItem('kelion_user', user);
-                localStorage.setItem('kelion_admin', state.isAdmin);
+                $('do-login').textContent = "AUTHENTICATING...";
+                $('do-login').disabled = true;
 
-                // UI UPDATE (NO RELOAD)
-                $('login-modal').style.display = 'none';
-                $('user-name').textContent = state.user.toUpperCase();
-                $('sys-status').textContent = "CONNECTED";
-                $('sys-status').className = "stat-val online";
-                $('login-btn').textContent = "LOG OFF";
-                $('login-btn').classList.add('logged');
-                $('input-bar').style.display = 'flex';
-                $('chat-container').style.display = 'flex';
+                try {
+                    const response = await fetch("/api/login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username, password })
+                    });
 
-                if (state.isAdmin) {
-                    const tb = $('traffic-btn');
-                    if (tb) {
-                        tb.style.display = 'inline-block';
-                        tb.style.opacity = '1';
-                        tb.style.pointerEvents = 'auto';
+                    const data = await response.json();
+
+                    if (data.success) {
+                        state.user = data.username || username;
+                        state.isLogged = true;
+                        state.isAdmin = (data.role === 'admin');
+
+                        // Storage (though we clear it on load, it helps within same session)
+                        sessionStorage.setItem('kelion_user', state.user);
+                        sessionStorage.setItem('kelion_admin', state.isAdmin);
+                        localStorage.setItem('kelion_user', state.user);
+                        localStorage.setItem('kelion_admin', state.isAdmin);
+
+                        // UI UPDATE
+                        $('login-modal').style.display = 'none';
+                        $('user-name').textContent = state.user.toUpperCase();
+                        $('sys-status').textContent = "CONNECTED";
+                        $('sys-status').className = "stat-val online";
+                        $('login-btn').textContent = "LOG OFF";
+                        $('login-btn').classList.add('logged');
+                        $('input-bar').style.display = 'flex';
+                        $('chat-container').style.display = 'flex';
+
+                        if (state.isAdmin) {
+                            const tb = $('traffic-btn');
+                            if (tb) {
+                                tb.style.display = 'inline-block';
+                                tb.style.opacity = '1';
+                                tb.style.pointerEvents = 'auto';
+                            }
+                        }
+
+                        // 🕒 GREETING AFTER LOGIN
+                        greetUser(state.user);
+                    } else {
+                        alert("⚠️ ACCESS DENIED: " + (data.error || "Invalid Credentials"));
                     }
+                } catch (err) {
+                    console.error("Login Error:", err);
+                    alert("⚠️ CONNECTION ERROR: Neural core unreachable.");
+                } finally {
+                    $('do-login').textContent = "INITIALIZE";
+                    $('do-login').disabled = false;
                 }
-
-                // 🕒 GREETING AFTER LOGIN
-                greetUser(state.user);
             };
 
             const tBtn = $('traffic-btn');
