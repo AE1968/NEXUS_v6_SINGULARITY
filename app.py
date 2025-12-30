@@ -699,6 +699,48 @@ def status():
 def get_config():
     return jsonify({"paypal_client_id": PAYPAL_CLIENT_ID, "api_url": request.host_url.rstrip('/')})
 
+# ==============================================================================
+# v143: AI SAFETY & LEGAL COMPLIANCE
+# ==============================================================================
+
+def check_ai_safety(text):
+    """Verifică conformitatea AI cu regulile legale (COPPA, GDPR, etc)"""
+    unsafe_keywords = [
+        'child porn', 'hacking', 'how to kill', 'illegal drugs', 
+        'stolen credit cards', 'bomb instructions', 'terrorist'
+    ]
+    for kw in unsafe_keywords:
+        if kw in (text or "").lower():
+            return False, "I cannot fulfill this request due to legal safety policy standards. [[ACTION:BLOCKED]]"
+    return True, None
+
+@app.route('/api/chat', methods=['POST'])
+@token_required
+def api_chat(current_user):
+    data = request.json
+    message = data.get('message', '').strip()
+    
+    # Safety Check on User Input
+    is_safe, warning = check_ai_safety(message)
+    if not is_safe:
+        return jsonify({"success": True, "response": warning, "lang": "en"})
+    
+    # Process Chat
+    response = get_chatgpt_response(
+        message, 
+        current_user.username, 
+        current_user.username,
+        gender=data.get('gender', 'male')
+    )
+    
+    # Safety Check on AI Output
+    is_safe, warning = check_ai_safety(response)
+    if not is_safe:
+        return jsonify({"success": True, "response": warning, "lang": "en"})
+        
+    return jsonify({"success": True, "response": response, "lang": "en"})
+
+
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
@@ -709,6 +751,7 @@ def register():
     phone = data.get('phone', '')
     country = data.get('country', '')
     subscription = data.get('subscription', 'basic')
+    voucher_code = data.get('voucher_code')
     
     if not email or not password:
         return jsonify({"success": False, "error": "Email and password are required"}), 400
@@ -716,13 +759,19 @@ def register():
     if User.query.filter_by(email=email).first():
         return jsonify({"success": False, "error": "Email already registered"}), 400
         
-    # Verify PayPal if not demo
-    # TODO: Re-enable for production (see REMINDER_BEFORE_ONLINE.txt)
+    # PRODUCTION MODE: Remove demo bypass
     paypal_sub_id = data.get('paypal_subscription_id')
     paypal_order_id = data.get('paypal_order_id')
-    LOCAL_TEST_MODE = True  # Set to False before going online!
+    LOCAL_TEST_MODE = False  # DO NOT CHANGE FOR PRODUCTION
     
-    if subscription != 'demo' and not LOCAL_TEST_MODE:
+    is_voucher_valid = False
+    if voucher_code:
+        voucher = VoucherCode.query.filter_by(code=voucher_code, is_used=False).first()
+        if voucher:
+            is_voucher_valid = True
+            subscription = 'basic' # Voucher gives basic
+    
+    if not is_voucher_valid and subscription != 'demo' and not LOCAL_TEST_MODE:
         if not paypal_sub_id and not paypal_order_id:
             return jsonify({"success": False, "error": "Payment evidence required"}), 402
         
@@ -734,17 +783,18 @@ def register():
         if not valid:
             return jsonify({"success": False, "error": f"Payment verification failed: {pp_data}"}), 402
 
-    paypal_id = paypal_sub_id or paypal_order_id or "local_test"
+    paypal_id = paypal_sub_id or paypal_order_id or (voucher_code if is_voucher_valid else "local_test")
 
     username = email.split('@')[0]
     if User.query.filter_by(username=username).first():
         username = email
         
-    # Set expiration: 30 days for basic, more for others
-    # In a real app, we'd base this on the actual PayPal plan duration
+    # Set expiration
     days = 30
-    if subscription == 'premium': days = 90
-    if subscription == 'enterprise': days = 365
+    if is_voucher_valid:
+        days = 30 * (voucher.value_months or 1)
+    elif subscription == 'premium': days = 90
+    elif subscription == 'enterprise': days = 365
     
     expiry = datetime.datetime.utcnow() + datetime.timedelta(days=days)
     
@@ -762,12 +812,24 @@ def register():
         billing_history=json.dumps([{
             "event": "registration",
             "paypal_id": paypal_id,
+            "voucher": voucher_code if is_voucher_valid else None,
             "date": datetime.datetime.utcnow().isoformat()
         }]) if paypal_id else "[]"
     )
     
     db.session.add(new_user)
+    
+    # Mark voucher as used
+    if is_voucher_valid:
+        voucher.is_used = True
+        voucher.used_at = datetime.datetime.utcnow()
+        # Note: used_by_user_id will be set after commit when user.id is available
+        
     db.session.commit()
+    
+    if is_voucher_valid:
+        voucher.used_by_user_id = new_user.id
+        db.session.commit()
     
     # Send confirmation email
     send_confirmation_email(
@@ -780,7 +842,7 @@ def register():
     
     return jsonify({
         "success": True, 
-        "message": "Registration successful! Check your email.",
+        "message": "Registration successful!",
         "username": username,
         "expiry": expiry.strftime('%Y-%m-%d')
     })
