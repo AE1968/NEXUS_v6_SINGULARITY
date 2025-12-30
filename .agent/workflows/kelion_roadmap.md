@@ -1,32 +1,25 @@
 ---
-description: KELION v142 - Lista Completă de Implementare și Roadmap
+description: KELION v143 - Lista Completă de Implementare și Roadmap
 ---
 
-# 🚀 KELION v142 - ROADMAP COMPLET DE DEZVOLTARE
+# 🚀 KELION v143 - ROADMAP COMPLET DE DEZVOLTARE
 
-**Ultima actualizare:** 30 Decembrie 2025  
-**Status General:** 🔴 SITE OFFLINE (DNS nu rezolvă kelionai.app)
-
----
-
-## 🔴 PROBLEMA CRITICĂ #0: SITE OFFLINE
-
-### Diagnostic:
-- **Eroare:** `dial tcp: lookup kelionai.app: no such host`
-- **Cauză posibilă:** 
-  1. Railway nu mai servește aplicația (deployment inactiv/șters)
-  2. DNS Cloudflare nu mai pointează către Railway
-  3. Contul Railway a expirat sau a fost suspendat
-
-### Acțiuni Necesare:
-1. [ ] Verifică statusul deployment-ului în Railway Dashboard
-2. [ ] Verifică înregistrările DNS în Cloudflare pentru `kelionai.app`
-3. [ ] Re-deploy aplicația dacă e necesar
-4. [ ] Testează accesul după remediere
+**Ultima actualizare:** 30 Decembrie 2025 @ 19:30  
+**Status General:** 🟢 SITE ONLINE | 🔶 BACKEND v143 DEPLOYED
 
 ---
 
-## 📋 LISTA COMPLETĂ DE CERINȚE
+## ✅ REZOLVAT: Site Online
+
+DNS-ul a fost reparat în Cloudflare:
+- ✅ CNAME `kelionai.app` → `kelionai-production.up.railway.app`
+- ✅ CNAME `www` → `kelionai.app`
+- ✅ MX records pentru email intacte
+- ✅ Site accesibil la https://kelionai.app
+
+---
+
+## 📋 STATUS IMPLEMENTARE v143
 
 ### 1. 🗄️ Bază de Date Client (COMPLETĂ)
 - [ ] Formular de înregistrare complet:

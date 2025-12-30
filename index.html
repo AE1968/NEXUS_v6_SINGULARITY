@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>KELION v142.1 - GLOBAL_EYE OS</title>
+    <title>KELION v143.0 - GLOBAL_EYE OS</title>
 
     <!-- 🛑 FORCE NO-CACHE (AUTO-REFRESH LOGIC) -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -832,14 +832,141 @@
             <h2>SYSTEM ACCESS</h2>
             <div class="input-grp">
                 <label>Architect ID</label>
-                <input type="text" id="u-input" placeholder="demo" value="demo">
+                <input type="text" id="u-input" placeholder="Email or Username" value="">
             </div>
             <div class="input-grp">
                 <label>Security Key</label>
-                <input type="password" id="p-input" placeholder="••••••••" value="demo">
+                <input type="password" id="p-input" placeholder="••••••••" value="">
             </div>
             <button id="do-login" class="modal-btn">INITIALIZE</button>
-            <p style="margin-top:20px; font-size:0.75rem; color:#556;">Note: Connection secured with RSA-4096</p>
+            <p style="margin-top:15px;">
+                <a href="#" id="forgot-pass-link"
+                    style="color: var(--cyan); text-decoration: none; font-size: 0.8rem;">🔑 Forgot Password?</a>
+            </p>
+            <p style="margin-top:10px; font-size:0.75rem; color:#556;">Note: Connection secured with RSA-4096</p>
+            <p style="margin-top:15px;">
+                <a href="#" id="register-link"
+                    style="color: var(--pink); text-decoration: none; font-size: 0.85rem; font-weight: 600;">📝 Create
+                    Account</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgot-modal"
+        style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px);">
+        <div class="modal-box" style="max-width:450px;">
+            <h2 style="color:var(--cyan);">🔐 PASSWORD RESET</h2>
+
+            <!-- Step 1: Enter Email -->
+            <div id="forgot-step1">
+                <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">Enter your email to receive a reset code.
+                </p>
+                <div class="input-grp">
+                    <label>Email Address</label>
+                    <input type="email" id="forgot-email" placeholder="your@email.com">
+                </div>
+                <button id="forgot-send-btn" class="modal-btn">📧 SEND CODE</button>
+            </div>
+
+            <!-- Step 2: Enter Code + New Password -->
+            <div id="forgot-step2" style="display:none;">
+                <p style="color:#00ff00; font-size:0.85rem; margin-bottom:20px;">✅ Code sent! Check your email.</p>
+                <div class="input-grp">
+                    <label>6-Digit Code</label>
+                    <input type="text" id="forgot-code" placeholder="123456" maxlength="6"
+                        style="letter-spacing:5px; text-align:center; font-size:1.4rem;">
+                </div>
+                <div class="input-grp">
+                    <label>New Password (min 8 chars)</label>
+                    <input type="password" id="forgot-newpass" placeholder="••••••••">
+                </div>
+                <button id="forgot-reset-btn" class="modal-btn" style="background:var(--pink);">🔓 RESET
+                    PASSWORD</button>
+            </div>
+
+            <p style="margin-top:20px;">
+                <a href="#" id="forgot-back-link" style="color:#888; font-size:0.8rem;">← Back to Login</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div id="register-modal"
+        style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px); overflow-y:auto;">
+        <div class="modal-box" style="max-width:550px; margin:30px auto;">
+            <h2 style="color:var(--pink);">📝 CREATE ACCOUNT</h2>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="input-grp">
+                    <label>First Name *</label>
+                    <input type="text" id="reg-firstname" placeholder="John" required>
+                </div>
+                <div class="input-grp">
+                    <label>Last Name *</label>
+                    <input type="text" id="reg-lastname" placeholder="Doe" required>
+                </div>
+            </div>
+
+            <div class="input-grp">
+                <label>Email *</label>
+                <input type="email" id="reg-email" placeholder="john@example.com" required>
+            </div>
+
+            <div class="input-grp">
+                <label>Password * (min 8 chars)</label>
+                <input type="password" id="reg-password" placeholder="••••••••" required>
+            </div>
+
+            <div style="display:grid; grid-template-columns:100px 1fr; gap:10px;">
+                <div class="input-grp">
+                    <label>Country</label>
+                    <select id="reg-country"
+                        style="width:100%; padding:15px; background:rgba(0,0,0,0.6); border:1px solid var(--border); border-radius:8px; color:#fff;">
+                        <option value="UK">🇬🇧 UK</option>
+                        <option value="RO">🇷🇴 RO</option>
+                        <option value="US">🇺🇸 US</option>
+                        <option value="DE">🇩🇪 DE</option>
+                        <option value="FR">🇫🇷 FR</option>
+                    </select>
+                </div>
+                <div class="input-grp">
+                    <label>Phone (Optional)</label>
+                    <input type="tel" id="reg-phone" placeholder="7123456789">
+                </div>
+            </div>
+
+            <div class="input-grp">
+                <label>Address (Optional)</label>
+                <input type="text" id="reg-address" placeholder="123 Main Street">
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="input-grp">
+                    <label>City</label>
+                    <input type="text" id="reg-city" placeholder="London">
+                </div>
+                <div class="input-grp">
+                    <label>Postal Code</label>
+                    <input type="text" id="reg-postal" placeholder="SW1A 1AA">
+                </div>
+            </div>
+
+            <!-- Voucher Code Field -->
+            <div class="input-grp"
+                style="background:rgba(0,255,0,0.05); padding:15px; border-radius:10px; border:1px dashed rgba(0,255,0,0.3);">
+                <label style="color:#00ff00;">🎟️ Voucher Code (Optional)</label>
+                <input type="text" id="reg-voucher" placeholder="KEL-XXXXXXXX" style="text-transform:uppercase;">
+                <small style="color:#888; font-size:0.7rem;">If you have a promotional code, enter it here for free
+                    access.</small>
+            </div>
+
+            <button id="do-register" class="modal-btn"
+                style="background:linear-gradient(135deg, var(--pink), var(--cyan));">🚀 CREATE ACCOUNT</button>
+
+            <p style="margin-top:15px;">
+                <a href="#" id="register-back-link" style="color:#888; font-size:0.8rem;">← Back to Login</a>
+            </p>
         </div>
     </div>
 
@@ -1606,6 +1733,215 @@
             write('bot', welcomeText);
             speak(welcomeText);
         }
+
+        // =====================================================================
+        // v143: NEW FEATURES - Password Reset, Register, Tracking, Security
+        // =====================================================================
+
+        // Track visitor on page load
+        (function trackVisit() {
+            fetch('/api/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ page: window.location.pathname, username: localStorage.getItem('username') || null })
+            }).catch(() => { });
+        })();
+
+        // FORGOT PASSWORD MODAL
+        document.getElementById('forgot-pass-link')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('forgot-modal').style.display = 'flex';
+            document.getElementById('forgot-step1').style.display = 'block';
+            document.getElementById('forgot-step2').style.display = 'none';
+        });
+
+        document.getElementById('forgot-back-link')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('forgot-modal').style.display = 'none';
+            document.getElementById('login-modal').style.display = 'flex';
+        });
+
+        document.getElementById('forgot-send-btn')?.addEventListener('click', async function () {
+            const email = document.getElementById('forgot-email').value.trim();
+            if (!email) return alert('Please enter your email');
+
+            this.textContent = '⏳ Sending...';
+            this.disabled = true;
+
+            try {
+                const res = await fetch('/api/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    document.getElementById('forgot-step1').style.display = 'none';
+                    document.getElementById('forgot-step2').style.display = 'block';
+                } else {
+                    alert(data.error || 'Failed to send code');
+                }
+            } catch (e) {
+                alert('Network error');
+            }
+
+            this.textContent = '📧 SEND CODE';
+            this.disabled = false;
+        });
+
+        document.getElementById('forgot-reset-btn')?.addEventListener('click', async function () {
+            const email = document.getElementById('forgot-email').value.trim();
+            const code = document.getElementById('forgot-code').value.trim();
+            const newPass = document.getElementById('forgot-newpass').value;
+
+            if (!code || code.length !== 6) return alert('Please enter the 6-digit code');
+            if (!newPass || newPass.length < 8) return alert('Password must be at least 8 characters');
+
+            this.textContent = '⏳ Resetting...';
+            this.disabled = true;
+
+            try {
+                const res = await fetch('/api/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code, new_password: newPass })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('✅ Password reset! You can now login.');
+                    document.getElementById('forgot-modal').style.display = 'none';
+                    document.getElementById('login-modal').style.display = 'flex';
+                } else {
+                    alert(data.error || 'Reset failed');
+                }
+            } catch (e) {
+                alert('Network error');
+            }
+
+            this.textContent = '🔓 RESET PASSWORD';
+            this.disabled = false;
+        });
+
+        // REGISTER MODAL
+        document.getElementById('register-link')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('register-modal').style.display = 'flex';
+        });
+
+        document.getElementById('register-back-link')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('register-modal').style.display = 'none';
+            document.getElementById('login-modal').style.display = 'flex';
+        });
+
+        document.getElementById('do-register')?.addEventListener('click', async function () {
+            const firstName = document.getElementById('reg-firstname').value.trim();
+            const lastName = document.getElementById('reg-lastname').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const country = document.getElementById('reg-country').value;
+            const phone = document.getElementById('reg-phone').value.trim();
+            const address = document.getElementById('reg-address').value.trim();
+            const city = document.getElementById('reg-city').value.trim();
+            const postal = document.getElementById('reg-postal').value.trim();
+            const voucher = document.getElementById('reg-voucher').value.trim().toUpperCase();
+
+            if (!firstName || !lastName) return alert('First and Last name required');
+            if (!email) return alert('Email is required');
+            if (!password || password.length < 8) return alert('Password must be at least 8 characters');
+
+            this.textContent = '⏳ Creating...';
+            this.disabled = true;
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email, password, first_name: firstName, last_name: lastName,
+                        country, phone, address_line1: address, city, postal_code: postal,
+                        subscription: voucher ? 'voucher' : 'demo'
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    // If voucher was provided, try to redeem it
+                    if (voucher) {
+                        // Login first to get token
+                        const loginRes = await fetch('/api/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username: data.username, password })
+                        });
+                        const loginData = await loginRes.json();
+
+                        if (loginData.success && loginData.token) {
+                            // Redeem voucher
+                            await fetch('/api/voucher/redeem', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': 'Bearer ' + loginData.token
+                                },
+                                body: JSON.stringify({ code: voucher })
+                            });
+                        }
+                    }
+
+                    alert('✅ Account created! You can now login.');
+                    document.getElementById('register-modal').style.display = 'none';
+                    document.getElementById('login-modal').style.display = 'flex';
+                } else {
+                    alert(data.error || 'Registration failed');
+                }
+            } catch (e) {
+                alert('Network error');
+            }
+
+            this.textContent = '🚀 CREATE ACCOUNT';
+            this.disabled = false;
+        });
+
+        // ANTI-SCREENSHOT PROTECTION (Basic - can be bypassed but deters casual users)
+        // Disable right-click
+        document.addEventListener('contextmenu', function (e) {
+            const isAdmin = localStorage.getItem('role') === 'admin';
+            if (!isAdmin) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Disable Print Screen (limited effectiveness)
+        document.addEventListener('keyup', function (e) {
+            const isAdmin = localStorage.getItem('role') === 'admin';
+            if (!isAdmin && e.key === 'PrintScreen') {
+                navigator.clipboard.writeText('');
+                alert('Screenshots are disabled for security.');
+            }
+        });
+
+        // Disable keyboard shortcuts for screenshots
+        document.addEventListener('keydown', function (e) {
+            const isAdmin = localStorage.getItem('role') === 'admin';
+            if (!isAdmin) {
+                // Ctrl+P (print), Ctrl+S (save), Ctrl+Shift+S
+                if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'P' || e.key === 'S')) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+
+        // Update version tag to v143
+        const vTagNew = document.getElementById('version-tag');
+        if (vTagNew) vTagNew.textContent = 'v143.0';
+
     </script>
 
     <!-- 
