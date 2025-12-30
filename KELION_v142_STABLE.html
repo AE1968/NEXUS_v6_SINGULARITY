@@ -1330,7 +1330,10 @@
                 }
             } else {
                 $('input-bar').style.display = 'none';
-                write('bot', "SYSTEM STANDBY. PLEASE AUTHENTICATE.");
+                // Welcome message with KELIONAI spoken
+                setTimeout(() => {
+                    showKelionaiWelcome();
+                }, 2000); // Wait for loading to complete
             }
 
             // starfield(); // Disabled - using Matrix Rain (initThreeJS) instead
@@ -1587,6 +1590,21 @@
             console.log("Greeting:", welcomeMsg);
             write('bot', welcomeMsg);
             speak(welcomeMsg);
+        }
+
+        // 🌟 KELIONAI WELCOME MESSAGE (Page Load)
+        function showKelionaiWelcome() {
+            const hour = new Date().getHours();
+            let greeting;
+
+            if (hour >= 5 && hour < 12) greeting = "Bună dimineața";
+            else if (hour >= 12 && hour < 18) greeting = "Bună ziua";
+            else greeting = "Bună seara";
+
+            const welcomeText = `${greeting}! Bine ați venit la KELIONAI - Asistentul Vostru Inteligent. Apăsați LOGIN pentru a continua.`;
+
+            write('bot', welcomeText);
+            speak(welcomeText);
         }
     </script>
 

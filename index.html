@@ -965,13 +965,15 @@
 
     <div id="footer-ticker">
         <div class="ticker-text" style="color: #00f3ff;">
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
-            GOOGLE DEEPMIND // SYSTEM SECURED <img src="assets/images/logo_ae.png"
-                style="height:22px; vertical-align:middle; margin:0 10px;" alt="AE"> ARCHITECT: ADRIAN ENCIULESCU
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
-            GOOGLE DEEPMIND // SYSTEM SECURED <img src="assets/images/logo_ae.png"
-                style="height:22px; vertical-align:middle; margin:0 10px;" alt="AE"> ARCHITECT: ADRIAN ENCIULESCU
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
         </div>
     </div>
 
@@ -1298,6 +1300,13 @@
                     $('loading-screen').style.visibility = 'hidden';
                     $('bg-image').classList.add('active');
                     document.body.classList.add('ready');
+
+                    // 🎤 Play welcome message AFTER robot appears (only if not logged in)
+                    if (!sessionStorage.getItem('kelion_user') && !localStorage.getItem('kelion_user')) {
+                        setTimeout(() => {
+                            showKelionaiWelcome();
+                        }, 1500); // 1.5s after robot appears
+                    }
                 }, 1000);
             };
 
@@ -1330,7 +1339,7 @@
                 }
             } else {
                 $('input-bar').style.display = 'none';
-                write('bot', "SYSTEM STANDBY. PLEASE AUTHENTICATE.");
+                // Welcome message is now triggered in initSequence() after robot appears
             }
 
             // starfield(); // Disabled - using Matrix Rain (initThreeJS) instead
@@ -1563,30 +1572,35 @@
 
         // Matrix effect removed - keeping clean background
 
-        // 🌟 GREETING HELPER (Time-based, Multilingual)
+        // 🌟 GREETING HELPER (After Login)
         function greetUser(username) {
-            const hour = new Date().getHours();
-            const lang = state.language || 'en';
-
-            let greeting, welcomeMsg;
-
-            if (lang === 'ro' || lang === 'română' || lang === 'Romanian') {
-                // Romanian greetings
-                if (hour >= 5 && hour < 12) greeting = "Bună dimineața";
-                else if (hour >= 12 && hour < 18) greeting = "Bună ziua";
-                else greeting = "Bună seara";
-                welcomeMsg = `${greeting}, ${username}. Sunt KELION AI. Cu ce te pot ajuta astăzi?`;
-            } else {
-                // English (default)
-                if (hour >= 5 && hour < 12) greeting = "Good Morning";
-                else if (hour >= 12 && hour < 18) greeting = "Good Afternoon";
-                else greeting = "Good Evening";
-                welcomeMsg = `${greeting}, ${username}. I am KELION AI. How can I assist you today?`;
+            // Clear chat history - keep only the last message (this one)
+            const chatMessages = $('chat-messages');
+            if (chatMessages) {
+                chatMessages.innerHTML = ''; // Clear all previous messages
             }
+
+            // Simple, direct greeting in English
+            const welcomeMsg = `How can I help you today, ${username}?`;
 
             console.log("Greeting:", welcomeMsg);
             write('bot', welcomeMsg);
             speak(welcomeMsg);
+        }
+
+        // 🌟 KELIONAI WELCOME MESSAGE (Page Load)
+        function showKelionaiWelcome() {
+            const hour = new Date().getHours();
+            let greeting;
+
+            if (hour >= 5 && hour < 12) greeting = "Good morning";
+            else if (hour >= 12 && hour < 18) greeting = "Good afternoon";
+            else greeting = "Good evening";
+
+            const welcomeText = `${greeting}, visitor! Welcome to KELIONAI - Your Intelligent Assistant. Please click LOGIN to continue.`;
+
+            write('bot', welcomeText);
+            speak(welcomeText);
         }
     </script>
 
