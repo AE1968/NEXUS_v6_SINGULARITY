@@ -1849,20 +1849,15 @@
 
         // Matrix effect removed - keeping clean background
 
-        // 🌟 GREETING HELPER (After Login)
+        // 🌟 LOGIN CLEANUP (After Login) - No greeting message
         function greetUser(username) {
-            // Clear chat history - keep only the last message (this one)
+            // Only clear chat history for clean start - no greeting needed
             const chatMessages = $('chat-messages');
             if (chatMessages) {
-                chatMessages.innerHTML = ''; // Clear all previous messages
+                chatMessages.innerHTML = '';
             }
-
-            // Simple, direct greeting in English
-            const welcomeMsg = `How can I help you today, ${username}?`;
-
-            console.log("Greeting:", welcomeMsg);
-            write('bot', welcomeMsg);
-            speak(welcomeMsg);
+            console.log("User logged in:", username);
+            // No greeting message as per user request
         }
 
         // 🌟 KELIONAI WELCOME MESSAGE (Page Load) - VOICE ONLY
