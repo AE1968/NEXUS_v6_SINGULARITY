@@ -508,6 +508,23 @@ def contact():
         print(f"Contact error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
+# Global ticker state (in production, use Redis or DB)
+TICKER_STATE = {"active": False, "message": ""}
+
+@app.route('/api/ticker', methods=['GET'])
+def get_ticker():
+    """Get current ticker state"""
+    return jsonify(TICKER_STATE)
+
+@app.route('/api/ticker', methods=['POST'])
+def set_ticker():
+    """Set ticker state (admin only)"""
+    global TICKER_STATE
+    data = request.json
+    TICKER_STATE["active"] = data.get("active", False)
+    TICKER_STATE["message"] = data.get("message", "")
+    return jsonify({"success": True, "state": TICKER_STATE})
+
 @app.route('/api/config')
 def get_config():
     return jsonify({"paypal_client_id": PAYPAL_CLIENT_ID, "api_url": request.host_url.rstrip('/')})

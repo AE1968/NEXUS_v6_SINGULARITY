@@ -955,8 +955,90 @@
                 > SYNCING WITH NEURAL GRID...<br>
                 > ACCESS GRANTED: ARCHITECT MODE...
             </div>
+
+            <!-- ADMIN TICKER CONTROL PANEL -->
+            <div
+                style="background:rgba(255,0,255,0.1); border:1px solid #ff00ff; border-radius:10px; padding:15px; margin-top:10px;">
+                <h3 style="color:#ff00ff; font-family:'Orbitron'; margin:0 0 15px 0; font-size:14px;">📢 LIVE
+                    ANNOUNCEMENT TICKER</h3>
+
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <button id="ticker-on-btn" onclick="toggleAdminTicker(true)"
+                        style="flex:1; padding:10px; background:#00ff00; color:#000; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
+                        🟢 ACTIVATE TICKER
+                    </button>
+                    <button id="ticker-off-btn" onclick="toggleAdminTicker(false)"
+                        style="flex:1; padding:10px; background:#ff4444; color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
+                        🔴 DEACTIVATE TICKER
+                    </button>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <label style="color:#00f3ff; font-size:12px; display:block; margin-bottom:5px;">PRESET
+                        MESSAGES:</label>
+                    <select id="ticker-preset" onchange="setTickerFromPreset()"
+                        style="width:100%; padding:10px; background:#001020; color:#00f3ff; border:1px solid #00f3ff; border-radius:5px; font-size:12px;">
+                        <option value="">-- Select preset message --</option>
+                        <option
+                            value="🔧 SYSTEM MAINTENANCE: Scheduled maintenance in progress. Some features may be temporarily unavailable.">
+                            🔧 System Maintenance</option>
+                        <option
+                            value="🚀 NEW FEATURE: Check out our latest AI improvements! Enhanced accuracy and faster responses.">
+                            🚀 New Feature Announcement</option>
+                        <option value="⚠️ IMPORTANT: Please update your account information for security purposes.">⚠️
+                            Security Notice</option>
+                        <option
+                            value="🎉 SPECIAL OFFER: Limited time discount on premium subscriptions! Use code KELION2025.">
+                            🎉 Special Offer</option>
+                        <option
+                            value="📢 ANNOUNCEMENT: Welcome to KELION AI - Your Intelligent Assistant. Explore all features today!">
+                            📢 Welcome Message</option>
+                        <option
+                            value="🔒 SECURITY ALERT: We've detected unusual activity. Please verify your identity.">🔒
+                            Security Alert</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <label style="color:#00f3ff; font-size:12px; display:block; margin-bottom:5px;">CUSTOM
+                        MESSAGE:</label>
+                    <input type="text" id="ticker-custom-msg" placeholder="Enter custom announcement message..."
+                        style="width:100%; padding:10px; background:#001020; color:#fff; border:1px solid #00f3ff; border-radius:5px; font-size:12px; box-sizing:border-box;">
+                </div>
+
+                <button onclick="setCustomTickerMessage()"
+                    style="width:100%; padding:12px; background:linear-gradient(135deg, #ff00ff, #00f3ff); color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer; font-size:14px;">
+                    📨 BROADCAST MESSAGE
+                </button>
+
+                <div id="ticker-status"
+                    style="margin-top:10px; padding:8px; background:rgba(0,0,0,0.5); border-radius:5px; font-size:11px; color:#888; text-align:center;">
+                    Ticker Status: <span id="ticker-status-text" style="color:#ff4444;">INACTIVE</span>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- ADMIN ANNOUNCEMENT TICKER (Top of page, visible when active) -->
+    <div id="admin-announcement-ticker"
+        style="display:none; position:fixed; top:0; left:0; width:100%; background:linear-gradient(90deg, #ff00ff, #00f3ff, #ff00ff); padding:8px 0; z-index:99998; overflow:hidden;">
+        <div id="admin-ticker-text"
+            style="color:#fff; font-weight:bold; font-size:14px; white-space:nowrap; animation: tickerScroll 20s linear infinite; text-shadow: 0 0 10px #000;">
+            📢 Welcome to KELION AI - Your Intelligent Assistant!
+        </div>
+    </div>
+
+    <style>
+        @keyframes tickerScroll {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
 
 
 
@@ -967,15 +1049,15 @@
 
     <div id="footer-ticker">
         <div class="ticker-text" style="color: #00f3ff;">
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
         </div>
     </div>
 
@@ -996,6 +1078,77 @@
         };
 
         const $ = id => document.getElementById(id);
+
+        // 📢 ADMIN TICKER CONTROL FUNCTIONS
+        let tickerActive = false;
+
+        function toggleAdminTicker(active) {
+            tickerActive = active;
+            const ticker = $('admin-announcement-ticker');
+            const statusText = $('ticker-status-text');
+
+            if (active) {
+                ticker.style.display = 'block';
+                statusText.textContent = 'ACTIVE';
+                statusText.style.color = '#00ff00';
+                // Save state to backend
+                saveTickerState(true, $('admin-ticker-text').textContent);
+            } else {
+                ticker.style.display = 'none';
+                statusText.textContent = 'INACTIVE';
+                statusText.style.color = '#ff4444';
+                saveTickerState(false, '');
+            }
+        }
+
+        function setTickerFromPreset() {
+            const preset = $('ticker-preset').value;
+            if (preset) {
+                $('admin-ticker-text').textContent = preset;
+                $('ticker-custom-msg').value = preset;
+            }
+        }
+
+        function setCustomTickerMessage() {
+            const customMsg = $('ticker-custom-msg').value.trim();
+            if (customMsg) {
+                $('admin-ticker-text').textContent = customMsg;
+                toggleAdminTicker(true);
+                alert('📢 Message broadcast activated!');
+            } else {
+                alert('⚠️ Please enter a message first');
+            }
+        }
+
+        async function saveTickerState(active, message) {
+            try {
+                await fetch('/api/ticker', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ active, message })
+                });
+            } catch (e) {
+                console.log('Ticker state save failed:', e);
+            }
+        }
+
+        async function loadTickerState() {
+            try {
+                const res = await fetch('/api/ticker');
+                const data = await res.json();
+                if (data.active) {
+                    $('admin-ticker-text').textContent = data.message || 'Welcome to KELION AI!';
+                    toggleAdminTicker(true);
+                }
+            } catch (e) {
+                console.log('Ticker state load failed:', e);
+            }
+        }
+
+        // Load ticker state on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(loadTickerState, 2000);
+        });
 
         // 🌐 LANGUAGE DETECTION HELPER
         function detectLanguage(text) {
