@@ -1420,10 +1420,10 @@
                     $('bg-image').classList.add('active');
                     document.body.classList.add('ready');
 
-                    // 🎤 Play welcome message AFTER robot appears (always visitor since we clear session)
+                    // 🎤 Play welcome voice AFTER robot appears (1 second delay)
                     setTimeout(() => {
                         showKelionaiWelcome();
-                    }, 1500); // 1.5s after robot appears
+                    }, 1000); // 1s after robot appears
                 }, 1000);
             };
 
@@ -1709,19 +1709,14 @@
             speak(welcomeMsg);
         }
 
-        // 🌟 KELIONAI WELCOME MESSAGE (Page Load)
+        // 🌟 KELIONAI WELCOME MESSAGE (Page Load) - VOICE ONLY
         function showKelionaiWelcome() {
-            const hour = new Date().getHours();
-            let greeting;
+            // Short, polite voice-only introduction with name
+            const welcomeVoice = "Hello! I'm Kelion, your intelligent assistant. Please login to start.";
 
-            if (hour >= 5 && hour < 12) greeting = "Good morning";
-            else if (hour >= 12 && hour < 18) greeting = "Good afternoon";
-            else greeting = "Good evening";
-
-            const welcomeText = `${greeting}, visitor! Welcome to KELIONAI - Your Intelligent Assistant. Please click LOGIN to continue.`;
-
-            write('bot', welcomeText);
-            speak(welcomeText);
+            // Only speak, don't write to chat
+            speak(welcomeVoice);
+            console.log("Welcome voice played:", welcomeVoice);
         }
     </script>
 
