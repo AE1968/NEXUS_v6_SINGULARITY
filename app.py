@@ -607,75 +607,54 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
 
 
 def send_payment_confirmation_email(to_email, username, first_name, plan_name, amount, currency, subscription_end):
-    """Trimite email de confirmare plată cu factura"""
+    """Trimite email simplu de confirmare plată"""
     try:
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = '✅ Payment Confirmed - KELION AI Subscription'
+        msg['Subject'] = '✅ Payment Confirmed - KELION AI'
         msg['From'] = SMTP_EMAIL
         msg['To'] = to_email
-        # BCC pentru admin (clientul nu vede)
         
-        # Generează număr factură
-        invoice_number = f"KEL-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-        payment_date = datetime.datetime.now().strftime('%d %B %Y at %H:%M')
+        payment_date = datetime.datetime.now().strftime('%d %B %Y')
         
         html = f'''
         <html>
         <body style="font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; padding: 30px; margin: 0;">
-            <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #050510, #0a0a1a); border: 2px solid #00f3ff; border-radius: 15px; padding: 40px;">
+            <div style="max-width: 500px; margin: 0 auto; background: #0a0a1a; border: 1px solid #00f3ff; border-radius: 10px; padding: 30px;">
                 
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="color: #00f3ff; margin: 0; font-size: 28px;">🚀 KELION AI</h1>
-                    <p style="color: #888; margin: 5px 0;">Payment Confirmation</p>
+                <h1 style="color: #00f3ff; text-align: center; margin-bottom: 20px;">🚀 KELION AI</h1>
+                
+                <div style="background: rgba(0, 255, 0, 0.1); border: 1px solid #00ff00; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 20px;">
+                    <p style="color: #00ff00; margin: 0; font-size: 18px; font-weight: bold;">✅ Payment Received</p>
                 </div>
                 
-                <div style="background: rgba(0, 255, 0, 0.1); border: 1px solid #00ff00; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 25px;">
-                    <h2 style="color: #00ff00; margin: 0;">✅ Payment Successful!</h2>
-                </div>
+                <p>Hello <strong>{first_name or username}</strong>,</p>
+                <p>Your payment has been successfully processed.</p>
                 
-                <p style="margin-bottom: 20px;">Hello <strong style="color: #00f3ff;">{first_name or username}</strong>,</p>
-                <p>Thank you for your purchase! Your KELION AI subscription is now active.</p>
-                
-                <hr style="border-color: #00f3ff; opacity: 0.2; margin: 25px 0;">
-                
-                <h3 style="color: #ff00ff; margin-bottom: 15px;">📋 Invoice Details</h3>
-                
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                    <tr style="border-bottom: 1px solid rgba(0,243,255,0.1);">
-                        <td style="padding: 12px 0; color: #888;">Invoice Number:</td>
-                        <td style="padding: 12px 0; text-align: right; font-weight: bold;">{invoice_number}</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid rgba(0,243,255,0.1);">
-                        <td style="padding: 12px 0; color: #888;">Date:</td>
-                        <td style="padding: 12px 0; text-align: right;">{payment_date}</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid rgba(0,243,255,0.1);">
-                        <td style="padding: 12px 0; color: #888;">Plan:</td>
-                        <td style="padding: 12px 0; text-align: right; color: #00f3ff;">{plan_name}</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid rgba(0,243,255,0.1);">
-                        <td style="padding: 12px 0; color: #888;">Amount Paid:</td>
-                        <td style="padding: 12px 0; text-align: right; font-weight: bold; font-size: 1.2em; color: #00ff00;">£{amount:.2f} {currency}</td>
+                <table style="width: 100%; margin: 20px 0; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 10px 0; color: #888;">Subscription:</td>
+                        <td style="padding: 10px 0; text-align: right; color: #00f3ff; font-weight: bold;">{plan_name}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 12px 0; color: #888;">Valid Until:</td>
-                        <td style="padding: 12px 0; text-align: right; font-weight: bold; color: #ff00ff;">{subscription_end}</td>
+                        <td style="padding: 10px 0; color: #888;">Amount:</td>
+                        <td style="padding: 10px 0; text-align: right; color: #00ff00; font-weight: bold; font-size: 1.1em;">£{amount:.2f}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 0; color: #888;">Date:</td>
+                        <td style="padding: 10px 0; text-align: right;">{payment_date}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 0; color: #888;">Valid until:</td>
+                        <td style="padding: 10px 0; text-align: right; color: #ff00ff;">{subscription_end}</td>
                     </tr>
                 </table>
                 
-                <hr style="border-color: #00f3ff; opacity: 0.2; margin: 25px 0;">
-                
-                <p style="text-align: center; margin: 30px 0;">
-                    <a href="https://kelionai.app" style="display: inline-block; background: linear-gradient(135deg, #00f3ff, #ff00ff); color: #000; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold;">Access KELION AI</a>
+                <p style="text-align: center; margin-top: 25px;">
+                    <a href="https://kelionai.app" style="display: inline-block; background: #00f3ff; color: #000; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Access KELION</a>
                 </p>
                 
-                <p style="font-size: 12px; color: #666; text-align: center; margin-top: 30px;">
-                    This is an automated payment confirmation.<br>
-                    For support, contact us at <a href="mailto:contact@kelionai.app" style="color: #00f3ff;">contact@kelionai.app</a>
-                </p>
-                
-                <p style="font-size: 11px; color: #444; text-align: center; margin-top: 20px;">
-                    KELION AI © 2025 | kelionai.app
+                <p style="font-size: 11px; color: #555; text-align: center; margin-top: 25px;">
+                    Questions? Contact <a href="mailto:contact@kelionai.app" style="color: #00f3ff;">contact@kelionai.app</a>
                 </p>
             </div>
         </body>
@@ -872,6 +851,119 @@ def verify_code():
         return jsonify({"success": True})
     
     return jsonify({"success": False, "error": "Invalid code"}), 400
+
+
+# ==============================================================================
+# v143: PROCESARE PLATĂ COMPLETĂ (salvare DB + email)
+# ==============================================================================
+
+@app.route('/api/payment/process', methods=['POST'])
+@token_required
+def process_payment(current_user):
+    """
+    Procesează o plată: verifică PayPal, salvează în DB, actualizează user, trimite email.
+    Folosit pentru: upgrade abonament, reînnoire, plată nouă.
+    """
+    data = request.json
+    plan_id = data.get('plan_id')  # '1_month', '6_months', '12_months'
+    paypal_order_id = data.get('paypal_order_id')
+    paypal_subscription_id = data.get('paypal_subscription_id')
+    
+    if not plan_id or plan_id not in SUBSCRIPTION_PLANS:
+        return jsonify({"success": False, "error": "Invalid plan"}), 400
+    
+    plan = SUBSCRIPTION_PLANS[plan_id]
+    amount = plan['price']
+    days = plan['days']
+    plan_name = plan['name']
+    
+    # Verifică plata PayPal (LIVE mode)
+    payment_ref = paypal_order_id or paypal_subscription_id
+    if payment_ref:
+        if paypal_order_id:
+            valid, pp_data = verify_paypal_order(paypal_order_id)
+        else:
+            valid, pp_data = verify_paypal_subscription(paypal_subscription_id)
+        
+        if not valid:
+            return jsonify({"success": False, "error": f"Payment verification failed: {pp_data}"}), 402
+    else:
+        return jsonify({"success": False, "error": "Payment reference required"}), 400
+    
+    # Calculează noua dată de expirare
+    now = datetime.datetime.utcnow()
+    if current_user.subscription_end_date and current_user.subscription_end_date > now:
+        # Dacă are deja abonament activ, extinde de la acea dată
+        new_expiry = current_user.subscription_end_date + datetime.timedelta(days=days)
+    else:
+        # Altfel, de la acum
+        new_expiry = now + datetime.timedelta(days=days)
+    
+    # Salvează în PaymentRecord
+    payment_record = PaymentRecord(
+        user_id=current_user.id,
+        amount=amount,
+        currency='GBP',
+        payment_method='paypal',
+        plan_name=plan_name,
+        paypal_order_id=paypal_order_id,
+        paypal_subscription_id=paypal_subscription_id,
+        status='completed',
+        completed_at=now,
+        confirmation_email_sent=False
+    )
+    db.session.add(payment_record)
+    
+    # Actualizează user-ul
+    current_user.subscription = plan_id
+    current_user.subscription_end_date = new_expiry
+    if paypal_subscription_id:
+        current_user.paypal_subscription_id = paypal_subscription_id
+    
+    # Adaugă la billing history
+    try:
+        history = json.loads(current_user.billing_history or '[]')
+    except:
+        history = []
+    
+    history.append({
+        "event": "payment",
+        "plan": plan_name,
+        "amount": amount,
+        "currency": "GBP",
+        "paypal_ref": payment_ref,
+        "date": now.isoformat(),
+        "valid_until": new_expiry.isoformat()
+    })
+    current_user.billing_history = json.dumps(history)
+    
+    db.session.commit()
+    
+    # Trimite email de confirmare (cu BCC la admin)
+    email_sent = send_payment_confirmation_email(
+        to_email=current_user.email,
+        username=current_user.username,
+        first_name=current_user.first_name,
+        plan_name=plan_name,
+        amount=amount,
+        currency='GBP',
+        subscription_end=new_expiry.strftime('%d %B %Y')
+    )
+    
+    # Marchează că email-ul a fost trimis
+    if email_sent:
+        payment_record.confirmation_email_sent = True
+        db.session.commit()
+    
+    return jsonify({
+        "success": True,
+        "message": "Payment processed successfully",
+        "plan": plan_name,
+        "amount": amount,
+        "valid_until": new_expiry.strftime('%d %B %Y'),
+        "email_sent": email_sent
+    })
+
 
 @app.route('/api/paypal/webhook', methods=['POST'])
 def paypal_webhook():
