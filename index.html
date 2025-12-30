@@ -782,22 +782,20 @@
     <div id="header">
         <div id="status-display">
             <div class="status-row top">
-                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v142.2</span>
+                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v142.1</span>
                 <span id="user-display">USER: <span id="user-name" class="stat-val">OFFLINE</span></span>
                 <span id="cloud-display">CLOUD: <span id="sys-status"
                         class="stat-val offline">DISCONNECTED</span></span>
             </div>
             <div class="status-row bottom">
-                <div id="system-clock"
-                    style="color: #39FF14; font-weight: bold; text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14;">
+                <div id="system-clock">
                     <div class="clock-part" id="h-part"><span>00</span></div>
                     <span>:</span>
                     <div class="clock-part" id="m-part"><span>00</span></div>
                     <span>:</span>
                     <div class="clock-part" id="s-part"><span>00</span></div>
                 </div>
-                <span id="system-date"
-                    style="color: #39FF14; font-weight: bold; text-shadow: 0 0 10px #39FF14;">DD-MM-YYYY</span>
+                <span id="system-date">DD-MM-YYYY</span>
             </div>
         </div>
         <div class="header-actions">
@@ -860,7 +858,8 @@
                     </div>
                 </div>
 
-                <form id="ae-contact-form" onsubmit="submitContactForm(event)">
+                <form id="ae-contact-form"
+                    onsubmit="event.preventDefault(); alert('Message sent! (Simulation)'); document.getElementById('ae-contact-modal').classList.remove('active');">
                     <div class="ae-form-group">
                         <label>📧 Your Email</label>
                         <input type="email" id="ae-email" placeholder="example@email.com" required>
@@ -889,16 +888,15 @@
                             required></textarea>
                     </div>
 
-                    <button type="submit" class="ae-submit-btn" id="ae-submit-btn">
+                    <button type="submit" class="ae-submit-btn">
                         📨 Send Message
                     </button>
-                    <div id="ae-status" style="text-align:center; margin-top:10px; font-size:14px;"></div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- ADMIN TRAFFIC & REQUIREMENTS MODAL -->
+    <!-- ADMIN TRAFFIC & CERINTE MODAL -->
     <div id="admin-modal"
         style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(15px);">
         <div class="modal-box"
@@ -955,90 +953,8 @@
                 > SYNCING WITH NEURAL GRID...<br>
                 > ACCESS GRANTED: ARCHITECT MODE...
             </div>
-
-            <!-- ADMIN TICKER CONTROL PANEL -->
-            <div
-                style="background:rgba(255,0,255,0.1); border:1px solid #ff00ff; border-radius:10px; padding:15px; margin-top:10px;">
-                <h3 style="color:#ff00ff; font-family:'Orbitron'; margin:0 0 15px 0; font-size:14px;">📢 LIVE
-                    ANNOUNCEMENT TICKER</h3>
-
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <button id="ticker-on-btn" onclick="toggleAdminTicker(true)"
-                        style="flex:1; padding:10px; background:#00ff00; color:#000; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
-                        🟢 ACTIVATE TICKER
-                    </button>
-                    <button id="ticker-off-btn" onclick="toggleAdminTicker(false)"
-                        style="flex:1; padding:10px; background:#ff4444; color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
-                        🔴 DEACTIVATE TICKER
-                    </button>
-                </div>
-
-                <div style="margin-bottom:10px;">
-                    <label style="color:#00f3ff; font-size:12px; display:block; margin-bottom:5px;">PRESET
-                        MESSAGES:</label>
-                    <select id="ticker-preset" onchange="setTickerFromPreset()"
-                        style="width:100%; padding:10px; background:#001020; color:#00f3ff; border:1px solid #00f3ff; border-radius:5px; font-size:12px;">
-                        <option value="">-- Select preset message --</option>
-                        <option
-                            value="🔧 SYSTEM MAINTENANCE: Scheduled maintenance in progress. Some features may be temporarily unavailable.">
-                            🔧 System Maintenance</option>
-                        <option
-                            value="🚀 NEW FEATURE: Check out our latest AI improvements! Enhanced accuracy and faster responses.">
-                            🚀 New Feature Announcement</option>
-                        <option value="⚠️ IMPORTANT: Please update your account information for security purposes.">⚠️
-                            Security Notice</option>
-                        <option
-                            value="🎉 SPECIAL OFFER: Limited time discount on premium subscriptions! Use code KELION2025.">
-                            🎉 Special Offer</option>
-                        <option
-                            value="📢 ANNOUNCEMENT: Welcome to KELION AI - Your Intelligent Assistant. Explore all features today!">
-                            📢 Welcome Message</option>
-                        <option
-                            value="🔒 SECURITY ALERT: We've detected unusual activity. Please verify your identity.">🔒
-                            Security Alert</option>
-                    </select>
-                </div>
-
-                <div style="margin-bottom:10px;">
-                    <label style="color:#00f3ff; font-size:12px; display:block; margin-bottom:5px;">CUSTOM
-                        MESSAGE:</label>
-                    <input type="text" id="ticker-custom-msg" placeholder="Enter custom announcement message..."
-                        style="width:100%; padding:10px; background:#001020; color:#fff; border:1px solid #00f3ff; border-radius:5px; font-size:12px; box-sizing:border-box;">
-                </div>
-
-                <button onclick="setCustomTickerMessage()"
-                    style="width:100%; padding:12px; background:linear-gradient(135deg, #ff00ff, #00f3ff); color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer; font-size:14px;">
-                    📨 BROADCAST MESSAGE
-                </button>
-
-                <div id="ticker-status"
-                    style="margin-top:10px; padding:8px; background:rgba(0,0,0,0.5); border-radius:5px; font-size:11px; color:#888; text-align:center;">
-                    Ticker Status: <span id="ticker-status-text" style="color:#ff4444;">INACTIVE</span>
-                </div>
-            </div>
         </div>
     </div>
-
-    <!-- ADMIN ANNOUNCEMENT TICKER (Top of page, visible when active) -->
-    <div id="admin-announcement-ticker"
-        style="display:none; position:fixed; top:0; left:0; width:100%; background:linear-gradient(90deg, #ff00ff, #00f3ff, #ff00ff); padding:8px 0; z-index:99998; overflow:hidden;">
-        <div id="admin-ticker-text"
-            style="color:#fff; font-weight:bold; font-size:14px; white-space:nowrap; animation: tickerScroll 20s linear infinite; text-shadow: 0 0 10px #000;">
-            📢 Welcome to KELION AI - Your Intelligent Assistant!
-        </div>
-    </div>
-
-    <style>
-        @keyframes tickerScroll {
-            0% {
-                transform: translateX(100%);
-            }
-
-            100% {
-                transform: translateX(-100%);
-            }
-        }
-    </style>
 
 
 
@@ -1049,15 +965,15 @@
 
     <div id="footer-ticker">
         <div class="ticker-text" style="color: #00f3ff;">
-            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.2 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
         </div>
     </div>
 
@@ -1074,152 +990,10 @@
             isAdmin: false,
             user: "N/A",
             voice: true,
-            language: sessionStorage.getItem('kelion_language') || 'en'  // Persist language until logout
+            language: 'en'  // English default
         };
 
         const $ = id => document.getElementById(id);
-
-        // 📢 ADMIN TICKER CONTROL FUNCTIONS
-        let tickerActive = false;
-
-        function toggleAdminTicker(active) {
-            tickerActive = active;
-            const ticker = $('admin-announcement-ticker');
-            const statusText = $('ticker-status-text');
-
-            if (active) {
-                ticker.style.display = 'block';
-                statusText.textContent = 'ACTIVE';
-                statusText.style.color = '#00ff00';
-                // Save state to backend
-                saveTickerState(true, $('admin-ticker-text').textContent);
-            } else {
-                ticker.style.display = 'none';
-                statusText.textContent = 'INACTIVE';
-                statusText.style.color = '#ff4444';
-                saveTickerState(false, '');
-            }
-        }
-
-        function setTickerFromPreset() {
-            const preset = $('ticker-preset').value;
-            if (preset) {
-                $('admin-ticker-text').textContent = preset;
-                $('ticker-custom-msg').value = preset;
-            }
-        }
-
-        function setCustomTickerMessage() {
-            const customMsg = $('ticker-custom-msg').value.trim();
-            if (customMsg) {
-                $('admin-ticker-text').textContent = customMsg;
-                toggleAdminTicker(true);
-                alert('📢 Message broadcast activated!');
-            } else {
-                alert('⚠️ Please enter a message first');
-            }
-        }
-
-        async function saveTickerState(active, message) {
-            try {
-                await fetch('/api/ticker', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ active, message })
-                });
-            } catch (e) {
-                console.log('Ticker state save failed:', e);
-            }
-        }
-
-        async function loadTickerState() {
-            try {
-                const res = await fetch('/api/ticker');
-                const data = await res.json();
-                if (data.active) {
-                    $('admin-ticker-text').textContent = data.message || 'Welcome to KELION AI!';
-                    toggleAdminTicker(true);
-                }
-            } catch (e) {
-                console.log('Ticker state load failed:', e);
-            }
-        }
-
-        // Load ticker state on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(loadTickerState, 2000);
-        });
-
-        // 🌐 LANGUAGE DETECTION HELPER
-        function detectLanguage(text) {
-            // Simple detection based on common words
-            const romanianPatterns = /\b(sunt|este|pentru|care|sau|dar|mai|foarte|bine|salut|buna|multumesc|te rog)\b/i;
-            const englishPatterns = /\b(the|is|are|for|what|how|can|you|please|thank|hello|good)\b/i;
-
-            if (romanianPatterns.test(text)) return 'ro';
-            if (englishPatterns.test(text)) return 'en';
-            return state.language; // Keep current if uncertain
-        }
-
-        // 📧 CONTACT FORM SUBMISSION (REAL)
-        async function submitContactForm(event) {
-            event.preventDefault();
-
-            const submitBtn = $('ae-submit-btn');
-            const statusDiv = $('ae-status');
-            const originalText = submitBtn.innerHTML;
-
-            // Get form data
-            const formData = {
-                email: $('ae-email').value.trim(),
-                name: $('ae-name').value.trim() || 'Anonymous',
-                topic: $('ae-topic').value,
-                topicLabel: $('ae-topic').options[$('ae-topic').selectedIndex].text,
-                message: $('ae-message').value.trim(),
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent,
-                source: window.location.href
-            };
-
-            // Validate
-            if (!formData.email || !formData.topic || !formData.message) {
-                statusDiv.innerHTML = '<span style="color:#ff4444;">⚠️ Please fill all required fields</span>';
-                return;
-            }
-
-            try {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '⏳ Sending...';
-                statusDiv.innerHTML = '';
-
-                const response = await fetch('/api/contact', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    statusDiv.innerHTML = '<span style="color:#00ff00;">✅ Message sent successfully! We will reply soon.</span>';
-                    // Reset form
-                    $('ae-contact-form').reset();
-                    // Close modal after 2 seconds
-                    setTimeout(() => {
-                        $('ae-contact-modal').classList.remove('active');
-                        statusDiv.innerHTML = '';
-                    }, 2000);
-                } else {
-                    throw new Error(data.error || 'Failed to send message');
-                }
-            } catch (err) {
-                console.error('Contact form error:', err);
-                statusDiv.innerHTML = `<span style="color:#ff4444;">❌ Error: ${err.message}</span>`;
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        }
 
         // 📝 CHAT SYSTEM
         function write(who, text, isError = false) {
@@ -1329,93 +1103,48 @@
             const msg = input.value.trim();
             if (!msg) return;
 
-            // Detect user's language and persist it
-            const detectedLang = detectLanguage(msg);
-            if (detectedLang !== state.language) {
-                state.language = detectedLang;
-                sessionStorage.setItem('kelion_language', detectedLang);
-                console.log('Language switched to:', detectedLang);
-            }
-
-            // Ensure chat container is visible
-            $('chat-container').style.display = 'flex';
-
             write('user', msg);
             input.value = "";
 
             const thinking = write('bot', "Synapsing...");
 
             try {
-                // Check if user wants to search the web
-                // Includes Romanian with diacritics: caută, căutare AND without: cauta, cautare
-                const searchPatterns = /\b(search|google|find|look up|what is|who is|latest|news|weather|current)\b|caut[aăAĂ]|c[aăAĂ]utar|internet|stir[ie]/i;
-                const isSearchQuery = searchPatterns.test(msg);
+                // Use backend /api/chat endpoint (has API keys configured)
+                thinking.textContent = "Connecting to neural core...";
 
-                if (isSearchQuery) {
-                    thinking.textContent = "🌐 Searching the web...";
-                    const searchResults = await searchWeb(msg);
+                const response = await fetch("/api/chat", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: msg,
+                        username: state.user,
+                        gender: "male",
+                        conversation_id: state.user
+                    })
+                });
 
-                    // Now send to AI with search context
-                    const enrichedMessage = `User asked: "${msg}"\n\nHere are real-time web search results:\n${searchResults}\n\nPlease provide a helpful response based on this information. Respond in ${state.language === 'ro' ? 'Romanian' : 'English'}.`;
+                if (!response.ok) throw new Error("Chat API Error");
 
-                    thinking.textContent = "Processing search results...";
+                const data = await response.json();
 
-                    const response = await fetch("/api/chat", {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            message: enrichedMessage,
-                            username: state.user,
-                            gender: "male",
-                            conversation_id: state.user,
-                            language: state.language
-                        })
-                    });
+                if (data.success) {
+                    const reply = data.response;
+                    thinking.remove();
+                    write('bot', reply);
+                    speak(reply);
 
-                    if (!response.ok) throw new Error("Chat API Error");
-                    const data = await response.json();
-
-                    if (data.success) {
-                        thinking.remove();
-                        write('bot', data.response);
-                        speak(data.response);
-                    } else {
-                        throw new Error(data.error || "Unknown error");
-                    }
+                    // Detect language from response for future use
+                    if (data.lang) state.language = data.lang;
                 } else {
-                    // Regular chat without web search
-                    thinking.textContent = "Connecting to neural core...";
-
-                    const response = await fetch("/api/chat", {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            message: msg + (state.language === 'ro' ? ' (Please respond in Romanian)' : ''),
-                            username: state.user,
-                            gender: "male",
-                            conversation_id: state.user,
-                            language: state.language
-                        })
-                    });
-
-                    if (!response.ok) throw new Error("Chat API Error");
-                    const data = await response.json();
-
-                    if (data.success) {
-                        thinking.remove();
-                        write('bot', data.response);
-                        speak(data.response);
-                    } else {
-                        throw new Error(data.error || "Unknown error");
-                    }
+                    throw new Error(data.error || "Unknown error");
                 }
 
             } catch (err) {
                 console.error("AI Processor Error:", err);
                 thinking.remove();
-                const errStatus = state.language === 'ro'
-                    ? "Conexiune instabilă. Încearcă din nou."
-                    : "Neural Link unstable. Please try again.";
+                const errStatus = "Neural Link unstable. Please try again.";
                 write('bot', errStatus);
                 speak(errStatus);
             }
@@ -1576,10 +1305,10 @@
                     $('bg-image').classList.add('active');
                     document.body.classList.add('ready');
 
-                    // 🎤 Play welcome voice AFTER robot appears (1 second delay)
+                    // 🎤 Play welcome message AFTER robot appears (always visitor since we clear session)
                     setTimeout(() => {
                         showKelionaiWelcome();
-                    }, 1000); // 1s after robot appears
+                    }, 1500); // 1.5s after robot appears
                 }, 1000);
             };
 
@@ -1648,10 +1377,8 @@
                     state.isLogged = false;
                     state.user = "N/A";
                     state.isAdmin = false;
-                    state.language = 'en'; // Reset language on logout
                     sessionStorage.removeItem('kelion_user');
                     sessionStorage.removeItem('kelion_admin');
-                    sessionStorage.removeItem('kelion_language'); // Clear language persistence
                     localStorage.removeItem('kelion_user');
                     localStorage.removeItem('kelion_admin');
                     location.reload(); // Hard reset on logout
@@ -1849,25 +1576,35 @@
 
         // Matrix effect removed - keeping clean background
 
-        // 🌟 LOGIN CLEANUP (After Login) - No greeting message
+        // 🌟 GREETING HELPER (After Login)
         function greetUser(username) {
-            // Only clear chat history for clean start - no greeting needed
+            // Clear chat history - keep only the last message (this one)
             const chatMessages = $('chat-messages');
             if (chatMessages) {
-                chatMessages.innerHTML = '';
+                chatMessages.innerHTML = ''; // Clear all previous messages
             }
-            console.log("User logged in:", username);
-            // No greeting message as per user request
+
+            // Simple, direct greeting in English
+            const welcomeMsg = `How can I help you today, ${username}?`;
+
+            console.log("Greeting:", welcomeMsg);
+            write('bot', welcomeMsg);
+            speak(welcomeMsg);
         }
 
-        // 🌟 KELIONAI WELCOME MESSAGE (Page Load) - VOICE ONLY
+        // 🌟 KELIONAI WELCOME MESSAGE (Page Load)
         function showKelionaiWelcome() {
-            // Short, polite voice-only introduction with name
-            const welcomeVoice = "Hello! I'm Kelion, your intelligent assistant. Please login to start.";
+            const hour = new Date().getHours();
+            let greeting;
 
-            // Only speak, don't write to chat
-            speak(welcomeVoice);
-            console.log("Welcome voice played:", welcomeVoice);
+            if (hour >= 5 && hour < 12) greeting = "Good morning";
+            else if (hour >= 12 && hour < 18) greeting = "Good afternoon";
+            else greeting = "Good evening";
+
+            const welcomeText = `${greeting}, visitor! Welcome to KELIONAI - Your Intelligent Assistant. Please click LOGIN to continue.`;
+
+            write('bot', welcomeText);
+            speak(welcomeText);
         }
     </script>
 

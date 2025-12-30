@@ -469,61 +469,7 @@ def serve_static(filename):
 
 @app.route('/status')
 def status():
-    return jsonify({"status": "online", "system": "KELION v142.2", "engine": "Flask/Python"})
-
-@app.route('/api/contact', methods=['POST'])
-def contact():
-    """Handle contact form submissions - save to DB and notify admin"""
-    try:
-        data = request.json
-        email = data.get('email')
-        name = data.get('name', 'Anonymous')
-        topic = data.get('topic')
-        topic_label = data.get('topicLabel', topic)
-        message = data.get('message')
-        user_agent = data.get('userAgent', request.headers.get('User-Agent'))
-        source = data.get('source', request.referrer)
-        
-        if not email or not topic or not message:
-            return jsonify({"success": False, "error": "Email, topic and message are required"}), 400
-        
-        # Save to database
-        new_contact = ContactMessage(
-            email=email,
-            name=name,
-            topic=topic,
-            topic_label=topic_label,
-            message=message,
-            user_agent=user_agent,
-            source=source
-        )
-        db.session.add(new_contact)
-        db.session.commit()
-        
-        # Send admin notification email
-        send_admin_notification(email, name, topic, topic_label, message)
-        
-        return jsonify({"success": True, "message": "Contact message saved successfully"})
-    except Exception as e:
-        print(f"Contact error: {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
-
-# Global ticker state (in production, use Redis or DB)
-TICKER_STATE = {"active": False, "message": ""}
-
-@app.route('/api/ticker', methods=['GET'])
-def get_ticker():
-    """Get current ticker state"""
-    return jsonify(TICKER_STATE)
-
-@app.route('/api/ticker', methods=['POST'])
-def set_ticker():
-    """Set ticker state (admin only)"""
-    global TICKER_STATE
-    data = request.json
-    TICKER_STATE["active"] = data.get("active", False)
-    TICKER_STATE["message"] = data.get("message", "")
-    return jsonify({"success": True, "state": TICKER_STATE})
+    return jsonify({"status": "online", "system": "KELION v142.1", "engine": "Flask/Python"})
 
 @app.route('/api/config')
 def get_config():
@@ -726,16 +672,63 @@ def paypal_webhook():
 
 @app.route('/api/demo/heartbeat', methods=['POST'])
 def demo_heartbeat():
-    # Demo tracking removed - full access enabled
-    return jsonify({"success": True, "remaining": 99999}), 200
+    try:
+        data = request.json
+        username = data.get('username')
+        if username != 'demo':
+            return jsonify({"success": True}), 200 
+            
+        ip_addr = request.remote_addr
+        tracker = DemoTracking.query.filter_by(ip_address=ip_addr).first()
+        
+        if tracker:
+            # Add time (frontend calls every 10s)
+            tracker.total_seconds_used += 10
+            tracker.last_access = datetime.datetime.utcnow()
+            db.session.commit()
+            
+            # Check limit (20 mins = 1200 seconds)
+            if tracker.total_seconds_used >= 1200:
+                return jsonify({"success": False, "expired": True}), 403
+                
+            return jsonify({"success": True, "remaining": 1200 - tracker.total_seconds_used})
+            
+    except Exception as e:
+        print(f"Heartbeat error: {e}")
+        return jsonify({"success": False}), 500
 
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
     username_q = data.get('username')
     password_q = data.get('password')
+    ip_addr = request.remote_addr
     
-    # Full access - no demo restrictions
+    demo_remaining_seconds = 0
+    
+    # 1. SECURITY CHECK FOR DEMO ACCOUNT
+    if username_q == 'demo':
+        # Check tracking
+        tracker = DemoTracking.query.filter_by(ip_address=ip_addr).first()
+        
+        if not tracker:
+            # First time demo user
+            tracker = DemoTracking(ip_address=ip_addr, total_seconds_used=0)
+            db.session.add(tracker)
+            db.session.commit()
+            demo_remaining_seconds = 1200
+        else:
+            # Existing demo user - check budget
+            if tracker.total_seconds_used >= 1200:
+                 return jsonify({
+                    "success": False, 
+                    "error": "The 20-minute Demo time has been completely exhausted. Please create an account."
+                }), 403
+            
+            demo_remaining_seconds = 1200 - tracker.total_seconds_used
+            # Update last access
+            tracker.last_access = datetime.datetime.utcnow()
+            db.session.commit()
 
     user = User.query.filter_by(username=username_q).first()
     if not user:
