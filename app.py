@@ -17,7 +17,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# Adaugam folderul curent la path pentru a asigura importul configurarii
+# Add current folder to path to ensure configuration import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Configuration Loading (Cloud Native - Environment Variables)
@@ -155,7 +155,7 @@ class OTP(db.Model):
 class ContactMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), nullable=False)
-    name = db.Column(db.String(100), default='Anonim')
+    name = db.Column(db.String(100), default='Anonymous')
     topic = db.Column(db.String(50), nullable=False)
     topic_label = db.Column(db.String(100))
     message = db.Column(db.Text, nullable=False)
@@ -206,7 +206,7 @@ def get_history():
 def chat():
     data = request.json
     message = data.get('message', '').strip()
-    username = data.get('username', 'Utilizator')
+    username = data.get('username', 'User')
     gender = data.get('gender', 'male')
     conversation_id = data.get('conversation_id', username)
     
@@ -216,25 +216,25 @@ def chat():
     # If ChatGPT failed, fall back to pattern matching
     if not response_text:
         message_lower = message.lower()
-        # ... (păstrăm pattern matching pentru siguranță)
+        # ... (keeping pattern matching for safety)
         responses = {
-            'salut': f'Salut, {username}! Cu ce te pot ajuta astăzi?',
-            'buna': f'Bună! Sunt KELION, asistentul tău virtual. Ce dorești să afli?',
+            'salut': f'Hello, {username}! How can I help you today?',
+            'buna': f'Hi! I am KELION, your virtual assistant. What would you like to know?',
             'hello': f'Hello, {username}! How can I assist you today?',
-            'cine esti': 'Sunt KELION v135.0, un asistent AI humanoid creat de echipa GENEZA NEXUS.',
-            'ce poti face': 'Pot să conversez cu tine, să răspund la întrebări, să ofer informații și să te ajut să explorezi sistemul NEXUS v135.0.',
-            'cum te cheama': 'Mă numesc KELION v135.0 - sau VEONA dacă preferi avatarul feminin.',
-            'versiune': 'Sunt KELION v135.0, cea mai recentă versiune a interfeței neurale NEXUS.',
-            'ajutor': 'Desigur! Poți să mă întrebi orice. De exemplu: "Ce poți face?", "Cine ești?", sau orice altă întrebare!',
+            'cine esti': 'I am KELION v142.0, a humanoid AI assistant created by the GENEZA NEXUS team.',
+            'ce poti face': 'I can chat with you, answer questions, provide information, and help you explore the NEXUS v142.0 system.',
+            'cum te cheama': 'My name is KELION v142.0 - or VEONA if you prefer the female avatar.',
+            'versiune': 'I am KELION v142.0, the latest version of the NEXUS neural interface.',
+            'ajutor': 'Of course! You can ask me anything. For example: "What can you do?", "Who are you?", or any other question!',
             'help': 'Of course! You can ask me anything. For example: "What can you do?", "Who are you?", or any other question!',
-            'multumesc': 'Cu plăcere! Sunt mereu aici pentru tine.',
+            'multumesc': 'You are welcome! I am always here for you.',
             'thanks': 'You\'re welcome! I\'m always here for you.',
-            'la revedere': 'La revedere! Să ai o zi minunată! 👋',
+            'la revedere': 'Goodbye! Have a wonderful day! 👋',
             'bye': 'Goodbye! Have a wonderful day! 👋',
-            'ce ora e': f'Ora curentă este: {datetime.datetime.now().strftime("%H:%M")}',
-            'ce data e': f'Data de astăzi este: {datetime.datetime.now().strftime("%d %B %Y")}',
-            'vremea': 'Momentan nu am acces la date meteo în timp real, dar pot fi integrat cu un API meteo în viitor!',
-            'gluma': 'De ce nu se certă niciodată roboții? Pentru că au întotdeauna logică! 🤖😄',
+            'ce ora e': f'The current time is: {datetime.datetime.now().strftime("%H:%M")}',
+            'ce data e': f'Today\'s date is: {datetime.datetime.now().strftime("%d %B %Y")}',
+            'vremea': 'I currently don\'t have access to real-time weather data, but I can be integrated with a weather API in the future!',
+            'gluma': 'Why don\'t robots ever argue? Because they always have logic! 🤖😄',
             'joke': 'Why don\'t robots ever get angry? Because they always stay logical! 🤖😄',
         }
         
@@ -245,11 +245,11 @@ def chat():
         
         if not response_text:
             default_responses = [
-                f'Interesant, {username}! Poți să îmi spui mai multe despre asta?',
-                'Hmm, lasă-mă să mă gândesc la asta... Ce altceva ai vrea să știi?',
-                'Sunt aici să te ajut! Încearcă să mă întrebi ceva specific.',
-                f'Am înțeles, {username}. Cu ce altceva te pot ajuta?',
-                'Fascinant! Continuă, sunt toate urechile... adică, toate senzorii! 🤖',
+                f'Interesting, {username}! Can you tell me more about that?',
+                'Hmm, let me think about that... What else would you like to know?',
+                'I am here to help! Try asking me something specific.',
+                f'I understand, {username}. How else can I help you?',
+                'Fascinating! Please continue, I am all ears... well, all sensors! 🤖',
             ]
             response_text = random.choice(default_responses)
             
@@ -334,7 +334,7 @@ def verify_paypal_order(order_id):
 def send_confirmation_email(to_email, username, first_name, subscription, expiry_date):
     try:
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = '✅ Bun venit la GENEZA NEXUS!'
+        msg['Subject'] = '✅ Welcome to GENEZA NEXUS!'
         msg['From'] = SMTP_EMAIL
         msg['To'] = to_email
         
@@ -343,18 +343,18 @@ def send_confirmation_email(to_email, username, first_name, subscription, expiry
         <body style="font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; padding: 30px;">
             <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1a0a2e, #0a0a0a); border: 1px solid #00f3ff; border-radius: 10px; padding: 30px;">
                 <h1 style="color: #00f3ff; text-align: center;">🚀 GENEZA NEXUS</h1>
-                <h2 style="color: #bc13fe;">Bun venit, {first_name}!</h2>
-                <p>Contul tău a fost creat cu succes.</p>
+                <h2 style="color: #bc13fe;">Welcome, {first_name}!</h2>
+                <p>Your account has been created successfully.</p>
                 <hr style="border-color: #00f3ff; opacity: 0.3;">
                 <p><strong>Username:</strong> {username}</p>
                 <p><strong>Email:</strong> {to_email}</p>
-                <p><strong>Abonament:</strong> {subscription.upper()}</p>
-                <p><strong>Valabil până la:</strong> {expiry_date}</p>
+                <p><strong>Subscription:</strong> {subscription.upper()}</p>
+                <p><strong>Valid until:</strong> {expiry_date}</p>
                 <hr style="border-color: #00f3ff; opacity: 0.3;">
                 <p style="text-align: center;">
-                    <a href="http://127.0.0.1:8000/" style="display: inline-block; background: linear-gradient(135deg, #bc13fe, #00f3ff); color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accesează NEXUS</a>
+                    <a href="http://127.0.0.1:8000/" style="display: inline-block; background: linear-gradient(135deg, #bc13fe, #00f3ff); color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Access NEXUS</a>
                 </p>
-                <p style="font-size: 12px; color: #888; text-align: center; margin-top: 20px;">Acest email a fost trimis automat. Nu răspunde la acest mesaj.</p>
+                <p style="font-size: 12px; color: #888; text-align: center; margin-top: 20px;">This email was sent automatically. Please do not reply to this message.</p>
             </div>
         </body>
         </html>
@@ -379,7 +379,7 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
         ADMIN_EMAIL = "ae1968@kidsdigitalhub.com"  # Admin email
         
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = f'📧 Nou Mesaj Contact AE: {topic_label}'
+        msg['Subject'] = f'📧 New AE Contact Message: {topic_label}'
         msg['From'] = SMTP_EMAIL
         msg['To'] = ADMIN_EMAIL
         msg['Reply-To'] = user_email
@@ -388,15 +388,15 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
         <html>
         <body style="font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; padding: 30px;">
             <div style="max-width: 700px; margin: 0 auto; background: linear-gradient(135deg, #0a0a2e, #0a0a0a); border: 2px solid #00f3ff; border-radius: 12px; padding: 30px;">
-                <h1 style="color: #00f3ff; text-align: center; margin-bottom: 10px;">📧 Mesaj Nou de Contact</h1>
-                <p style="text-align: center; color: #888; font-size: 14px; margin-top: 0;">Sistemul AE Contact</p>
+                <h1 style="color: #00f3ff; text-align: center; margin-bottom: 10px;">📧 New Contact Message</h1>
+                <p style="text-align: center; color: #888; font-size: 14px; margin-top: 0;">AE Contact System</p>
                 
                 <hr style="border-color: #00f3ff; opacity: 0.3; margin: 25px 0;">
                 
-                <h2 style="color: #bc13fe; font-size: 20px; margin-bottom: 15px;">Detalii Client:</h2>
+                <h2 style="color: #bc13fe; font-size: 20px; margin-bottom: 15px;">Client Details:</h2>
                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                     <tr>
-                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold; width: 150px;">👤 Nume:</td>
+                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold; width: 150px;">👤 Name:</td>
                         <td style="padding: 8px 0; color: #fff;">{user_name}</td>
                     </tr>
                     <tr>
@@ -406,18 +406,18 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">📋 Subiect:</td>
+                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">📋 Subject:</td>
                         <td style="padding: 8px 0; color: #ff00ff; font-weight: bold;">{topic_label}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">🕐 Data:</td>
+                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">🕐 Date:</td>
                         <td style="padding: 8px 0; color: #888;">{datetime.datetime.now().strftime('%d %B %Y, %H:%M')}</td>
                     </tr>
                 </table>
                 
                 <hr style="border-color: #00f3ff; opacity: 0.3; margin: 25px 0;">
                 
-                <h2 style="color: #bc13fe; font-size: 20px; margin-bottom: 15px;">💭 Mesaj:</h2>
+                <h2 style="color: #bc13fe; font-size: 20px; margin-bottom: 15px;">💭 Message:</h2>
                 <div style="background: rgba(0, 243, 255, 0.05); border-left: 4px solid #00f3ff; padding: 20px; border-radius: 6px; color: #fff; line-height: 1.8; font-size: 15px;">
                     {message}
                 </div>
@@ -426,13 +426,13 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
                 
                 <p style="text-align: center; margin-top: 30px;">
                     <a href="mailto:{user_email}?subject=Re: {topic_label}" style="display: inline-block; background: linear-gradient(135deg, #00f3ff, #0080ff); color: #000; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);">
-                        📨 Răspunde Acum
+                        📨 Reply Now
                     </a>
                 </p>
                 
                 <p style="font-size: 12px; color: #555; text-align: center; margin-top: 30px;">
-                    Acest email a fost generat automat de GENEZA NEXUS Contact System.<br>
-                    Pentru a gestiona mesajele, accesează Admin Panel.
+                    This email was automatically generated by GENEZA NEXUS Contact System.<br>
+                    To manage messages, access the Admin Panel.
                 </p>
             </div>
         </body>
@@ -580,18 +580,18 @@ def send_code():
     # Send Email
     try:
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = f'🔐 Codul tău de verificare NEXUS: {code}'
+        msg['Subject'] = f'🔐 Your NEXUS Verification Code: {code}'
         msg['From'] = SMTP_EMAIL
         msg['To'] = email
         
         html = f'''
         <div style="font-family: Arial, sans-serif; background: #050505; color: #fff; padding: 20px; border: 1px solid #00f3ff; border-radius: 8px;">
-            <h2 style="color: #00f3ff;">Verificare NEXUS</h2>
-            <p>Codul tău de securitate pentru finalizarea înregistrării este:</p>
+            <h2 style="color: #00f3ff;">NEXUS Verification</h2>
+            <p>Your security code to complete the registration is:</p>
             <div style="font-size: 2.5rem; letter-spacing: 5px; color: #ff00ff; text-align: center; margin: 20px 0; font-weight: bold;">
                 {code}
             </div>
-            <p>Acest cod este valabil pentru 10 minute.</p>
+            <p>This code is valid for 10 minutes.</p>
         </div>
         '''
         msg.attach(MIMEText(html, 'html'))
@@ -722,7 +722,7 @@ def login():
             if tracker.total_seconds_used >= 1200:
                  return jsonify({
                     "success": False, 
-                    "error": "Timpul Demo de 20 minute a fost epuizat complet. Vă rugăm să creați un cont."
+                    "error": "The 20-minute Demo time has been completely exhausted. Please create an account."
                 }), 403
             
             demo_remaining_seconds = 1200 - tracker.total_seconds_used
@@ -736,7 +736,7 @@ def login():
 
     if user and check_password_hash(user.password_hash, password_q):
         if not user.is_subscription_active():
-            return jsonify({"success": False, "error": "Abonament expirat. Vă rugăm reînnoiți."}), 403
+            return jsonify({"success": False, "error": "Subscription expired. Please renew."}), 403
             
         token = jwt.encode({
             'username': user.username,
@@ -752,7 +752,7 @@ def login():
             "demo_remaining": demo_remaining_seconds,
             "expiry": user.subscription_end_date.strftime('%Y-%m-%d') if user.subscription_end_date else 'Never'
         })
-    return jsonify({"success": False, "error": "Date incorecte"}), 401
+    return jsonify({"success": False, "error": "Invalid credentials"}), 401
 
 # ==============================================================================
 # CHAT AI ENDPOINT - ChatGPT Integration
@@ -1043,7 +1043,7 @@ def contact():
         }), 400
     
     # Extract optional fields
-    name = data.get('name', 'Anonim')
+    name = data.get('name', 'Anonymous')
     topic_label = data.get('topicLabel', '')
     user_agent = data.get('userAgent', '')
     source = data.get('source', '')
@@ -1223,12 +1223,12 @@ def delete_contact_message(message_id):
 
 
 # ==============================================================================
-# WEB SEARCH ENDPOINT - Pentru frontend
+# WEB SEARCH ENDPOINT - For frontend
 # ==============================================================================
 
 @app.route('/api/search', methods=['POST'])
 def api_search():
-    """Web search endpoint pentru frontend - folosește SERPER_API_KEY din env"""
+    """Web search endpoint for frontend - uses SERPER_API_KEY from env"""
     data = request.json
     query = data.get('query', '').strip()
     
@@ -1248,7 +1248,7 @@ def api_search():
 
 @app.route('/api/whisper', methods=['POST'])
 def api_whisper():
-    """Whisper transcription endpoint - folosește OPENAI_API_KEY din env"""
+    """Whisper transcription endpoint - uses OPENAI_API_KEY from env"""
     if not OPENAI_API_KEY or OPENAI_API_KEY == "sk-YOUR_OPENAI_API_KEY_HERE":
         return jsonify({"error": "OpenAI API Key missing"}), 503
     
