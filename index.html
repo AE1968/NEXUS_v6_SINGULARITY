@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 
 <head>
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>KELION v143.0 - GLOBAL_EYE OS</title>
 
-    <!-- 🛑 FORCE NO-CACHE (AUTO-REFRESH LOGIC) -->
+    <!-- ðŸ›‘ FORCE NO-CACHE (AUTO-REFRESH LOGIC) -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -782,7 +782,7 @@
     <div id="header">
         <div id="status-display">
             <div class="status-row top">
-                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v142.1</span>
+                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v143.0</span>
                 <span id="user-display">USER: <span id="user-name" class="stat-val">OFFLINE</span></span>
                 <span id="cloud-display">CLOUD: <span id="sys-status"
                         class="stat-val offline">DISCONNECTED</span></span>
@@ -805,10 +805,10 @@
     </div>
 
     <div id="side-indicators">
-        <div class="indicator voice" title="TTS Active">🔊</div>
-        <div class="indicator vision" title="Vision Scan Ready">👁️</div>
-        <div class="indicator processing" title="AI Core Usage">⚡</div>
-        <div class="indicator storage" title="Encrypted Database">💾</div>
+        <div class="indicator voice" title="TTS Active">ðŸ”Š</div>
+        <div class="indicator vision" title="Vision Scan Ready">ðŸ‘ï¸</div>
+        <div class="indicator processing" title="AI Core Usage">âš¡</div>
+        <div class="indicator storage" title="Encrypted Database">ðŸ’¾</div>
     </div>
 
     <!-- NEXUS ROBOT IMAGE -->
@@ -816,7 +816,7 @@
 
     <div id="chat-container">
         <div id="chat-header">
-            <span>NEURAL INTERFACE v142.1</span>
+            <span>NEURAL INTERFACE v143.0</span>
             <span style="color: #00ff00; letter-spacing: 2px;">ONLINE</span>
         </div>
         <div id="chat-messages"></div>
@@ -824,7 +824,7 @@
 
     <div id="input-bar">
         <input type="text" id="chat-input" placeholder="Enter neural command..." autocomplete="off">
-        <button id="mic-btn" class="icon-btn">🎙️</button>
+        <button id="mic-btn" class="icon-btn">ðŸŽ™ï¸</button>
     </div>
 
     <div id="login-modal">
@@ -836,17 +836,17 @@
             </div>
             <div class="input-grp">
                 <label>Security Key</label>
-                <input type="password" id="p-input" placeholder="••••••••" value="">
+                <input type="password" id="p-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" value="">
             </div>
             <button id="do-login" class="modal-btn">INITIALIZE</button>
             <p style="margin-top:15px;">
                 <a href="#" id="forgot-pass-link"
-                    style="color: var(--cyan); text-decoration: none; font-size: 0.8rem;">🔑 Forgot Password?</a>
+                    style="color: var(--cyan); text-decoration: none; font-size: 0.8rem;">ðŸ”‘ Forgot Password?</a>
             </p>
             <p style="margin-top:10px; font-size:0.75rem; color:#556;">Note: Connection secured with RSA-4096</p>
             <p style="margin-top:15px;">
                 <a href="#" id="register-link"
-                    style="color: var(--pink); text-decoration: none; font-size: 0.85rem; font-weight: 600;">📝 Create
+                    style="color: var(--pink); text-decoration: none; font-size: 0.85rem; font-weight: 600;">ðŸ“ Create
                     Account</a>
             </p>
         </div>
@@ -856,7 +856,7 @@
     <div id="forgot-modal"
         style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px);">
         <div class="modal-box" style="max-width:450px;">
-            <h2 style="color:var(--cyan);">🔐 PASSWORD RESET</h2>
+            <h2 style="color:var(--cyan);">ðŸ” PASSWORD RESET</h2>
 
             <!-- Step 1: Enter Email -->
             <div id="forgot-step1">
@@ -866,12 +866,12 @@
                     <label>Email Address</label>
                     <input type="email" id="forgot-email" placeholder="your@email.com">
                 </div>
-                <button id="forgot-send-btn" class="modal-btn">📧 SEND CODE</button>
+                <button id="forgot-send-btn" class="modal-btn">ðŸ“§ SEND CODE</button>
             </div>
 
             <!-- Step 2: Enter Code + New Password -->
             <div id="forgot-step2" style="display:none;">
-                <p style="color:#00ff00; font-size:0.85rem; margin-bottom:20px;">✅ Code sent! Check your email.</p>
+                <p style="color:#00ff00; font-size:0.85rem; margin-bottom:20px;">âœ… Code sent! Check your email.</p>
                 <div class="input-grp">
                     <label>6-Digit Code</label>
                     <input type="text" id="forgot-code" placeholder="123456" maxlength="6"
@@ -879,14 +879,14 @@
                 </div>
                 <div class="input-grp">
                     <label>New Password (min 8 chars)</label>
-                    <input type="password" id="forgot-newpass" placeholder="••••••••">
+                    <input type="password" id="forgot-newpass" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
                 </div>
-                <button id="forgot-reset-btn" class="modal-btn" style="background:var(--pink);">🔓 RESET
+                <button id="forgot-reset-btn" class="modal-btn" style="background:var(--pink);">ðŸ”“ RESET
                     PASSWORD</button>
             </div>
 
             <p style="margin-top:20px;">
-                <a href="#" id="forgot-back-link" style="color:#888; font-size:0.8rem;">← Back to Login</a>
+                <a href="#" id="forgot-back-link" style="color:#888; font-size:0.8rem;">â† Back to Login</a>
             </p>
         </div>
     </div>
@@ -895,7 +895,7 @@
     <div id="register-modal"
         style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px); overflow-y:auto;">
         <div class="modal-box" style="max-width:550px; margin:30px auto;">
-            <h2 style="color:var(--pink);">📝 CREATE ACCOUNT</h2>
+            <h2 style="color:var(--pink);">ðŸ“ CREATE ACCOUNT</h2>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
                 <div class="input-grp">
@@ -915,7 +915,7 @@
 
             <div class="input-grp">
                 <label>Password * (min 8 chars)</label>
-                <input type="password" id="reg-password" placeholder="••••••••" required>
+                <input type="password" id="reg-password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required>
             </div>
 
             <div style="display:grid; grid-template-columns:100px 1fr; gap:10px;">
@@ -923,11 +923,11 @@
                     <label>Country</label>
                     <select id="reg-country"
                         style="width:100%; padding:15px; background:rgba(0,0,0,0.6); border:1px solid var(--border); border-radius:8px; color:#fff;">
-                        <option value="UK">🇬🇧 UK</option>
-                        <option value="RO">🇷🇴 RO</option>
-                        <option value="US">🇺🇸 US</option>
-                        <option value="DE">🇩🇪 DE</option>
-                        <option value="FR">🇫🇷 FR</option>
+                        <option value="UK">ðŸ‡¬ðŸ‡§ UK</option>
+                        <option value="RO">ðŸ‡·ðŸ‡´ RO</option>
+                        <option value="US">ðŸ‡ºðŸ‡¸ US</option>
+                        <option value="DE">ðŸ‡©ðŸ‡ª DE</option>
+                        <option value="FR">ðŸ‡«ðŸ‡· FR</option>
                     </select>
                 </div>
                 <div class="input-grp">
@@ -955,17 +955,17 @@
             <!-- Voucher Code Field -->
             <div class="input-grp"
                 style="background:rgba(0,255,0,0.05); padding:15px; border-radius:10px; border:1px dashed rgba(0,255,0,0.3);">
-                <label style="color:#00ff00;">🎟️ Voucher Code (Optional)</label>
+                <label style="color:#00ff00;">ðŸŽŸï¸ Voucher Code (Optional)</label>
                 <input type="text" id="reg-voucher" placeholder="KEL-XXXXXXXX" style="text-transform:uppercase;">
                 <small style="color:#888; font-size:0.7rem;">If you have a promotional code, enter it here for free
                     access.</small>
             </div>
 
             <button id="do-register" class="modal-btn"
-                style="background:linear-gradient(135deg, var(--pink), var(--cyan));">🚀 CREATE ACCOUNT</button>
+                style="background:linear-gradient(135deg, var(--pink), var(--cyan));">ðŸš€ CREATE ACCOUNT</button>
 
             <p style="margin-top:15px;">
-                <a href="#" id="register-back-link" style="color:#888; font-size:0.8rem;">← Back to Login</a>
+                <a href="#" id="register-back-link" style="color:#888; font-size:0.8rem;">â† Back to Login</a>
             </p>
         </div>
     </div>
@@ -973,7 +973,8 @@
     <!-- AE CONTACT SYSTEM (Integrated) -->
     <div id="ae-contact-modal">
         <div class="ae-modal-content">
-            <div class="ae-close-btn" onclick="document.getElementById('ae-contact-modal').classList.remove('active')">×
+            <div class="ae-close-btn" onclick="document.getElementById('ae-contact-modal').classList.remove('active')">
+                Ã—
             </div>
 
             <div id="ae-form-container">
@@ -981,42 +982,42 @@
                     <!-- LOGO REMOVED AS REQUESTED -->
                     <div>
                         <h2>Contact Us</h2>
-                        <p>We're here for you! 💙</p>
+                        <p>We're here for you! ðŸ’™</p>
                     </div>
                 </div>
 
                 <form id="ae-contact-form"
                     onsubmit="event.preventDefault(); alert('Message sent! (Simulation)'); document.getElementById('ae-contact-modal').classList.remove('active');">
                     <div class="ae-form-group">
-                        <label>📧 Your Email</label>
+                        <label>ðŸ“§ Your Email</label>
                         <input type="email" id="ae-email" placeholder="example@email.com" required>
                     </div>
 
                     <div class="ae-form-group">
-                        <label>👤 Name (Optional)</label>
+                        <label>ðŸ‘¤ Name (Optional)</label>
                         <input type="text" id="ae-name" placeholder="Your name">
                     </div>
 
                     <div class="ae-form-group">
-                        <label>📋 Subject</label>
+                        <label>ðŸ“‹ Subject</label>
                         <select id="ae-topic" required>
                             <option value="">Select a topic...</option>
-                            <option value="general">💬 General Question</option>
-                            <option value="technical">🔧 Technical Support</option>
-                            <option value="business">💼 Business Collaboration</option>
-                            <option value="feedback">⭐ Feedback & Suggestions</option>
-                            <option value="other">📋 Other</option>
+                            <option value="general">ðŸ’¬ General Question</option>
+                            <option value="technical">ðŸ”§ Technical Support</option>
+                            <option value="business">ðŸ’¼ Business Collaboration</option>
+                            <option value="feedback">â­ Feedback & Suggestions</option>
+                            <option value="other">ðŸ“‹ Other</option>
                         </select>
                     </div>
 
                     <div class="ae-form-group">
-                        <label>💭 Your Message</label>
+                        <label>ðŸ’­ Your Message</label>
                         <textarea id="ae-message" placeholder="Describe your question, issue, or suggestion..."
                             required></textarea>
                     </div>
 
                     <button type="submit" class="ae-submit-btn">
-                        📨 Send Message
+                        ðŸ“¨ Send Message
                     </button>
                 </form>
             </div>
@@ -1033,7 +1034,7 @@
                 <h2 style="font-family:'Orbitron'; color:#ff00ff; margin:0; letter-spacing:4px; font-size:1.2rem;">
                     NETWORK TRAFFIC & REQUIREMENTS</h2>
                 <button onclick="document.getElementById('admin-modal').style.display='none'"
-                    style="background:none; border:1px solid #ff00ff; color:#ff00ff; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+                    style="background:none; border:1px solid #ff00ff; color:#ff00ff; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">Ã—</button>
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr; gap:15px;">
@@ -1092,22 +1093,22 @@
 
     <div id="footer-ticker">
         <div class="ticker-text" style="color: #00f3ff;">
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v143.0 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v143.0 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v143.0 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v143.0 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+            GENEZA KELION v143.0 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
         </div>
     </div>
 
     <script>
         "use strict";
 
-        // 🔑 API CONFIGURATION - All API calls routed through Flask backend
+        // ðŸ”‘ API CONFIGURATION - All API calls routed through Flask backend
         // Backend endpoints: /api/chat, /api/tts, /api/search, /api/whisper
         // API keys are securely stored in Railway environment variables
         // No frontend API keys needed - all handled by backend (app.py)
@@ -1122,7 +1123,7 @@
 
         const $ = id => document.getElementById(id);
 
-        // 📝 CHAT SYSTEM
+        // ðŸ“ CHAT SYSTEM
         function write(who, text, isError = false) {
             const msg = document.createElement('div');
             msg.className = `message ${who} ${isError ? 'error' : ''}`;
@@ -1132,9 +1133,9 @@
             return msg;
         }
 
-        // 🌐 REAL-TIME WEB SEARCH (via Backend /api/search)
+        // ðŸŒ REAL-TIME WEB SEARCH (via Backend /api/search)
         async function searchWeb(query) {
-            console.log(`🌐 Searching web via backend for: ${query}`);
+            console.log(`ðŸŒ Searching web via backend for: ${query}`);
             try {
                 const response = await fetch("/api/search", {
                     method: "POST",
@@ -1161,7 +1162,7 @@
 
                 if (results.length === 0) return "No results found for this query.";
 
-                return "🌐 LIVE WEB SEARCH RESULTS:\n" + results.join("\n\n");
+                return "ðŸŒ LIVE WEB SEARCH RESULTS:\n" + results.join("\n\n");
 
             } catch (err) {
                 console.error("Web Search Error:", err);
@@ -1169,7 +1170,7 @@
             }
         }
 
-        // 🔊 VOICE SYSTEM (OPENAI TTS)
+        // ðŸ”Š VOICE SYSTEM (OPENAI TTS)
         let currentAudio = null;
 
         async function speak(text) {
@@ -1224,7 +1225,7 @@
         }
 
 
-        // 🧠 AI PROCESSOR (INTELLIGENT RESOLVER v142 + WEB SEARCH via Backend)
+        // ðŸ§  AI PROCESSOR (INTELLIGENT RESOLVER v142 + WEB SEARCH via Backend)
         async function execute() {
             const input = $('chat-input');
             const msg = input.value.trim();
@@ -1278,7 +1279,7 @@
         }
 
 
-        // 🌌 BACKGROUND PARTICLES
+        // ðŸŒŒ BACKGROUND PARTICLES
         function starfield() {
             const canvas = $('bg-canvas');
             const ctx = canvas.getContext('2d');
@@ -1399,13 +1400,13 @@
             }
         }
 
-        // 🚀 INITIALIZATION
+        // ðŸš€ INITIALIZATION
         document.addEventListener('DOMContentLoaded', () => {
-            // 🛑 SECURITY: Force logout on every access (Requested by Architect)
+            // ðŸ›‘ SECURITY: Force logout on every access (Requested by Architect)
             localStorage.clear();
             sessionStorage.clear();
 
-            // 🚀 NEURAL INITIALIZATION SEQUENCE
+            // ðŸš€ NEURAL INITIALIZATION SEQUENCE
             const initSequence = async () => {
                 const bar = $('load-bar');
                 const status = $('load-status');
@@ -1415,7 +1416,7 @@
                     { p: 30, s: "AUTHENTICATING BIO-SIGNATURES...", d: "> USER_RECOGNIZED: ARCHITECT" },
                     { p: 50, s: "LOADING CORE AI MATRICES...", d: "> GPT-4O_CORE_LOADED" },
                     { p: 80, s: "SYNCHRONIZING GLOBAL_EYES...", d: "> SATELLITE_UPLINK_STABLE" },
-                    { p: 100, s: "SYSTEM READY", d: "> WELCOME TO KELION v142.1" }
+                    { p: 100, s: "SYSTEM READY", d: "> WELCOME TO KELION v143.0" }
                 ];
 
                 for (let step of steps) {
@@ -1432,7 +1433,7 @@
                     $('bg-image').classList.add('active');
                     document.body.classList.add('ready');
 
-                    // 🎤 Play welcome message AFTER robot appears (always visitor since we clear session)
+                    // ðŸŽ¤ Play welcome message AFTER robot appears (always visitor since we clear session)
                     setTimeout(() => {
                         showKelionaiWelcome();
                     }, 1500); // 1.5s after robot appears
@@ -1441,7 +1442,7 @@
 
             initSequence();
 
-            // 🔓 PRE-POPULATE DEMO
+            // ðŸ”“ PRE-POPULATE DEMO
             $('u-input').value = "demo";
             $('p-input').value = "demo";
 
@@ -1498,7 +1499,7 @@
             setInterval(updateClock, 1000);
             updateClock();
 
-            // 🔄 LOGIN HANDLERS
+            // ðŸ”„ LOGIN HANDLERS
             $('login-btn').onclick = () => {
                 if (state.isLogged) {
                     state.isLogged = false;
@@ -1519,7 +1520,7 @@
                 const password = $('p-input').value.trim();
 
                 if (!username || !password) {
-                    alert("⚠️ Please enter both Architect ID and Security Key.");
+                    alert("âš ï¸ Please enter both Architect ID and Security Key.");
                     return;
                 }
 
@@ -1565,14 +1566,14 @@
                             }
                         }
 
-                        // 🕒 GREETING AFTER LOGIN
+                        // ðŸ•’ GREETING AFTER LOGIN
                         greetUser(state.user);
                     } else {
-                        alert("⚠️ ACCESS DENIED: " + (data.error || "Invalid Credentials"));
+                        alert("âš ï¸ ACCESS DENIED: " + (data.error || "Invalid Credentials"));
                     }
                 } catch (err) {
                     console.error("Login Error:", err);
-                    alert("⚠️ CONNECTION ERROR: Neural core unreachable.");
+                    alert("âš ï¸ CONNECTION ERROR: Neural core unreachable.");
                 } finally {
                     $('do-login').textContent = "INITIALIZE";
                     $('do-login').disabled = false;
@@ -1587,7 +1588,7 @@
                 };
             }
 
-            // 🎤 VOICE RECOGNITION (WHISPER)
+            // ðŸŽ¤ VOICE RECOGNITION (WHISPER)
             let mediaRecorder;
             let audioChunks = [];
             const micBtn = $('mic-btn');
@@ -1611,7 +1612,7 @@
                         mediaRecorder.onstart = () => {
                             isRecording = true;
                             micBtn.classList.add('recording');
-                            micBtn.innerHTML = "🔴";
+                            micBtn.innerHTML = "ðŸ”´";
                             micBtn.style.color = "#f00";
                             micBtn.style.textShadow = "0 0 15px #f00";
                             $('chat-input').placeholder = "Listening... (Release to Send)";
@@ -1624,7 +1625,7 @@
 
                             // Visual: Processing
                             $('chat-input').placeholder = "Transcribing & Sending...";
-                            micBtn.innerHTML = "⏳";
+                            micBtn.innerHTML = "â³";
                             micBtn.style.color = "#00f3ff"; // Processing color
                             micBtn.style.textShadow = "";
 
@@ -1656,7 +1657,7 @@
 
                             // Cleanup UI
                             micBtn.classList.remove('recording');
-                            micBtn.innerHTML = "🎙️";
+                            micBtn.innerHTML = "ðŸŽ™ï¸";
                             micBtn.style.color = "";
                             stream.getTracks().forEach(t => t.stop());
                         };
@@ -1696,14 +1697,14 @@
 
             // Update Version
             const vTag = document.querySelector('.version-tag');
-            if (vTag) vTag.textContent = "v142.1";
+            if (vTag) vTag.textContent = "v143.0";
 
             // initThreeJS(); // DISABLED - shows robot background instead
         });
 
         // Matrix effect removed - keeping clean background
 
-        // 🌟 GREETING HELPER (After Login)
+        // ðŸŒŸ GREETING HELPER (After Login)
         function greetUser(username) {
             // Clear chat history - keep only the last message (this one)
             const chatMessages = $('chat-messages');
@@ -1719,7 +1720,7 @@
             speak(welcomeMsg);
         }
 
-        // 🌟 KELIONAI WELCOME MESSAGE (Page Load)
+        // ðŸŒŸ KELIONAI WELCOME MESSAGE (Page Load)
         function showKelionaiWelcome() {
             const hour = new Date().getHours();
             let greeting;
@@ -1766,7 +1767,7 @@
             const email = document.getElementById('forgot-email').value.trim();
             if (!email) return alert('Please enter your email');
 
-            this.textContent = '⏳ Sending...';
+            this.textContent = 'â³ Sending...';
             this.disabled = true;
 
             try {
@@ -1787,7 +1788,7 @@
                 alert('Network error');
             }
 
-            this.textContent = '📧 SEND CODE';
+            this.textContent = 'ðŸ“§ SEND CODE';
             this.disabled = false;
         });
 
@@ -1799,7 +1800,7 @@
             if (!code || code.length !== 6) return alert('Please enter the 6-digit code');
             if (!newPass || newPass.length < 8) return alert('Password must be at least 8 characters');
 
-            this.textContent = '⏳ Resetting...';
+            this.textContent = 'â³ Resetting...';
             this.disabled = true;
 
             try {
@@ -1811,7 +1812,7 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    alert('✅ Password reset! You can now login.');
+                    alert('âœ… Password reset! You can now login.');
                     document.getElementById('forgot-modal').style.display = 'none';
                     document.getElementById('login-modal').style.display = 'flex';
                 } else {
@@ -1821,7 +1822,7 @@
                 alert('Network error');
             }
 
-            this.textContent = '🔓 RESET PASSWORD';
+            this.textContent = 'ðŸ”“ RESET PASSWORD';
             this.disabled = false;
         });
 
@@ -1854,7 +1855,7 @@
             if (!email) return alert('Email is required');
             if (!password || password.length < 8) return alert('Password must be at least 8 characters');
 
-            this.textContent = '⏳ Creating...';
+            this.textContent = 'â³ Creating...';
             this.disabled = true;
 
             try {
@@ -1893,7 +1894,7 @@
                         }
                     }
 
-                    alert('✅ Account created! You can now login.');
+                    alert('âœ… Account created! You can now login.');
                     document.getElementById('register-modal').style.display = 'none';
                     document.getElementById('login-modal').style.display = 'flex';
                 } else {
@@ -1903,7 +1904,7 @@
                 alert('Network error');
             }
 
-            this.textContent = '🚀 CREATE ACCOUNT';
+            this.textContent = 'ðŸš€ CREATE ACCOUNT';
             this.disabled = false;
         });
 
@@ -1938,14 +1939,39 @@
             }
         });
 
-        // Update version tag to v143
-        const vTagNew = document.getElementById('version-tag');
-        if (vTagNew) vTagNew.textContent = 'v143.0';
+        // =====================================================================
+        // AUTO-VERSIONING: Preia versiunea de la backend și actualizează peste tot
+        // =====================================================================
+        (async function loadVersion() {
+            try {
+                const res = await fetch('/api/version');
+                const data = await res.json();
+                const version = data.version || 'v143.0';
+
+                // Actualizează toate elementele cu versiunea
+                document.querySelectorAll('.version-tag, #version-tag').forEach(el => {
+                    el.textContent = version;
+                });
+
+                // Actualizează titlul paginii
+                document.title = `KELION ${version} - ${data.codename || 'GLOBAL_EYE'} OS`;
+
+                // Actualizează NEURAL INTERFACE header
+                const chatHeader = document.querySelector('#chat-header span');
+                if (chatHeader && chatHeader.textContent.includes('NEURAL INTERFACE')) {
+                    chatHeader.textContent = `NEURAL INTERFACE ${version}`;
+                }
+
+                console.log(`✅ Version loaded: ${version} (${data.codename})`);
+            } catch (e) {
+                console.log('Version API unavailable, using fallback');
+            }
+        })();
 
     </script>
 
     <!-- 
-    🛑 NEXUS AI VERIFICATION SEAL 🛑
+    ðŸ›‘ NEXUS AI VERIFICATION SEAL ðŸ›‘
     ================================
     DATE: 2025-12-25
     AUDITOR: NEXUS_PRIME_AUDITOR (External)

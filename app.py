@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import json
 import logging
@@ -20,12 +20,15 @@ from email.mime.multipart import MIMEMultipart
 # Add current folder to path to ensure configuration import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Import version from centralized file
+from version import VERSION, get_version_info
+
 # Configuration Loading (Cloud Native - Environment Variables)
 def get_env(key, default=""):
     return os.getenv(key, default)
 
 # CORE SECRETS
-SECRET_KEY = get_env("SECRET_KEY", "kelion_super_secret_key_v142")
+SECRET_KEY = get_env("SECRET_KEY", f"kelion_super_secret_key_{VERSION}")
 DB_NAME = get_env("DB_NAME", "nexus.db")
 
 # API KEYS - Set these in Railway Variables!
@@ -123,15 +126,15 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     billing_history = db.Column(db.Text, default='[]')
     
-    # === CÂMPURI NOI v143 ===
-    # Adresă completă
+    # === CÃ‚MPURI NOI v143 ===
+    # AdresÄƒ completÄƒ
     address_line1 = db.Column(db.String(255))
     address_line2 = db.Column(db.String(255))
     city = db.Column(db.String(100))
     postal_code = db.Column(db.String(20))
     phone_country_code = db.Column(db.String(5))  # +40, +44, etc.
     
-    # Verificări securitate
+    # VerificÄƒri securitate
     email_verified = db.Column(db.Boolean, default=False)
     phone_verified = db.Column(db.Boolean, default=False)
     bank_verified = db.Column(db.Boolean, default=False)
@@ -203,7 +206,7 @@ class ContactMessage(db.Model):
 
 
 # ==============================================================================
-# MODELE NOI v143: Vouchere, Plăți, Trafic
+# MODELE NOI v143: Vouchere, PlÄƒÈ›i, Trafic
 # ==============================================================================
 
 class VoucherCode(db.Model):
@@ -229,7 +232,7 @@ class VoucherCode(db.Model):
 
 
 class PaymentRecord(db.Model):
-    """Evidența tuturor plăților"""
+    """EvidenÈ›a tuturor plÄƒÈ›ilor"""
     __tablename__ = 'payment_records'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -278,7 +281,7 @@ class VisitorLog(db.Model):
 
 
 class ExpiryNotification(db.Model):
-    """Tracking notificări expirare"""
+    """Tracking notificÄƒri expirare"""
     __tablename__ = 'expiry_notifications'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -297,7 +300,7 @@ SUBSCRIPTION_PLANS = {
     '12_months': {'name': '12 Months', 'days': 365, 'price': 60.00, 'per_month': 5.00}
 }
 
-# Coduri țări pentru telefon
+# Coduri È›Äƒri pentru telefon
 COUNTRY_PHONE_CODES = {
     'RO': '+40', 'UK': '+44', 'US': '+1', 'DE': '+49', 'FR': '+33',
     'IT': '+39', 'ES': '+34', 'NL': '+31', 'BE': '+32', 'AT': '+43',
@@ -361,21 +364,21 @@ def chat():
             'salut': f'Hello, {username}! How can I help you today?',
             'buna': f'Hi! I am KELION, your virtual assistant. What would you like to know?',
             'hello': f'Hello, {username}! How can I assist you today?',
-            'cine esti': 'I am KELION v142.0, a humanoid AI assistant created by the GENEZA NEXUS team.',
-            'ce poti face': 'I can chat with you, answer questions, provide information, and help you explore the NEXUS v142.0 system.',
-            'cum te cheama': 'My name is KELION v142.0 - or VEONA if you prefer the female avatar.',
-            'versiune': 'I am KELION v142.0, the latest version of the NEXUS neural interface.',
+            'cine esti': 'I am KELION v143.0, a humanoid AI assistant created by the GENEZA NEXUS team.',
+            'ce poti face': 'I can chat with you, answer questions, provide information, and help you explore the NEXUS v143.0 system.',
+            'cum te cheama': 'My name is KELION v143.0 - or VEONA if you prefer the female avatar.',
+            'versiune': 'I am KELION v143.0, the latest version of the NEXUS neural interface.',
             'ajutor': 'Of course! You can ask me anything. For example: "What can you do?", "Who are you?", or any other question!',
             'help': 'Of course! You can ask me anything. For example: "What can you do?", "Who are you?", or any other question!',
             'multumesc': 'You are welcome! I am always here for you.',
             'thanks': 'You\'re welcome! I\'m always here for you.',
-            'la revedere': 'Goodbye! Have a wonderful day! 👋',
-            'bye': 'Goodbye! Have a wonderful day! 👋',
+            'la revedere': 'Goodbye! Have a wonderful day! ðŸ‘‹',
+            'bye': 'Goodbye! Have a wonderful day! ðŸ‘‹',
             'ce ora e': f'The current time is: {datetime.datetime.now().strftime("%H:%M")}',
             'ce data e': f'Today\'s date is: {datetime.datetime.now().strftime("%d %B %Y")}',
             'vremea': 'I currently don\'t have access to real-time weather data, but I can be integrated with a weather API in the future!',
-            'gluma': 'Why don\'t robots ever argue? Because they always have logic! 🤖😄',
-            'joke': 'Why don\'t robots ever get angry? Because they always stay logical! 🤖😄',
+            'gluma': 'Why don\'t robots ever argue? Because they always have logic! ðŸ¤–ðŸ˜„',
+            'joke': 'Why don\'t robots ever get angry? Because they always stay logical! ðŸ¤–ðŸ˜„',
         }
         
         for key, value in responses.items():
@@ -389,7 +392,7 @@ def chat():
                 'Hmm, let me think about that... What else would you like to know?',
                 'I am here to help! Try asking me something specific.',
                 f'I understand, {username}. How else can I help you?',
-                'Fascinating! Please continue, I am all ears... well, all sensors! 🤖',
+                'Fascinating! Please continue, I am all ears... well, all sensors! ðŸ¤–',
             ]
             response_text = random.choice(default_responses)
             
@@ -474,7 +477,7 @@ def verify_paypal_order(order_id):
 def send_confirmation_email(to_email, username, first_name, subscription, expiry_date):
     try:
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = '✅ Welcome to GENEZA NEXUS!'
+        msg['Subject'] = 'âœ… Welcome to GENEZA NEXUS!'
         msg['From'] = SMTP_EMAIL
         msg['To'] = to_email
         
@@ -482,7 +485,7 @@ def send_confirmation_email(to_email, username, first_name, subscription, expiry
         <html>
         <body style="font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; padding: 30px;">
             <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1a0a2e, #0a0a0a); border: 1px solid #00f3ff; border-radius: 10px; padding: 30px;">
-                <h1 style="color: #00f3ff; text-align: center;">🚀 GENEZA NEXUS</h1>
+                <h1 style="color: #00f3ff; text-align: center;">ðŸš€ GENEZA NEXUS</h1>
                 <h2 style="color: #bc13fe;">Welcome, {first_name}!</h2>
                 <p>Your account has been created successfully.</p>
                 <hr style="border-color: #00f3ff; opacity: 0.3;">
@@ -507,10 +510,10 @@ def send_confirmation_email(to_email, username, first_name, subscription, expiry
             server.login(SMTP_EMAIL, SMTP_PASSWORD)
             server.sendmail(SMTP_EMAIL, to_email, msg.as_string())
         
-        print(f"✅ Email sent to {to_email}")
+        print(f"âœ… Email sent to {to_email}")
         return True
     except Exception as e:
-        print(f"❌ Email error: {e}")
+        print(f"âŒ Email error: {e}")
         return False
 
 def send_admin_notification(user_email, user_name, topic, topic_label, message):
@@ -519,7 +522,7 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
         ADMIN_EMAIL = "ae1968@kidsdigitalhub.com"  # Admin email
         
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = f'📧 New AE Contact Message: {topic_label}'
+        msg['Subject'] = f'ðŸ“§ New AE Contact Message: {topic_label}'
         msg['From'] = SMTP_EMAIL
         msg['To'] = ADMIN_EMAIL
         msg['Reply-To'] = user_email
@@ -528,7 +531,7 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
         <html>
         <body style="font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; padding: 30px;">
             <div style="max-width: 700px; margin: 0 auto; background: linear-gradient(135deg, #0a0a2e, #0a0a0a); border: 2px solid #00f3ff; border-radius: 12px; padding: 30px;">
-                <h1 style="color: #00f3ff; text-align: center; margin-bottom: 10px;">📧 New Contact Message</h1>
+                <h1 style="color: #00f3ff; text-align: center; margin-bottom: 10px;">ðŸ“§ New Contact Message</h1>
                 <p style="text-align: center; color: #888; font-size: 14px; margin-top: 0;">AE Contact System</p>
                 
                 <hr style="border-color: #00f3ff; opacity: 0.3; margin: 25px 0;">
@@ -536,28 +539,28 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
                 <h2 style="color: #bc13fe; font-size: 20px; margin-bottom: 15px;">Client Details:</h2>
                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                     <tr>
-                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold; width: 150px;">👤 Name:</td>
+                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold; width: 150px;">ðŸ‘¤ Name:</td>
                         <td style="padding: 8px 0; color: #fff;">{user_name}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">📧 Email:</td>
+                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">ðŸ“§ Email:</td>
                         <td style="padding: 8px 0;">
                             <a href="mailto:{user_email}" style="color: #00f3ff; text-decoration: none;">{user_email}</a>
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">📋 Subject:</td>
+                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">ðŸ“‹ Subject:</td>
                         <td style="padding: 8px 0; color: #ff00ff; font-weight: bold;">{topic_label}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">🕐 Date:</td>
+                        <td style="padding: 8px 0; color: #00f3ff; font-weight: bold;">ðŸ• Date:</td>
                         <td style="padding: 8px 0; color: #888;">{datetime.datetime.now().strftime('%d %B %Y, %H:%M')}</td>
                     </tr>
                 </table>
                 
                 <hr style="border-color: #00f3ff; opacity: 0.3; margin: 25px 0;">
                 
-                <h2 style="color: #bc13fe; font-size: 20px; margin-bottom: 15px;">💭 Message:</h2>
+                <h2 style="color: #bc13fe; font-size: 20px; margin-bottom: 15px;">ðŸ’­ Message:</h2>
                 <div style="background: rgba(0, 243, 255, 0.05); border-left: 4px solid #00f3ff; padding: 20px; border-radius: 6px; color: #fff; line-height: 1.8; font-size: 15px;">
                     {message}
                 </div>
@@ -566,7 +569,7 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
                 
                 <p style="text-align: center; margin-top: 30px;">
                     <a href="mailto:{user_email}?subject=Re: {topic_label}" style="display: inline-block; background: linear-gradient(135deg, #00f3ff, #0080ff); color: #000; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);">
-                        📨 Reply Now
+                        ðŸ“¨ Reply Now
                     </a>
                 </p>
                 
@@ -586,10 +589,10 @@ def send_admin_notification(user_email, user_name, topic, topic_label, message):
             server.login(SMTP_EMAIL, SMTP_PASSWORD)
             server.sendmail(SMTP_EMAIL, ADMIN_EMAIL, msg.as_string())
         
-        print(f"✅ Admin notification sent for contact from {user_email}")
+        print(f"âœ… Admin notification sent for contact from {user_email}")
         return True
     except Exception as e:
-        print(f"❌ Admin notification error: {e}")
+        print(f"âŒ Admin notification error: {e}")
         return False
 
 
@@ -609,7 +612,7 @@ def serve_static(filename):
 
 @app.route('/status')
 def status():
-    return jsonify({"status": "online", "system": "KELION v142.1", "engine": "Flask/Python"})
+    return jsonify({"status": "online", "system": "KELION v143.0", "engine": "Flask/Python"})
 
 @app.route('/api/config')
 def get_config():
@@ -720,7 +723,7 @@ def send_code():
     # Send Email
     try:
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = f'🔐 Your NEXUS Verification Code: {code}'
+        msg['Subject'] = f'ðŸ” Your NEXUS Verification Code: {code}'
         msg['From'] = SMTP_EMAIL
         msg['To'] = email
         
@@ -898,7 +901,7 @@ def login():
 # CHAT AI ENDPOINT - ChatGPT Integration
 # ==============================================================================
 
-# 🧠 PERSISTENT NEURAL MEMORY: Retrieval logic
+# ðŸ§  PERSISTENT NEURAL MEMORY: Retrieval logic
 def get_chatgpt_response(message, username, conversation_id, gender='male'):
     """Call OpenAI ChatGPT API for intelligent responses with persistent DB memory"""
     
@@ -915,7 +918,7 @@ def get_chatgpt_response(message, username, conversation_id, gender='male'):
 
     ai_name = "KELION" if gender == 'male' else "VEONA"
     
-    system_prompt = f"""You are {ai_name} v142.1, an advanced humanoid AI assistant created by the GENEZA NEXUS team.
+    system_prompt = f"""You are {ai_name} v143.0, an advanced humanoid AI assistant created by the GENEZA NEXUS team.
 Personality: Polite, intelligent, friendly. PREDEFINED LANGUAGE: ENGLISH. 
 Rules: ACADEMIC, AUTHORITATIVE, PRECISE responses. Concise for speech (max 3-4 sentences).
 MEMORY: You have a neural link to previous conversations. Mention old facts if relevant.
@@ -1033,7 +1036,7 @@ def vision_analyze():
 
 @app.route('/api/forgot-password', methods=['POST'])
 def forgot_password():
-    """Inițiază recuperarea parolei - trimite cod pe email"""
+    """IniÈ›iazÄƒ recuperarea parolei - trimite cod pe email"""
     data = request.json
     email = data.get('email', '').strip()
     
@@ -1057,13 +1060,13 @@ def forgot_password():
     # Send reset email
     try:
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = '🔐 KELION Password Reset Code'
+        msg['Subject'] = 'ðŸ” KELION Password Reset Code'
         msg['From'] = SMTP_EMAIL
         msg['To'] = email
         
         html = f'''
         <div style="font-family: Arial, sans-serif; background: #050505; color: #fff; padding: 30px; border: 2px solid #00f3ff; border-radius: 12px; max-width: 500px;">
-            <h1 style="color: #00f3ff; text-align: center;">🔐 Password Reset</h1>
+            <h1 style="color: #00f3ff; text-align: center;">ðŸ” Password Reset</h1>
             <p style="text-align: center;">Hello <strong>{user.first_name or user.username}</strong>,</p>
             <p style="text-align: center;">Your password reset code is:</p>
             <div style="font-size: 2.5rem; letter-spacing: 8px; color: #ff00ff; text-align: center; margin: 30px 0; font-weight: bold; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px;">
@@ -1082,17 +1085,17 @@ def forgot_password():
             server.login(SMTP_EMAIL, SMTP_PASSWORD)
             server.sendmail(SMTP_EMAIL, email, msg.as_string())
             
-        print(f"✅ Password reset code sent to {email}")
+        print(f"âœ… Password reset code sent to {email}")
         return jsonify({"success": True, "message": "Reset code sent to your email."})
         
     except Exception as e:
-        print(f"❌ Email error: {e}")
+        print(f"âŒ Email error: {e}")
         return jsonify({"success": False, "error": "Failed to send email. Try again later."}), 500
 
 
 @app.route('/api/reset-password', methods=['POST'])
 def reset_password():
-    """Finalizează resetarea parolei cu cod OTP"""
+    """FinalizeazÄƒ resetarea parolei cu cod OTP"""
     data = request.json
     email = data.get('email', '').strip()
     code = data.get('code', '').strip()
@@ -1124,7 +1127,7 @@ def reset_password():
     db.session.delete(otp)
     db.session.commit()
     
-    print(f"✅ Password reset successful for {email}")
+    print(f"âœ… Password reset successful for {email}")
     return jsonify({"success": True, "message": "Password reset successful. You can now login."})
 
 
@@ -1275,7 +1278,7 @@ def contact():
         db.session.commit()
         
         # Log for admin
-        print(f"📧 NEW CONTACT from {name} ({email}) - Topic: {topic_label}")
+        print(f"ðŸ“§ NEW CONTACT from {name} ({email}) - Topic: {topic_label}")
         print(f"   Message: {message[:100]}...")
         
         # Send email notification to admin
@@ -1288,7 +1291,7 @@ def contact():
         }), 200
         
     except Exception as e:
-        print(f"❌ Contact form error: {e}")
+        print(f"âŒ Contact form error: {e}")
         db.session.rollback()
         return jsonify({
             "success": False,
@@ -1503,8 +1506,18 @@ def debug_health():
     return jsonify({
         "status": "alive",
         "environment": env_status,
-        "version": "v143.0"
+        "version": VERSION
     })
+
+
+# ==============================================================================
+# v143: API VERSION ENDPOINT (pentru frontend)
+# ==============================================================================
+
+@app.route('/api/version', methods=['GET'])
+def api_version():
+    """Returnează versiunea curentă - folosit de frontend pentru afișare consistentă"""
+    return jsonify(get_version_info())
 
 
 # ==============================================================================
@@ -1513,7 +1526,7 @@ def debug_health():
 
 @app.route('/api/plans', methods=['GET'])
 def get_plans():
-    """Returnează toate planurile de abonament disponibile"""
+    """ReturneazÄƒ toate planurile de abonament disponibile"""
     return jsonify({
         "success": True,
         "plans": SUBSCRIPTION_PLANS,
@@ -1523,7 +1536,7 @@ def get_plans():
 
 @app.route('/api/countries', methods=['GET'])
 def get_countries():
-    """Returnează codurile de țară pentru telefon"""
+    """ReturneazÄƒ codurile de È›arÄƒ pentru telefon"""
     return jsonify({
         "success": True,
         "countries": COUNTRY_PHONE_CODES
@@ -1536,7 +1549,7 @@ def get_countries():
 
 @app.route('/api/voucher/validate', methods=['POST'])
 def validate_voucher():
-    """Validează un cod voucher fără a-l folosi"""
+    """ValideazÄƒ un cod voucher fÄƒrÄƒ a-l folosi"""
     data = request.json
     code = data.get('code', '').strip().upper()
     
@@ -1566,7 +1579,7 @@ def validate_voucher():
 
 @app.route('/api/voucher/redeem', methods=['POST'])
 def redeem_voucher():
-    """Folosește un voucher pentru a activa abonament"""
+    """FoloseÈ™te un voucher pentru a activa abonament"""
     auth_header = request.headers.get('Authorization')
     if not auth_header:
         return jsonify({"success": False, "error": "Unauthorized"}), 401
@@ -1637,7 +1650,7 @@ def redeem_voucher():
 
 @app.route('/api/admin/voucher/generate', methods=['POST'])
 def admin_generate_voucher():
-    """Admin: Generează coduri voucher noi"""
+    """Admin: GenereazÄƒ coduri voucher noi"""
     auth_header = request.headers.get('Authorization')
     if not auth_header:
         return jsonify({"success": False, "error": "Unauthorized"}), 401
@@ -1721,7 +1734,7 @@ def admin_list_vouchers():
 
 @app.route('/api/track', methods=['POST'])
 def track_visitor():
-    """Înregistrează vizită (apelat de frontend)"""
+    """ÃŽnregistreazÄƒ vizitÄƒ (apelat de frontend)"""
     try:
         data = request.json or {}
         now = datetime.datetime.utcnow()
@@ -1761,7 +1774,7 @@ def admin_traffic():
     except:
         return jsonify({"success": False, "error": "Invalid token"}), 401
     
-    # Parametri opționali
+    # Parametri opÈ›ionali
     year = request.args.get('year', type=int)
     month = request.args.get('month', type=int)
     day = request.args.get('day', type=int)
@@ -1829,12 +1842,12 @@ def admin_traffic_live():
 
 
 # ==============================================================================
-# v143: NOTIFICĂRI EXPIRARE ABONAMENT
+# v143: NOTIFICÄ‚RI EXPIRARE ABONAMENT
 # ==============================================================================
 
 @app.route('/api/admin/check-expiring', methods=['POST'])
 def check_expiring_subscriptions():
-    """Admin: Verifică și trimite notificări pentru abonamente care expiră"""
+    """Admin: VerificÄƒ È™i trimite notificÄƒri pentru abonamente care expirÄƒ"""
     auth_header = request.headers.get('Authorization')
     if not auth_header:
         return jsonify({"success": False, "error": "Unauthorized"}), 401
@@ -1872,13 +1885,13 @@ def check_expiring_subscriptions():
             # Send email
             try:
                 msg = MIMEMultipart('alternative')
-                msg['Subject'] = '⚠️ Your KELION Subscription Expires Soon!'
+                msg['Subject'] = 'âš ï¸ Your KELION Subscription Expires Soon!'
                 msg['From'] = SMTP_EMAIL
                 msg['To'] = user.email
                 
                 html = f'''
                 <div style="font-family: Arial; background: #050505; color: #fff; padding: 30px; border: 2px solid #ff9900; border-radius: 12px;">
-                    <h1 style="color: #ff9900;">⚠️ Subscription Expiring</h1>
+                    <h1 style="color: #ff9900;">âš ï¸ Subscription Expiring</h1>
                     <p>Hello {user.first_name or user.username},</p>
                     <p>Your KELION subscription expires on <strong>{user.subscription_end_date.strftime('%d %B %Y')}</strong>.</p>
                     <p>Renew now to continue enjoying all features!</p>
@@ -1915,7 +1928,7 @@ def check_expiring_subscriptions():
 
 
 # ==============================================================================
-# v143: CONFORMITATE LEGALĂ AI
+# v143: CONFORMITATE LEGALÄ‚ AI
 # ==============================================================================
 
 AI_SAFETY_KEYWORDS = [
@@ -1925,7 +1938,7 @@ AI_SAFETY_KEYWORDS = [
 ]
 
 def check_ai_safety(message):
-    """Verifică dacă mesajul încalcă regulile de siguranță"""
+    """VerificÄƒ dacÄƒ mesajul Ã®ncalcÄƒ regulile de siguranÈ›Äƒ"""
     msg_lower = message.lower()
     for keyword in AI_SAFETY_KEYWORDS:
         if keyword in msg_lower:
@@ -1959,9 +1972,10 @@ if __name__ == '__main__':
             db.session.add(demo)
             
         db.session.commit()
-        print("✓ Database check complete.")
+        print("âœ“ Database check complete.")
     
     # Get port from environment variable (for deployment) or use 5000 for local
     port = int(os.environ.get('PORT', 5000))
-    print(f"🚀 KELION READY: http://localhost:{port}")
+    print(f"ðŸš€ KELION READY: http://localhost:{port}")
     app.run(port=port, debug=False, host='0.0.0.0')
+
