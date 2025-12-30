@@ -1222,6 +1222,64 @@ def delete_contact_message(message_id):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+# ==============================================================================
+# WEB SEARCH ENDPOINT - Pentru frontend
+# ==============================================================================
+
+@app.route('/api/search', methods=['POST'])
+def api_search():
+    """Web search endpoint pentru frontend - folosește SERPER_API_KEY din env"""
+    data = request.json
+    query = data.get('query', '').strip()
+    
+    if not query:
+        return jsonify({"success": False, "error": "Query is required"}), 400
+    
+    result = search_web(query)
+    
+    if "error" in result:
+        return jsonify({"success": False, "error": result["error"]}), 503
+    
+    return jsonify({
+        "success": True,
+        "query": query,
+        "results": result.get("results", [])
+    })
+
+@app.route('/api/whisper', methods=['POST'])
+def api_whisper():
+    """Whisper transcription endpoint - folosește OPENAI_API_KEY din env"""
+    if not OPENAI_API_KEY or OPENAI_API_KEY == "sk-YOUR_OPENAI_API_KEY_HERE":
+        return jsonify({"error": "OpenAI API Key missing"}), 503
+    
+    if 'file' not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+    
+    audio_file = request.files['file']
+    
+    try:
+        # Forward to OpenAI Whisper API
+        files = {
+            'file': (audio_file.filename, audio_file.read(), audio_file.content_type),
+            'model': (None, 'whisper-1')
+        }
+        
+        response = requests.post(
+            "https://api.openai.com/v1/audio/transcriptions",
+            headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
+            files=files,
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            return jsonify(response.json())
+        else:
+            return jsonify({"error": "Whisper API error"}), response.status_code
+            
+    except Exception as e:
+        print(f"Whisper Exception: {e}")
+        return jsonify({"error": str(e)}), 500
+
 # --- DEBUG HEALTH CHECK ---
 @app.route('/debug-health')
 def debug_health():

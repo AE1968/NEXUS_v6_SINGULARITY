@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>KELION v142.0 - GLOBAL_EYE OS</title>
+    <title>KELION v142.1 - GLOBAL_EYE OS</title>
 
     <!-- 🛑 FORCE NO-CACHE (AUTO-REFRESH LOGIC) -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -42,73 +42,201 @@
             position: relative;
         }
 
+        /* Neural Loading Sequence */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            transition: opacity 1s ease-out, visibility 1s;
+        }
+
+        .loading-loader {
+            width: 300px;
+            height: 2px;
+            background: rgba(0, 243, 255, 0.1);
+            position: relative;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--cyan);
+            box-shadow: 0 0 15px var(--cyan);
+            transition: width 0.5s ease;
+        }
+
+        .loading-text {
+            color: var(--cyan);
+            letter-spacing: 5px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--cyan);
+        }
+
+        /* Single background image - robot + galaxy combined */
         #bg-image {
             position: fixed;
             inset: 0;
-            background: url("assets/humanoid_male.png") no-repeat center 15% / cover;
+            background: url("https://raw.githubusercontent.com/AE1968/NEXUS_v6_SINGULARITY/main/assets/kelion_robot_galaxy.png") no-repeat center top 85px / auto 100vh;
+            background-color: #050505;
             z-index: -1;
-            /* Behind UI, in front of canvas */
             pointer-events: none;
-            /* Ensure it doesn't block interactions */
-            transform: translate3d(0, 0, 0);
-            /* Force GPU */
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
         }
 
-        /* Breathing effect restored */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
-            z-index: 1;
-            pointer-events: none;
-            animation: breathe 8s ease-in-out infinite;
+        #bg-image.active {
+            opacity: 1;
+            animation: robotActivate 2.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes breathe {
-
-            0%,
-            100% {
-                opacity: 0.6;
+        @keyframes robotActivate {
+            0% {
+                filter: brightness(0) blur(20px);
+                transform: scale(1.05);
             }
 
             50% {
-                opacity: 0.9;
+                filter: brightness(1.5) contrast(1.2) blur(5px);
+            }
+
+            100% {
+                filter: brightness(1) blur(0);
+                transform: scale(1);
             }
         }
 
-        #bg-canvas {
-            display: block;
+        .scan-line {
             position: fixed;
-            inset: 0;
-            z-index: -2;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    transparent 50%,
+                    rgba(0, 243, 255, 0.05) 50%,
+                    rgba(0, 243, 255, 0.05) 51%,
+                    transparent 51%);
+            background-size: 100% 4px;
+            z-index: 1;
             pointer-events: none;
+            opacity: 0.3;
+        }
+
+        #header,
+        #side-indicators,
+        #ae-contact-btn,
+        #footer-ticker {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        body.ready #header,
+        body.ready #side-indicators,
+        body.ready #ae-contact-btn,
+        body.ready #footer-ticker {
+            opacity: 1;
         }
 
         /* Top Status Bar */
         #header {
             position: fixed;
-            top: 0;
+            top: 20px;
             left: 0;
             width: 100%;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 30px;
             z-index: 1000;
         }
 
         #status-display {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 10, 20, 0.9);
             border: 1px solid var(--cyan);
-            padding: 10px 25px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 4px;
             font-family: 'Orbitron', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            backdrop-filter: blur(8px);
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .status-row.top {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+            padding-bottom: 5px;
+        }
+
+        .status-row.bottom {
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            color: rgba(0, 243, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #system-clock {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 1.2em;
+            overflow: hidden;
+            min-width: 65px;
+            justify-content: center;
+        }
+
+        .clock-part {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 1.5em;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .clock-part span {
+            display: block;
+            height: 1.2em;
+            line-height: 1.2em;
+        }
+
+        #system-date {
+            font-weight: 900;
+            color: var(--cyan);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
             font-size: 0.9rem;
             letter-spacing: 2px;
+        }
+
+        .header-actions {
+            position: absolute;
+            right: 30px;
+            top: 0;
             display: flex;
-            gap: 20px;
-            box-shadow: var(--glow);
+            gap: 10px;
         }
 
         .stat-val {
@@ -636,26 +764,41 @@
 
 <body>
 
+    <div id="loading-screen">
+        <div class="loading-text" id="load-status">NEURAL LINK INITIALIZING...</div>
+        <div class="loading-loader">
+            <div class="loading-bar" id="load-bar"></div>
+        </div>
+        <div style="margin-top:20px; font-size: 0.6rem; color: rgba(0,243,255,0.4); font-family: monospace;"
+            id="load-detail">
+            > EXECUTING CORE_V142_PROTOCOLS...
+        </div>
+    </div>
+
     <canvas id="bg-canvas"></canvas>
     <div id="bg-image"></div>
+    <div class="scan-line"></div>
 
     <div id="header">
         <div id="status-display">
-            <div
-                style="display:flex; flex-direction:column; line-height:1.2; padding-right:20px; border-right:1px solid rgba(0,243,255,0.3); margin-right:15px; text-align:right;">
-                <span class="version-tag" style="font-size:1.1em; font-weight:bold; letter-spacing:3px;"
-                    id="version-tag">v142.0</span>
-                <span id="system-clock"
-                    style="font-size:0.85em; color:rgba(0,243,255,0.7); letter-spacing:1px;">00:00:00</span>
-                <span id="system-date"
-                    style="font-size:0.75em; color:rgba(0,243,255,0.5); letter-spacing:1px;">DD-MM-YYYY</span>
+            <div class="status-row top">
+                <span class="version-tag" style="font-weight:700; color:var(--cyan);" id="version-tag">v142.1</span>
+                <span id="user-display">USER: <span id="user-name" class="stat-val">OFFLINE</span></span>
+                <span id="cloud-display">CLOUD: <span id="sys-status"
+                        class="stat-val offline">DISCONNECTED</span></span>
             </div>
-            <div style="display:flex; gap:20px; align-items:center;">
-                <span>USER: <span id="user-name" class="stat-val">OFFLINE</span></span>
-                <span>CLOUD: <span id="sys-status" class="stat-val offline">DISCONNECTED</span></span>
+            <div class="status-row bottom">
+                <div id="system-clock">
+                    <div class="clock-part" id="h-part"><span>00</span></div>
+                    <span>:</span>
+                    <div class="clock-part" id="m-part"><span>00</span></div>
+                    <span>:</span>
+                    <div class="clock-part" id="s-part"><span>00</span></div>
+                </div>
+                <span id="system-date">DD-MM-YYYY</span>
             </div>
         </div>
-        <div style="display:flex; gap:10px;">
+        <div class="header-actions">
             <button id="traffic-btn">TRAFFIC</button>
             <button id="login-btn">LOGIN</button>
         </div>
@@ -668,10 +811,13 @@
         <div class="indicator storage" title="Encrypted Database">💾</div>
     </div>
 
+    <!-- NEXUS ROBOT IMAGE -->
+    <!-- NEXUS ROBOT INTEGRATED IN BACKGROUND -->
+
     <div id="chat-container">
         <div id="chat-header">
-            <span>NEURAL INTERFACE v142.0</span>
-            <span id="header-online-status" style="color: #00ff00; letter-spacing: 2px;">ONLINE</span>
+            <span>NEURAL INTERFACE v142.1</span>
+            <span style="color: #00ff00; letter-spacing: 2px;">ONLINE</span>
         </div>
         <div id="chat-messages"></div>
     </div>
@@ -686,11 +832,11 @@
             <h2>SYSTEM ACCESS</h2>
             <div class="input-grp">
                 <label>Architect ID</label>
-                <input type="text" id="u-input" placeholder="user: demo">
+                <input type="text" id="u-input" placeholder="demo" value="demo">
             </div>
             <div class="input-grp">
                 <label>Security Key</label>
-                <input type="password" id="p-input" placeholder="pass: demo">
+                <input type="password" id="p-input" placeholder="••••••••" value="demo">
             </div>
             <button id="do-login" class="modal-btn">INITIALIZE</button>
             <p style="margin-top:20px; font-size:0.75rem; color:#556;">Note: Connection secured with RSA-4096</p>
@@ -819,11 +965,11 @@
 
     <div id="footer-ticker">
         <div class="ticker-text" style="color: #00f3ff;">
-            GENEZA KELION v142.0 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
             GOOGLE DEEPMIND // SYSTEM SECURED <img src="assets/images/logo_ae.png"
                 style="height:22px; vertical-align:middle; margin:0 10px;" alt="AE"> ARCHITECT: ADRIAN ENCIULESCU
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v142.0 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
+            GENEZA KELION v142.1 // ARTIFICIAL GENERAL INTELLIGENCE // NEXUS PROTOCOL ACTIVE // POWERED BY OPENAI &
             GOOGLE DEEPMIND // SYSTEM SECURED <img src="assets/images/logo_ae.png"
                 style="height:22px; vertical-align:middle; margin:0 10px;" alt="AE"> ARCHITECT: ADRIAN ENCIULESCU
         </div>
@@ -832,24 +978,17 @@
     <script>
         "use strict";
 
-        // 🔑 API CONFIGURATION (OPENAI & GOOGLE)
-        const OPENAI_KEY = ""; // KEY REMOVED - Use backend API
-        const ENDPOINT = "https://api.openai.com/v1/chat/completions";
-        const WHISPER_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
-
-        // 🔧 PHP PROXY ENDPOINT (BYPASSES CORS)
-        const PHP_PROXY = "KELION_CORE_V142.php";
-
-        // 🌐 SERPER.DEV - REAL-TIME WEB SEARCH
-        const SERPER_API_KEY = "0dd93022fa63c96b23b13a102323b10df7b205c4";
+        // 🔑 API CONFIGURATION - All API calls routed through Flask backend
+        // Backend endpoints: /api/chat, /api/tts, /api/search, /api/whisper
+        // API keys are securely stored in Railway environment variables
+        // No frontend API keys needed - all handled by backend (app.py)
 
         const state = {
             isLogged: false,
             isAdmin: false,
             user: "N/A",
             voice: true,
-            language: null,  // Auto-detected from user input
-            isFirstMessage: true  // Flag pentru detectare limbă la primul mesaj
+            language: 'en'  // English default
         };
 
         const $ = id => document.getElementById(id);
@@ -864,43 +1003,29 @@
             return msg;
         }
 
-        // 🌐 REAL-TIME WEB SEARCH (SERPER.DEV)
+        // 🌐 REAL-TIME WEB SEARCH (via Backend /api/search)
         async function searchWeb(query) {
-            console.log(`🌐 Searching web for: ${query}`);
+            console.log(`🌐 Searching web via backend for: ${query}`);
             try {
-                const response = await fetch("https://google.serper.dev/search", {
+                const response = await fetch("/api/search", {
                     method: "POST",
                     headers: {
-                        "X-API-KEY": SERPER_API_KEY,
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({
-                        q: query,
-                        gl: "ro",  // Romania
-                        hl: "ro",  // Romanian language
-                        num: 5     // Top 5 results
-                    })
+                    body: JSON.stringify({ query: query })
                 });
 
                 if (!response.ok) throw new Error("Search API Error");
 
                 const data = await response.json();
 
+                if (!data.success) {
+                    return `Error: ${data.error || 'Search failed'}`;
+                }
+
                 let results = [];
-
-                // Answer Box (if available)
-                if (data.answerBox) {
-                    results.push(`📌 DIRECT ANSWER: ${data.answerBox.answer || data.answerBox.snippet || ''}`);
-                }
-
-                // Knowledge Graph (if available)
-                if (data.knowledgeGraph) {
-                    results.push(`📚 ${data.knowledgeGraph.title}: ${data.knowledgeGraph.description || ''}`);
-                }
-
-                // Organic results
-                if (data.organic && data.organic.length > 0) {
-                    data.organic.slice(0, 3).forEach((item, i) => {
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach((item, i) => {
                         results.push(`[${i + 1}] ${item.title}: ${item.snippet}`);
                     });
                 }
@@ -915,9 +1040,8 @@
             }
         }
 
-        // 🔊 VOICE SYSTEM (BACKEND TTS - Secure API Keys)
+        // 🔊 VOICE SYSTEM (OPENAI TTS)
         let currentAudio = null;
-        let currentGender = localStorage.getItem('kelion_voice_gender') || 'male'; // Persist voice gender
 
         async function speak(text) {
             if (!state.voice) return;
@@ -935,7 +1059,7 @@
                 // Visual indicator start
                 document.body.classList.add('speaking');
 
-                // Use backend TTS endpoint (keeps API keys secure)
+                // Use backend /api/tts endpoint (has API key configured)
                 const response = await fetch("/api/tts", {
                     method: "POST",
                     headers: {
@@ -943,13 +1067,12 @@
                     },
                     body: JSON.stringify({
                         text: text,
-                        username: state.user,
-                        gender: currentGender,
-                        provider: 'openai' // or 'eleven' for ElevenLabs
+                        gender: "male",
+                        username: state.user
                     })
                 });
 
-                if (!response.ok) throw new Error("TTS API Error: " + response.status);
+                if (!response.ok) throw new Error("TTS API Error");
 
                 const blob = await response.blob();
                 const url = URL.createObjectURL(blob);
@@ -964,72 +1087,30 @@
                 console.error("Backend TTS Failed. Using browser fallback:", err);
                 const utterance = new SpeechSynthesisUtterance(text);
                 const voices = window.speechSynthesis.getVoices();
-                // Try to find a matching voice based on saved gender and language
-                const langPref = state.language || 'ro';
-                utterance.voice = voices.find(v =>
-                    (v.lang.includes(langPref) || v.lang.includes('ro')) &&
-                    (currentGender === 'female' ? v.name.toLowerCase().includes('female') : !v.name.toLowerCase().includes('female'))
-                ) || voices.find(v => v.lang.includes('ro')) || voices[0];
+                // Try to find a male/romanian voice
+                utterance.voice = voices.find(v => v.lang.includes('ro') || v.name.includes('Male')) || voices[0];
                 utterance.onend = () => document.body.classList.remove('speaking');
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        // Function to switch voice gender and persist until logout
-        function setVoiceGender(gender) {
-            currentGender = gender;
-            localStorage.setItem('kelion_voice_gender', gender);
-            console.log(`Voice gender set to: ${gender}`);
-        }
 
-        // 🛠️ OPENAI TOOLS DEFINITION (FOR FUNCTION CALLING)
-        const TOOLS = [
-            {
-                type: "function",
-                function: {
-                    name: "search_web",
-                    description: "Search the internet for real-time information like news, weather, prices, sports scores, current events, or any information that requires up-to-date data.",
-                    parameters: {
-                        type: "object",
-                        properties: {
-                            query: {
-                                type: "string",
-                                description: "The search query (e.g., 'weather in Bucharest', 'Bitcoin price today', 'latest news Romania')"
-                            }
-                        },
-                        required: ["query"]
-                    }
-                }
-            }
-        ];
-
-        // 🧠 AI PROCESSOR (INTELLIGENT RESOLVER v142 - FLASK BACKEND)
-        let isProcessing = false;
-
+        // 🧠 AI PROCESSOR (INTELLIGENT RESOLVER v142 + WEB SEARCH via Backend)
         async function execute() {
-            if (isProcessing) return;
-
-            // Network Check
-            if (!navigator.onLine) {
-                write('bot', "CONNECTION ERROR: No internet access detected.", true);
-                return;
-            }
-
             const input = $('chat-input');
             const msg = input.value.trim();
             if (!msg) return;
 
-            isProcessing = true; // Lock
             write('user', msg);
             input.value = "";
 
             const thinking = write('bot', "Synapsing...");
 
             try {
-                // Send to Flask Backend which has the API keys
-                thinking.textContent = "Connecting to Neural Core...";
+                // Use backend /api/chat endpoint (has API keys configured)
+                thinking.textContent = "Connecting to neural core...";
 
-                const response = await fetch('/api/chat', {
+                const response = await fetch("/api/chat", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1037,33 +1118,23 @@
                     body: JSON.stringify({
                         message: msg,
                         username: state.user,
-                        gender: currentGender,
-                        language: state.language || 'DETECT',
-                        isFirstMessage: state.isFirstMessage  // Backend știe să detecteze și să salute
+                        gender: "male",
+                        conversation_id: state.user
                     })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Server error: ${response.status}`);
-                }
+                if (!response.ok) throw new Error("Chat API Error");
 
                 const data = await response.json();
 
-                if (data.success && data.response) {
+                if (data.success) {
+                    const reply = data.response;
                     thinking.remove();
-                    write('bot', data.response);
-                    speak(data.response);
+                    write('bot', reply);
+                    speak(reply);
 
-                    // Update language if detected from first message
-                    if (data.lang) {
-                        state.language = data.lang;
-                        console.log(`🌍 Language detected: ${data.lang}`);
-                    }
-
-                    // First message processed - no longer first
-                    if (state.isFirstMessage) {
-                        state.isFirstMessage = false;
-                    }
+                    // Detect language from response for future use
+                    if (data.lang) state.language = data.lang;
                 } else {
                     throw new Error(data.error || "Unknown error");
                 }
@@ -1072,10 +1143,8 @@
                 console.error("AI Processor Error:", err);
                 thinking.remove();
                 const errStatus = "Neural Link unstable. Please try again.";
-                write('bot', errStatus, true);
+                write('bot', errStatus);
                 speak(errStatus);
-            } finally {
-                isProcessing = false; // Unlock
             }
         }
 
@@ -1201,143 +1270,174 @@
             }
         }
 
-        // 🛡️ REFACTORED STATE MANAGEMENT & HANDLERS
-        function resetState() {
-            state.isLogged = false;
-            state.isAdmin = false;
-            state.user = "N/A";
-            state.language = null;
-            state.isFirstMessage = true;
-
-            localStorage.removeItem('kelion_user');
-            localStorage.removeItem('kelion_admin');
-            localStorage.removeItem('kelion_voice_lang');
-            localStorage.removeItem('kelion_voice_gender');
-        }
-
-        function handleLogout() {
-            resetState();
-
-            // SOFT UI RESET (No Reload)
-            $('input-bar').style.display = 'none';
-            $('chat-container').style.display = 'none';
-            $('traffic-btn').style.display = 'none';
-
-            // Reset Buttons
-            $('login-btn').textContent = "LOGIN";
-            $('login-btn').classList.remove('logged');
-
-            // Reset Status Indicators
-            $('user-name').textContent = "OFFLINE";
-            $('sys-status').textContent = "DISCONNECTED";
-            $('sys-status').className = "stat-val offline";
-
-            // Reset Header Online Status
-            const onlineStatus = document.getElementById('header-online-status');
-            if (onlineStatus) {
-                onlineStatus.textContent = "OFFLINE";
-                onlineStatus.style.color = "#ff4444";
-            }
-
-            write('bot', "SYSTEM STANDBY. PLEASE AUTHENTICATE.");
-        }
-
-        function handleLogin() {
-            const user = $('u-input').value || "Architect";
-            const pass = $('p-input').value;
-
-            if (user.toLowerCase() === "admin" && pass === "Andrada_1968!") {
-                state.isAdmin = true;
-                alert("⚠️ ADMINISTRATOR RECOGNIZED");
-            } else if (user.toLowerCase() === "admin") {
-                alert("⚠️ ACCESS DENIED"); return;
-            }
-
-            state.user = user;
-            state.isLogged = true;
-
-            // Persist
-            localStorage.setItem('kelion_user', user);
-            localStorage.setItem('kelion_admin', state.isAdmin);
-
-            // Update UI
-            updateUIForLogin();
-
-            state.isFirstMessage = true;
-            state.language = null;
-            showWaitingForInput();
-        }
-
-        function updateUIForLogin() {
-            $('login-modal').style.display = 'none';
-            $('user-name').textContent = state.user.toUpperCase();
-            $('sys-status').textContent = "CONNECTED";
-            $('sys-status').className = "stat-val online";
-            $('login-btn').textContent = "LOG OFF";
-            $('login-btn').classList.add('logged');
-            $('input-bar').style.display = 'flex';
-            $('chat-container').style.display = 'flex';
-
-            // Update Header Online Status
-            const onlineStatus = document.getElementById('header-online-status');
-            if (onlineStatus) {
-                onlineStatus.textContent = "ONLINE";
-                onlineStatus.style.color = "#00ff00";
-            }
-
-            if (state.isAdmin) {
-                const tb = $('traffic-btn');
-                if (tb) {
-                    tb.style.display = 'inline-block';
-                    tb.style.opacity = '1';
-                    tb.style.pointerEvents = 'auto';
-                }
-            }
-        }
-
-        // 🔒 RESTORE SESSION Function
-        function restoreSession() {
-            const savedUser = localStorage.getItem('kelion_user');
-            const savedAdmin = localStorage.getItem('kelion_admin') === 'true';
-            const savedLang = localStorage.getItem('kelion_voice_lang');
-
-            if (savedUser) {
-                state.user = savedUser;
-                state.isAdmin = savedAdmin;
-                state.isLogged = true;
-                state.language = savedLang;
-                state.isFirstMessage = false;
-
-                updateUIForLogin();
-                write('bot', `WELCOME BACK, ${state.user.toUpperCase()}. NEURAL LINK RESTORED.`);
-            } else {
-                // Ensure clean start if no session
-                // handleLogout(); // Optional check to avoid loop on load
-            }
-        }
-
         // 🚀 INITIALIZATION
         document.addEventListener('DOMContentLoaded', () => {
+            // 🚀 NEURAL INITIALIZATION SEQUENCE
+            const initSequence = async () => {
+                const bar = $('load-bar');
+                const status = $('load-status');
+                const detail = $('load-detail');
+                const steps = [
+                    { p: 10, s: "CONNECTING TO NEURAL HUB...", d: "> HANDSHAKE_REQUEST_SENT" },
+                    { p: 30, s: "AUTHENTICATING BIO-SIGNATURES...", d: "> USER_RECOGNIZED: ARCHITECT" },
+                    { p: 50, s: "LOADING CORE AI MATRICES...", d: "> GPT-4O_CORE_LOADED" },
+                    { p: 80, s: "SYNCHRONIZING GLOBAL_EYES...", d: "> SATELLITE_UPLINK_STABLE" },
+                    { p: 100, s: "SYSTEM READY", d: "> WELCOME TO KELION v142.1" }
+                ];
 
-            // 🔒 RESTORE SESSION IMMEDIATELY
-            restoreSession();
+                for (let step of steps) {
+                    await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
+                    bar.style.width = step.p + "%";
+                    status.textContent = step.s;
+                    detail.textContent = step.d;
+                }
+
+                await new Promise(r => setTimeout(r, 800));
+                $('loading-screen').style.opacity = '0';
+                setTimeout(() => {
+                    $('loading-screen').style.visibility = 'hidden';
+                    $('bg-image').classList.add('active');
+                    document.body.classList.add('ready');
+                }, 1000);
+            };
+
+            initSequence();
+
+            // 🔓 RESTORE SESSION: Check both session and local storage
+            let sessionUser = sessionStorage.getItem('kelion_user') || localStorage.getItem('kelion_user');
+            let sessionAdmin = (sessionStorage.getItem('kelion_admin') === 'true') || (localStorage.getItem('kelion_admin') === 'true');
+
+            if (sessionUser) {
+                state.user = sessionUser;
+                state.isLogged = true;
+                state.isAdmin = sessionAdmin;
+
+                $('user-name').textContent = state.user.toUpperCase();
+                $('sys-status').textContent = "CONNECTED";
+                $('sys-status').className = "stat-val online";
+                $('login-btn').textContent = "LOG OFF";
+                $('login-btn').classList.add('logged');
+                $('input-bar').style.display = 'flex';
+                $('chat-container').style.display = 'flex';
+
+                if (state.isAdmin) {
+                    const tb = $('traffic-btn');
+                    if (tb) {
+                        tb.style.display = 'inline-block';
+                        tb.style.opacity = '1';
+                        tb.style.pointerEvents = 'auto';
+                    }
+                }
+            } else {
+                $('input-bar').style.display = 'none';
+                write('bot', "SYSTEM STANDBY. PLEASE AUTHENTICATE.");
+            }
+
+            // starfield(); // Disabled - using Matrix Rain (initThreeJS) instead
+
+            function updatePart(id, val) {
+                const container = $(id);
+                if (!container) return;
+                const current = container.querySelector('span:last-child');
+                if (current && current.textContent === val) return;
+
+                const next = document.createElement('span');
+                next.textContent = val;
+                container.appendChild(next);
+
+                // Ensure transition is active
+                container.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+
+                // Force layout reflow
+                container.offsetHeight;
+
+                const offset = (container.children.length - 1) * 1.2;
+                container.style.transform = `translateY(-${offset}em)`;
+
+                setTimeout(() => {
+                    if (container.children.length > 1) {
+                        const last = container.lastElementChild;
+                        container.style.transition = 'none';
+                        container.style.transform = 'translateY(0)';
+                        container.innerHTML = '';
+                        container.appendChild(last);
+                    }
+                }, 650);
+            }
 
             function updateClock() {
                 const now = new Date();
-                const timeString = now.toLocaleTimeString('ro-RO', { hour12: false });
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+
+                updatePart('h-part', h);
+                updatePart('m-part', m);
+                updatePart('s-part', s);
+
                 const dateString = now.toLocaleDateString('ro-RO');
-                if ($('system-clock')) $('system-clock').textContent = timeString;
-                if ($('system-date')) $('system-date').textContent = dateString;
+                if ($('system-date').textContent !== dateString) {
+                    $('system-date').textContent = dateString;
+                }
             }
             setInterval(updateClock, 1000);
             updateClock();
 
-            // 🔄 HANDLERS SETUP
+            // 🔄 LOGIN HANDLERS
             $('login-btn').onclick = () => {
-                state.isLogged ? handleLogout() : $('login-modal').style.display = 'flex';
+                if (state.isLogged) {
+                    state.isLogged = false;
+                    state.user = "N/A";
+                    state.isAdmin = false;
+                    sessionStorage.removeItem('kelion_user');
+                    sessionStorage.removeItem('kelion_admin');
+                    localStorage.removeItem('kelion_user');
+                    localStorage.removeItem('kelion_admin');
+                    location.reload(); // Hard reset on logout
+                } else {
+                    $('login-modal').style.display = 'flex';
+                }
             };
 
-            $('do-login').onclick = handleLogin;
+            $('do-login').onclick = () => {
+                const user = $('u-input').value || "Architect";
+                const pass = $('p-input').value;
+                if (user.toLowerCase() === "admin" && pass === "Andrada_1968!") {
+                    state.isAdmin = true;
+                    alert("⚠️ ADMINISTRATOR RECOGNIZED");
+                } else if (user.toLowerCase() === "admin") {
+                    alert("⚠️ ACCESS DENIED"); return;
+                }
+
+                state.user = user;
+                state.isLogged = true;
+                sessionStorage.setItem('kelion_user', user);
+                sessionStorage.setItem('kelion_admin', state.isAdmin);
+                localStorage.setItem('kelion_user', user);
+                localStorage.setItem('kelion_admin', state.isAdmin);
+
+                // UI UPDATE (NO RELOAD)
+                $('login-modal').style.display = 'none';
+                $('user-name').textContent = state.user.toUpperCase();
+                $('sys-status').textContent = "CONNECTED";
+                $('sys-status').className = "stat-val online";
+                $('login-btn').textContent = "LOG OFF";
+                $('login-btn').classList.add('logged');
+                $('input-bar').style.display = 'flex';
+                $('chat-container').style.display = 'flex';
+
+                if (state.isAdmin) {
+                    const tb = $('traffic-btn');
+                    if (tb) {
+                        tb.style.display = 'inline-block';
+                        tb.style.opacity = '1';
+                        tb.style.pointerEvents = 'auto';
+                    }
+                }
+
+                // 🕒 GREETING AFTER LOGIN
+                greetUser(state.user);
+            };
 
             const tBtn = $('traffic-btn');
             if (tBtn) {
@@ -1346,7 +1446,6 @@
                     startTrafficTracking();
                 };
             }
-
 
             // 🎤 VOICE RECOGNITION (WHISPER)
             let mediaRecorder;
@@ -1391,23 +1490,17 @@
 
                             const formData = new FormData();
                             formData.append("file", audioBlob, "voice.webm");
+                            formData.append("model", "whisper-1");
 
                             try {
-                                // Use backend STT endpoint (keeps API keys secure)
-                                const res = await fetch("/api/stt", {
+                                // Use backend /api/whisper endpoint (has API key configured)
+                                const res = await fetch("/api/whisper", {
                                     method: "POST",
                                     body: formData
                                 });
                                 const data = await res.json();
-                                if (data.success && data.text) {
+                                if (data.text) {
                                     $('chat-input').value = data.text;
-
-                                    // Save detected language for voice persistence until logout
-                                    if (data.language) {
-                                        state.language = data.language;
-                                        localStorage.setItem('kelion_voice_lang', data.language);
-                                        console.log(`Voice language detected: ${data.language}`);
-                                    }
 
                                     // AUTO-SEND ON RELEASE
                                     const finalMsg = $('chat-input').value.trim();
@@ -1415,9 +1508,6 @@
                                         console.log("Mic released. Auto-sending:", finalMsg);
                                         execute();
                                     }
-                                } else {
-                                    console.error("STT Error:", data.error);
-                                    $('chat-input').placeholder = "Error: " + (data.error || "Transcription failed");
                                 }
                             } catch (e) {
                                 console.error("Whisper Error:", e);
@@ -1461,195 +1551,40 @@
                 micBtn.onclick = null;
             }
 
-
             $('chat-input').onkeypress = e => { if (e.key === "Enter") execute(); };
 
-            // 🔒 SESSION PERSISTENCE (Modified by Antigravity)
-            const savedUser = localStorage.getItem('kelion_user');
-            const savedAdmin = localStorage.getItem('kelion_admin') === 'true';
-            const savedLang = localStorage.getItem('kelion_voice_lang');
-
-            if (savedUser) {
-                // Restore State
-                state.user = savedUser;
-                state.isAdmin = savedAdmin;
-                state.isLogged = true;
-                state.language = savedLang;
-                state.isFirstMessage = false;
-
-                // Update UI - CONNECTED
-                $('user-name').textContent = state.user.toUpperCase();
-                $('sys-status').textContent = "CONNECTED";
-                $('sys-status').className = "stat-val online";
-                $('login-btn').textContent = "LOG OFF";
-                $('login-btn').classList.add('logged');
-                $('input-bar').style.display = 'flex';
-                $('chat-container').style.display = 'flex';
-
-                if (state.isAdmin) {
-                    const tb = $('traffic-btn');
-                    if (tb) {
-                        tb.style.display = 'inline-block';
-                        tb.style.opacity = '1';
-                        tb.style.pointerEvents = 'auto';
-                    }
-                }
-                write('bot', `WELCOME BACK, ${state.user.toUpperCase()}. NEURAL LINK RESTORED.`);
-            } else {
-                // UI DEFAULT - LOG OFF
-                $('input-bar').style.display = 'none';
-                $('chat-container').style.display = 'none';
-                $('traffic-btn').style.display = 'none';
-                $('login-btn').textContent = "LOGIN";
-                $('login-btn').classList.remove('logged');
-                $('user-name').textContent = "OFFLINE";
-                $('sys-status').textContent = "DISCONNECTED";
-                $('sys-status').className = "stat-val offline";
-
-                write('bot', "SYSTEM STANDBY. PLEASE AUTHENTICATE.");
-            }
 
             // Update Version
             const vTag = document.querySelector('.version-tag');
-            if (vTag) vTag.textContent = "v142.0";
+            if (vTag) vTag.textContent = "v142.1";
 
-            initThreeJS();
+            // initThreeJS(); // DISABLED - shows robot background instead
         });
 
-        function initThreeJS() {
-            const canvas = document.getElementById('bg-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let width, height;
+        // Matrix effect removed - keeping clean background
 
-            function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            }
-            window.onresize = resize;
-            resize();
-
-            const columns = Math.floor(width / 20);
-            const drops = [];
-            for (let x = 0; x < columns; x++) drops[x] = 1;
-
-            function drawBg() {
-                ctx.fillStyle = 'rgba(0, 5, 10, 0.1)';
-                ctx.fillRect(0, 0, width, height);
-                ctx.font = '15px monospace';
-                for (let i = 0; i < drops.length; i++) {
-                    const text = String.fromCharCode(0x30A0 + Math.random() * 96);
-                    ctx.fillStyle = `rgba(0, 243, 255, ${0.3 + Math.random() * 0.4})`;
-                    ctx.fillText(text, i * 20, drops[i] * 20);
-                    if (drops[i] * 20 > height && Math.random() > 0.95) drops[i] = 0;
-                    drops[i]++;
-                }
-                requestAnimationFrame(drawBg);
-            }
-            drawBg();
-        }
-
-        // 🌍 SHOW WAITING MESSAGE (After login, before first input)
-        // ENGLISH ONLY - Detection happens after user's first message
-        function showWaitingForInput() {
-            const waitMsg = "Hello! Write or speak in your language, and I will respond natively.";
-            write('bot', waitMsg);
-            speak(waitMsg);  // Voce engleză
-        }
-
-        // 🌟 GREETING HELPER (Time-based, Multilingual) - Called AFTER language detection
-        function greetUser(username, detectedLang) {
+        // 🌟 GREETING HELPER (Time-based, Multilingual)
+        function greetUser(username) {
             const hour = new Date().getHours();
-            const lang = detectedLang || state.language || 'en';
+            const lang = state.language || 'en';
 
             let greeting, welcomeMsg;
 
-            // 🇷🇴 ROMÂNĂ - cu reguli gramaticale complete
             if (lang === 'ro' || lang === 'română' || lang === 'Romanian') {
+                // Romanian greetings
                 if (hour >= 5 && hour < 12) greeting = "Bună dimineața";
                 else if (hour >= 12 && hour < 18) greeting = "Bună ziua";
                 else greeting = "Bună seara";
-                welcomeMsg = `${greeting}, ${username}. Sunt KELION, inteligența ta artificială. Cu ce te pot ajuta?`;
-
-                // 🇬🇧 ENGLISH
-            } else if (lang === 'en' || lang === 'English') {
-                if (hour >= 5 && hour < 12) greeting = "Good morning";
-                else if (hour >= 12 && hour < 18) greeting = "Good afternoon";
-                else greeting = "Good evening";
-                welcomeMsg = `${greeting}, ${username}. I am KELION, your artificial intelligence. How may I assist you?`;
-
-                // 🇪🇸 ESPAÑOL
-            } else if (lang === 'es' || lang === 'Spanish' || lang === 'español') {
-                if (hour >= 5 && hour < 12) greeting = "Buenos días";
-                else if (hour >= 12 && hour < 18) greeting = "Buenas tardes";
-                else greeting = "Buenas noches";
-                welcomeMsg = `${greeting}, ${username}. Soy KELION, tu inteligencia artificial. ¿En qué puedo ayudarte?`;
-
-                // 🇫🇷 FRANÇAIS
-            } else if (lang === 'fr' || lang === 'French' || lang === 'français') {
-                if (hour >= 5 && hour < 12) greeting = "Bonjour";
-                else if (hour >= 12 && hour < 18) greeting = "Bon après-midi";
-                else greeting = "Bonsoir";
-                welcomeMsg = `${greeting}, ${username}. Je suis KELION, votre intelligence artificielle. Comment puis-je vous aider?`;
-
-                // 🇩🇪 DEUTSCH
-            } else if (lang === 'de' || lang === 'German' || lang === 'Deutsch') {
-                if (hour >= 5 && hour < 12) greeting = "Guten Morgen";
-                else if (hour >= 12 && hour < 18) greeting = "Guten Tag";
-                else greeting = "Guten Abend";
-                welcomeMsg = `${greeting}, ${username}. Ich bin KELION, Ihre künstliche Intelligenz. Wie kann ich Ihnen helfen?`;
-
-                // 🇮🇹 ITALIANO
-            } else if (lang === 'it' || lang === 'Italian' || lang === 'italiano') {
-                if (hour >= 5 && hour < 12) greeting = "Buongiorno";
-                else if (hour >= 12 && hour < 18) greeting = "Buon pomeriggio";
-                else greeting = "Buonasera";
-                welcomeMsg = `${greeting}, ${username}. Sono KELION, la tua intelligenza artificiale. Come posso aiutarti?`;
-
-                // 🇵🇹 PORTUGUÊS
-            } else if (lang === 'pt' || lang === 'Portuguese' || lang === 'português') {
-                if (hour >= 5 && hour < 12) greeting = "Bom dia";
-                else if (hour >= 12 && hour < 18) greeting = "Boa tarde";
-                else greeting = "Boa noite";
-                welcomeMsg = `${greeting}, ${username}. Sou KELION, a sua inteligência artificial. Como posso ajudá-lo?`;
-
-                // 🇷🇺 РУССКИЙ
-            } else if (lang === 'ru' || lang === 'Russian' || lang === 'русский') {
-                if (hour >= 5 && hour < 12) greeting = "Доброе утро";
-                else if (hour >= 12 && hour < 18) greeting = "Добрый день";
-                else greeting = "Добрый вечер";
-                welcomeMsg = `${greeting}, ${username}. Я KELION, ваш искусственный интеллект. Чем могу помочь?`;
-
-                // 🇯🇵 日本語
-            } else if (lang === 'ja' || lang === 'Japanese' || lang === '日本語') {
-                if (hour >= 5 && hour < 12) greeting = "おはようございます";
-                else if (hour >= 12 && hour < 18) greeting = "こんにちは";
-                else greeting = "こんばんは";
-                welcomeMsg = `${greeting}、${username}様。私はKELION、あなたの人工知能です。何かお手伝いできますか？`;
-
-                // 🇨🇳 中文
-            } else if (lang === 'zh' || lang === 'Chinese' || lang === '中文') {
-                if (hour >= 5 && hour < 12) greeting = "早上好";
-                else if (hour >= 12 && hour < 18) greeting = "下午好";
-                else greeting = "晚上好";
-                welcomeMsg = `${greeting}，${username}。我是KELION，您的人工智能助手。有什么可以帮助您的吗？`;
-
-                // 🇦🇪 العربية
-            } else if (lang === 'ar' || lang === 'Arabic' || lang === 'العربية') {
-                if (hour >= 5 && hour < 12) greeting = "صباح الخير";
-                else if (hour >= 12 && hour < 18) greeting = "مساء الخير";
-                else greeting = "مساء الخير";
-                welcomeMsg = `${greeting}، ${username}. أنا كيليون، ذكاؤك الاصطناعي. كيف يمكنني مساعدتك؟`;
-
-                // 🌐 DEFAULT (English fallback)
+                welcomeMsg = `${greeting}, ${username}. Sunt KELION AI. Cu ce te pot ajuta astăzi?`;
             } else {
-                if (hour >= 5 && hour < 12) greeting = "Good morning";
-                else if (hour >= 12 && hour < 18) greeting = "Good afternoon";
-                else greeting = "Good evening";
-                welcomeMsg = `${greeting}, ${username}. I am KELION, your artificial intelligence. How may I assist you?`;
+                // English (default)
+                if (hour >= 5 && hour < 12) greeting = "Good Morning";
+                else if (hour >= 12 && hour < 18) greeting = "Good Afternoon";
+                else greeting = "Good Evening";
+                welcomeMsg = `${greeting}, ${username}. I am KELION AI. How can I assist you today?`;
             }
 
-            console.log(`🌍 Greeting in ${lang}:`, welcomeMsg);
+            console.log("Greeting:", welcomeMsg);
             write('bot', welcomeMsg);
             speak(welcomeMsg);
         }
