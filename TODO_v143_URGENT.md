@@ -4,6 +4,24 @@
 
 Următoarele funcționalități sunt în curs de implementare sau necesită atenție imediată:
 
+# 🚨# KELION v143 - TODO URGENT
+
+## Data: 31-12-2025
+
+---
+
+## 🔴 DONE - Sesiune curentă
+- [x] SSH remote configurat: `git@github.com:AE1968/NEXUS_v6_SINGULARITY.git`
+- [x] Fundal spațiu cosmic fullscreen 
+- [x] Sferă plasma animată cu streamers
+- [x] Cap animat reactivat în sferă
+
+## 🟡 NEXT - De făcut
+- [ ] Culori sincronizate perfect între fundal, sferă, cap
+- [ ] Sfera și hologramă ca variabile configurabile
+- [ ] Verificare că nu sunt 2 capete suprapuse
+- [ ] Test pe live după deploy Railway
+
 ## ⚡ MANDAT EXECUTIV
 - [ ] **Global Implementation**: Reluarea tuturor punctelor de pe această listă, analizarea lor detaliată și implementarea completă pentru finalizarea versiunii v143.0.
 - [ ] **Server Log Verification**: Verificarea logurilor de la toate serverele (backend, baze de date, servicii externe), identificarea erorilor și rezolvarea integrală a acestora.
