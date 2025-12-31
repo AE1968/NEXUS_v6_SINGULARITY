@@ -9,16 +9,16 @@ Următoarele funcționalități sunt în curs de implementare sau necesită aten
 - [ ] **Server Log Verification**: Verificarea logurilor de la toate serverele (backend, baze de date, servicii externe), identificarea erorilor și rezolvarea integrală a acestora.
 
 ## 🔥 CRITICAL RESOLUTION PATH (Calea de Rezolvare Critică)
-- [ ] **DB MIGRATION (Urgid)**: Crearea unui script de migrare pentru `nexus.db` care să adauge toate câmpurile v143 și să creeze tabelele lipsă (`user_memories`, `trial_users`, etc.). **Elimină erorile 500.**
-- [ ] **JS CONVERGENCE**: Eliminarea redundanței prin mutarea logicii inline în module dedicate. Rezolvă conflictele de `localStorage` și duplicarea funcțiilor.
+- [x] **DB MIGRATION (Urgid)**: Script de migrare creat și rulat (`migrate_db.py`). Include auto-migrare la startup în `app.py`.
+- [x] **JS CONVERGENCE**: Eliminarea redundanței prin mutarea logicii inline în module dedicate (`js/main.js`, `js/hologram.js`, `css/style.css`).
 - [ ] **UTF-8 ENFORCEMENT**: Resalvarea și verificarea strictă a fișierelor pe server pentru a elimina caracterele corupte (`ðŸŠ`).
-- [ ] **SESSION RESTORATION**: Eliminarea `localStorage.clear()` de pe document ready pentru a permite funcționarea memoriei AI și a salutului personalizat.
+- [x] **SESSION RESTORATION**: `localStorage.clear()` a fost dezactivat (comentat) pentru a permite funcționarea memoriei AI.
 - [ ] **API HARMONIZATION**: Conectarea formularului de Contact și a sistemului 3D Globe la rutele reale de backend, nu doar simulări (alert).
 
 ## 🔴 CRITICE (Backend/Integrări)
 - [x] **Auto-Response Email**: Acum trimite emailuri categorizate AI de pe `contact@kelionai.app`.
 - [x] **Logging Profesional**: Înlocuit `print` cu `logger` pentru stabilitate Railway.
-- [x] **Health Check**: Endpoint `/health` activ.
+- [ ] **Health Check**: Endpoint `/status` simplificat pentru Railway. (În curs de validare deploy)
 - [x] **English Default (System Prompt)**: Modificarea prompt-ului în `app.py` (linia 1833) pentru a forța engleza și înlocuirea exemplului de search în română.
 - [x] **Full Backend Translation**: Backend-ul este predominant în engleză. Căutarea nu a găsit conținut în română.
 - [x] **Enforce Mandatory Fields (Backend)**: Actualizarea rutei `/api/register` și `/api/contact` pentru a valida obligativitatea tuturor câmpurilor (Name, Address, Phone, City, etc.).
