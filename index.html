@@ -299,37 +299,6 @@
             box-shadow: 0 0 20px var(--cyan);
         }
 
-        /* Side Panels Indicators */
-        #side-indicators {
-            position: fixed;
-            left: 30px;
-            top: 120px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 100;
-        }
-
-        .indicator {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--border);
-            padding: 12px;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            font-size: 1.4rem;
-            cursor: help;
-            transition: 0.4s;
-        }
-
-        .indicator:hover {
-            border-color: var(--cyan);
-            box-shadow: var(--glow);
-            transform: translateX(5px);
-        }
 
         /* Chat Interface */
         #chat-container {
@@ -728,6 +697,178 @@
             }
         }
 
+        /* ============================================
+           ACCESSIBILITY: Hearing Impaired Subtitles
+           ============================================ */
+        #accessibility-btn {
+            position: fixed;
+            bottom: 40px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 10, 20, 0.95);
+            border: 2px solid var(--cyan);
+            border-radius: 10px;
+            color: var(--cyan);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        #accessibility-btn:hover {
+            background: var(--cyan);
+            color: #000;
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        #accessibility-btn.active {
+            background: var(--cyan);
+            color: #000;
+            border-radius: 10px 10px 0 0;
+        }
+
+        #accessibility-btn .icon-closed {
+            display: block;
+        }
+
+        #accessibility-btn .icon-open {
+            display: none;
+        }
+
+        #accessibility-btn.active .icon-closed {
+            display: none;
+        }
+
+        #accessibility-btn.active .icon-open {
+            display: block;
+        }
+
+        /* Subtitle Box */
+        #subtitle-box {
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            width: 400px;
+            max-width: calc(100vw - 40px);
+            background: rgba(0, 5, 15, 0.98);
+            border: 2px solid var(--cyan);
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 9998;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 243, 255, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        #subtitle-box.active {
+            display: block;
+            animation: subtitleSlideIn 0.3s ease-out;
+        }
+
+        @keyframes subtitleSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #subtitle-box .subtitle-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        #subtitle-box .subtitle-header h4 {
+            margin: 0;
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #subtitle-box .subtitle-lang {
+            font-size: 0.7rem;
+            color: rgba(0, 243, 255, 0.6);
+            background: rgba(0, 243, 255, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        #subtitle-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #ffffff;
+            min-height: 60px;
+            max-height: 150px;
+            overflow-y: auto;
+            word-wrap: break-word;
+        }
+
+        #subtitle-text:empty::before {
+            content: 'Waiting for audio...';
+            color: rgba(255, 255, 255, 0.3);
+            font-style: italic;
+        }
+
+        #subtitle-text.speaking {
+            border-left: 3px solid var(--cyan);
+            padding-left: 15px;
+            animation: subtitlePulse 1s ease-in-out infinite;
+        }
+
+        @keyframes subtitlePulse {
+
+            0%,
+            100% {
+                border-color: var(--cyan);
+            }
+
+            50% {
+                border-color: var(--pink);
+            }
+        }
+
+        /* Scrollbar for subtitle text */
+        #subtitle-text::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #subtitle-text::-webkit-scrollbar-thumb {
+            background: var(--cyan);
+            border-radius: 2px;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 500px) {
+            #subtitle-box {
+                width: calc(100vw - 40px);
+                left: 20px;
+                right: 20px;
+            }
+
+            #subtitle-text {
+                font-size: 1rem;
+            }
+        }
+
         /* AE CONTACT SYSTEM STYLES */
         #ae-contact-btn {
             position: fixed;
@@ -904,11 +1045,20 @@
         </div>
     </div>
 
-    <div id="side-indicators">
-        <div class="indicator voice" title="TTS Active">&#128266;</div>
-        <div class="indicator vision" title="Vision Scan Ready">&#128065;</div>
-        <div class="indicator processing" title="AI Core Usage">&#9889;</div>
-        <div class="indicator storage" title="Encrypted Database">&#128190;</div>
+
+
+    <!-- ACCESSIBILITY: Hearing Impaired Subtitles -->
+    <button id="accessibility-btn" title="Subtitles for Hearing Impaired" aria-label="Toggle Subtitles">
+        <span class="icon-closed">🦻</span>
+        <span class="icon-open">✖</span>
+    </button>
+
+    <div id="subtitle-box">
+        <div class="subtitle-header">
+            <h4>🦻 SUBTITLES</h4>
+            <span class="subtitle-lang" id="subtitle-lang">EN</span>
+        </div>
+        <div id="subtitle-text"></div>
     </div>
 
     <!-- 3D HOLOGRAM CONTAINER -->
@@ -2340,6 +2490,98 @@
 
         // Expose to global for voice integration
         window.HologramSystem = HologramSystem;
+
+        // =====================================================================
+        // ACCESSIBILITY: Subtitle System for Hearing Impaired
+        // =====================================================================
+        const SubtitleSystem = {
+            isOpen: false,
+            currentLang: 'EN',
+
+            init: function () {
+                const btn = document.getElementById('accessibility-btn');
+                const box = document.getElementById('subtitle-box');
+
+                if (!btn || !box) return;
+
+                btn.addEventListener('click', () => this.toggle());
+
+                // Load saved preference
+                const saved = localStorage.getItem('subtitles_enabled');
+                if (saved === 'true') {
+                    this.open();
+                }
+
+                console.log('✅ Subtitle System initialized');
+            },
+
+            toggle: function () {
+                if (this.isOpen) {
+                    this.close();
+                } else {
+                    this.open();
+                }
+            },
+
+            open: function () {
+                this.isOpen = true;
+                document.getElementById('accessibility-btn')?.classList.add('active');
+                document.getElementById('subtitle-box')?.classList.add('active');
+                localStorage.setItem('subtitles_enabled', 'true');
+            },
+
+            close: function () {
+                this.isOpen = false;
+                document.getElementById('accessibility-btn')?.classList.remove('active');
+                document.getElementById('subtitle-box')?.classList.remove('active');
+                localStorage.setItem('subtitles_enabled', 'false');
+            },
+
+            // Main method to show subtitles - call this when AI speaks
+            showText: function (text, lang = 'EN') {
+                const subtitleText = document.getElementById('subtitle-text');
+                const subtitleLang = document.getElementById('subtitle-lang');
+
+                if (!subtitleText) return;
+
+                this.currentLang = lang.toUpperCase();
+                if (subtitleLang) {
+                    subtitleLang.textContent = this.currentLang;
+                }
+
+                // Animate text appearance
+                subtitleText.classList.add('speaking');
+                subtitleText.textContent = text;
+
+                // Auto-scroll to bottom
+                subtitleText.scrollTop = subtitleText.scrollHeight;
+            },
+
+            // Clear subtitles when speech ends
+            clear: function () {
+                const subtitleText = document.getElementById('subtitle-text');
+                if (subtitleText) {
+                    subtitleText.classList.remove('speaking');
+                }
+            },
+
+            // Append text (for streaming responses)
+            appendText: function (text) {
+                const subtitleText = document.getElementById('subtitle-text');
+                if (subtitleText) {
+                    subtitleText.textContent += text;
+                    subtitleText.scrollTop = subtitleText.scrollHeight;
+                }
+            }
+        };
+
+        // Initialize subtitle system
+        document.addEventListener('DOMContentLoaded', () => {
+            SubtitleSystem.init();
+        });
+
+        // Expose to global for integration
+        window.SubtitleSystem = SubtitleSystem;
 
     </script>
 
