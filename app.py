@@ -30,6 +30,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Import version from centralized file
 from version import VERSION, get_version_info
+import migrate_db
 
 # Configuration Loading (Cloud Native - Environment Variables)
 def get_env(key, default=""):
@@ -78,6 +79,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 CORS(app, origins=ALLOWED_ORIGINS)
 db = SQLAlchemy(app)
+
+# AUTO-MIGRATE DATABASE
+try:
+    print("🔄 Checking database schema...")
+    migrate_db.migrate()
+except Exception as e:
+    print(f"⚠️ Migration Error: {e}")
 
 limiter = Limiter(
     get_remote_address,
@@ -1578,6 +1586,19 @@ def status():
 def health():
     """Health check endpoint for Railway/Kubernetes"""
     return jsonify({"status": "ok", "version": "v143.0"}), 200
+
+# STATIC ASSETS ROUTES (Fix for deployments where files are not in /static)
+@app.route('/css/<path:path>')
+def send_css(path):
+    return send_from_directory(os.path.join(BASE_DIR, 'css'), path)
+
+@app.route('/js/<path:path>')
+def send_js(path):
+    return send_from_directory(os.path.join(BASE_DIR, 'js'), path)
+
+@app.route('/assets/<path:path>')
+def send_assets(path):
+    return send_from_directory(os.path.join(BASE_DIR, 'assets'), path)
 
 @app.route('/api/config')
 def get_config():

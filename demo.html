@@ -109,22 +109,17 @@
 </head>
 
 <body>
-
     <div id="hologram-container">
         <div class="scanline"></div>
         <div id="speech-text"></div>
-        <div class="visualizer-container" id="visualizer">
-            <!-- Bars generated via JS -->
-        </div>
+        <div class="visualizer-container" id="visualizer"></div>
     </div>
-
     <div class="controls">
         <button onclick="triggerSpeech('ro')">Vorbește (Română)</button>
         <button onclick="triggerSpeech('en')">Speak (English)</button>
         <button onclick="window.HologramSystem.setEmotion('happy')">Happy</button>
         <button onclick="window.HologramSystem.setEmotion('thinking')">Thinking</button>
     </div>
-
     <script>
         const HologramSystem = {
             scene: null, camera: null, renderer: null, model: null, mixer: null,
@@ -134,27 +129,19 @@
             init() {
                 const container = document.getElementById('hologram-container');
                 this.scene = new THREE.Scene();
-                this.camera = new THREE.PerspectiveCamera(45, 800/600, 0.1, 1000);
+                this.camera = new THREE.PerspectiveCamera(45, 800 / 600, 0.1, 1000);
                 this.camera.position.set(0, 0, 3);
-
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
                 this.renderer.setSize(800, 600);
                 this.renderer.setPixelRatio(window.devicePixelRatio);
                 container.appendChild(this.renderer.domElement);
-
                 this.scene.add(new THREE.AmbientLight(0x00f3ff, 0.6));
                 const dLight = new THREE.DirectionalLight(0x00f3ff, 1);
                 dLight.position.set(0, 1, 2);
                 this.scene.add(dLight);
-
-                // Initialize Energy Sphere from 3d-systems.js
-                if (window.EnergySphere) {
-                    window.EnergySphere.init(this.scene);
-                }
-
+                if (window.EnergySphere) window.EnergySphere.init(this.scene);
                 this.loadModel();
                 this.animate();
-
                 document.addEventListener('mousemove', (e) => {
                     this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
                     this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -163,115 +150,102 @@
 
             loadModel() {
                 const loader = new THREE.GLTFLoader();
-                loader.load('assets/kelion_holo/uploads_files_4723651_HologramMaleHead3DModelAnimatedWithFacialExpressions.glb', (gltf) => {
+                loader.load('assets/hologram.glb', (gltf) => {
                     this.model = gltf.scene;
                     this.model.traverse(child => {
                         if (child.isMesh) {
                             child.material = new THREE.MeshPhongMaterial({
-                                color: 0x00f3ff,
-                                emissive: 0x003344,
-                                transparent: true,
-                                opacity: 0.8,
-                                side: THREE.DoubleSide
+                                color: 0x00f3ff, emissive: 0x003344, transparent: true, opacity: 0.8, side: THREE.DoubleSide
                             });
                             if (child.morphTargetInfluences) {
-                                this.morphTargets[child.name] = chil           }
+                                this.morphTargets[child.name] = child;
+                            }
                         }
                     });
                     this.model.position.y = -0.5;
                     this.model.scale.set(1.8, 1.8, 1.8);
                     this.scene.add(this.model);
-                });
+                    console.log("Model Loaded");
+                }, undefined, (err) => console.error("Model Error:", err));
             },
 
             animate() {
                 requestAnimationFrame(() => this.animate());
-                const delta = this.clock.getDelta();
-                const time = Date.now();
-
                 if (this.model) {
                     this.targetLookX += (this.mouseX * 0.2 - this.targetLookX) * 0.05;
                     this.targetLookY += (this.mouseY * 0.15 - this.targetLookY) * 0.05;
                     this.model.rotation.y = this.targetLookX;
                     this.model.rotation.x = -this.targetLookY;
                 }
-
-                if (window.EnergySphere) {
-                    window.EnergySphere.update();
-                }
-
-                if (this.isSpeaking) {
-                    this.simulateLipSync();
-                }
-
+                if (window.EnergySphere) window.EnergySphere.update();
+                if (this.isSpeaking) this.simulateLipSync();
                 this.renderer.render(this.scene, this.camera);
             },
 
             simulateLipSync() {
-                // Using LipSyncSystem if available
                 if (window.LipSyncSystem && window.LipSyncSystem.analyser) {
                     const viseme = window.LipSyncSystem.getViseme();
                     Object.values(this.morphTargets).forEach(mesh => {
-        const idx = mesh.morphTargetDictionary['jawOpen'] || mesh.morphTargetDictionary['mouthOpen'] || 0;
+                        const idx = mesh.morphTargetDictionary['jawOpen'] || mesh.morphTargetDictionary['mouthOpen'] || 0;
                         let val = 0;
                         if (viseme === 'aa' || viseme === 'oo') val = 0.8;
-                                    me === 'ee' || viseme === 'ch') val = 0.4;
-                        else if (viseme === 'mm') val =                             mesh.morphTargetInfluen                                   });
+                        else if (viseme === 'ee' || viseme === 'ch') val = 0.4;
+                        else if (viseme === 'mm') val = 0;
+                        if (mesh.morphTargetInfluences) mesh.morphTargetInfluences[idx] = THREE.MathUtils.lerp(mesh.morphTargetInfluences[idx], val, 0.2);
+                    });
                 } else {
-                    // Fallb                              Object.values(this.morphTargets).forEach(mesh => {
-                        const idx = mesh                    y['jawOpen'] ||                    ionary['mouthOpen'] || 0;
-                        mesh.morphTargetInfluences[idx] = Math.abs(Math.sin(Date                                          });
+                    Object.values(this.morphTargets).forEach(mesh => {
+                        const idx = mesh.morphTargetDictionary['jawOpen'] || mesh.morphTargetDictionary['mouthOpen'] || 0;
+                        if (mesh.morphTargetInfluences) mesh.morphTargetInfluences[idx] = Math.abs(Math.sin(Date.now() * 0.01)) * 0.3;
+                    });
                 }
             },
 
             setEmotion(emotion) {
-                                     {
+                const emotionMorphs = {
                     happy: ['smile', 'mouthSmile'],
                     thinking: ['eyeSquintLeft', 'browUpRight'],
                     neutral: []
                 };
                 const targets = emotionMorphs[emotion] || [];
                 Object.values(this.morphTargets).forEach(mesh => {
-                    mesh.morphTargetInfluences.fill(0);
-                    targets.forEach(name => {
-                        const idx = mesh.morphTargetDictionary[name];
-                        if (idx !== undefined) mesh.morphTargetInfluences[idx] = 0.8;
-                    });
-    });
+                    if (mesh.morphTargetInfluences) {
+                        mesh.morphTargetInfluences.fill(0);
+                        targets.forEach(name => {
+                            const idx = mesh.morphTargetDictionary[name];
+                            if (idx !== undefined) mesh.morphTargetInfluences[idx] = 0.8;
+                        });
+                    }
+                });
             }
         };
 
         window.HologramSystem = HologramSystem;
 
         async function triggerSpeech(lang) {
-            const text = lang === 'ro' 
-                ? "Sistemul KELION v143.0 este acum complet activat. Toate funcțiile 3D, in clusiv Sfera de Energie și Sincron izarea Buzelor, sunt operaționale. Puterea și calmul absolut sunt elementele mele definitorii. Cum pot continu                : "The KELION v143.0 system is now fully activated. All 3D functions, including the Energy Sphere and Lip Sync, are operational. Absolute power and calm are my defining elements. How can I continue to assist you?";
-            
+            const text = lang === 'ro'
+                ? "Sistemul KELION v143.0 este complet activat. Toate funcțiile sunt operaționale."
+                : "The KELION v143.0 system is fully activated. All functions are operational.";
+
             const speechEl = document.getElementById('speech-text');
             speechEl.textContent = text;
             speechEl.style.opacity = '1';
 
             try {
-                // Initializing LipSyncSystem
-                if (window.LipSyncSystem) {
-                    window.LipSyncSystem.init();
-                }
+                if (window.LipSyncSystem) window.LipSyncSystem.init();
 
                 const response = await fetch('/api/tts', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({text: text, gender: 'male', username: 'demo'})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, gender: 'male', username: 'demo' })
                 });
-                
-                if (!response.ok) throw new Error("TTS failed");
-                      const blob = await response.blob();
+
+                if (!response.ok) throw new Error("TTS / Network failed");
+                const blob = await response.blob();
                 const url = URL.createObjectURL(blob);
                 const audio = new Audio(url);
-                
-                if (window.LipSyncSystem) {
-                    window.LipSyncSystem.connectAudio(audio);
-                }
 
+                if (window.LipSyncSystem) window.LipSyncSystem.connectAudio(audio);
                 HologramSystem.isSpeaking = true;
                 if (window.EnergySphere) window.EnergySphere.intensify();
 
@@ -280,22 +254,18 @@
                     speechEl.style.opacity = '0';
                     if (window.EnergySphere) window.EnergySphere.calm();
                 };
+                audio.play();
 
-                audio.play().catch(e => console.error("Audio play error:", e));
-
-                // Visualizer bars
                 const viz = document.getElementById('visualizer');
                 viz.innerHTML = '';
-                for(let i=0; i<20; i++) {
+                for (let i = 0; i < 20; i++) {
                     const bar = document.createElement('div');
                     bar.className = 'v-bar';
                     viz.appendChild(bar);
                 }
-
                 function updateViz() {
                     if (!HologramSystem.isSpeaking) return;
-                    const bars = document.querySelectorAll('.v-bar');
-                    bars.forEach(bar => {
+                    document.querySelectorAll('.v-bar').forEach(bar => {
                         bar.style.height = (5 + Math.random() * 35) + 'px';
                     });
                     requestAnimationFrame(updateViz);
@@ -305,9 +275,9 @@
             } catch (err) {
                 console.error(err);
                 alert("Speech error: " + err.message);
+                HologramSystem.isSpeaking = false;
             }
         }
-
         document.addEventListener('DOMContentLoaded', () => HologramSystem.init());
     </script>
 </body>
