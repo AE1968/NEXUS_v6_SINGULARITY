@@ -1571,7 +1571,8 @@ def serve_static(filename):
 
 @app.route('/status')
 def status():
-    return jsonify({"status": "online", "system": "KELION v143.0", "engine": "Flask/Python"})
+    """Simple plain-text status for Railway healthcheck"""
+    return "OK", 200
 
 @app.route('/health')
 def health():
