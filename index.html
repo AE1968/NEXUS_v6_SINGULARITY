@@ -22,6 +22,9 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
+    <!-- KELION 3D Systems: Globe, Energy Sphere, Lip Sync -->
+    <script src="js/3d-systems.js" defer></script>
+
     <style>
         :root {
             --cyan: #00f3ff;
@@ -79,6 +82,75 @@
             background: rgba(0, 0, 0, 0.05) !important;
             color: #1a1a2e !important;
             border-color: var(--border) !important;
+        }
+
+        /* High Contrast Mode for Visual Impairments */
+        body.high-contrast {
+            --cyan: #00ffff;
+            --pink: #ff00ff;
+            --bg: #000000;
+            --panel: #000000;
+            --border: #ffffff;
+            --text: #ffffff;
+        }
+
+        body.high-contrast {
+            background: #000000 !important;
+            color: #ffffff !important;
+        }
+
+        body.high-contrast * {
+            border-color: #ffffff !important;
+        }
+
+        body.high-contrast .message {
+            background: #000000 !important;
+            color: #ffffff !important;
+            border: 2px solid #ffffff !important;
+        }
+
+        body.high-contrast button,
+        body.high-contrast input,
+        body.high-contrast select {
+            background: #000000 !important;
+            color: #ffffff !important;
+            border: 2px solid #ffffff !important;
+        }
+
+        body.high-contrast a {
+            color: #ffff00 !important;
+            text-decoration: underline !important;
+        }
+
+        /* Keyboard Navigation Focus Styles */
+        *:focus {
+            outline: 3px solid var(--cyan) !important;
+            outline-offset: 2px;
+        }
+
+        button:focus,
+        input:focus,
+        select:focus,
+        textarea:focus,
+        a:focus {
+            box-shadow: 0 0 0 3px rgba(0, 243, 255, 0.5) !important;
+        }
+
+        /* Skip to main content link for screen readers */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--cyan);
+            color: #000;
+            padding: 8px 16px;
+            z-index: 100000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .skip-link:focus {
+            top: 0;
         }
 
         * {
@@ -1230,8 +1302,17 @@
         </div>
     </div>
 
-    <canvas id="bg-canvas"></canvas>
-    <div id="bg-image"></div>
+    <!-- ♿ ACCESSIBILITY: Skip to main content -->
+    <a href="#chat-input" class="skip-link" aria-label="Skip to main content">Skip to Chat</a>
+
+    <!-- ♿ ACCESSIBILITY: High Contrast Toggle -->
+    <button id="contrast-toggle" title="Toggle High Contrast Mode" aria-label="Toggle High Contrast Mode"
+        style="position:fixed; bottom:60px; right:20px; z-index:9999; background:rgba(0,0,0,0.8); border:1px solid var(--cyan); color:var(--cyan); padding:8px 12px; border-radius:5px; cursor:pointer; font-size:12px;">
+        ♿ HC
+    </button>
+
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+    <div id="bg-image" aria-hidden="true"></div>
     <div class="scan-line"></div>
 
     <div class="corner-h c-tl"></div>
@@ -1270,10 +1351,11 @@
                 <span id="system-date">DD-MM-YYYY</span>
             </div>
         </div>
-        <div class="header-actions">
-            <button id="export-btn" title="Download Conversation History">EXPORT</button>
-            <button id="traffic-btn">TRAFFIC</button>
-            <button id="login-btn">LOGIN</button>
+        <div class="header-actions" role="navigation" aria-label="Main actions">
+            <button id="export-btn" title="Download Conversation History"
+                aria-label="Export conversation to file">EXPORT</button>
+            <button id="traffic-btn" aria-label="View network traffic and admin panel">TRAFFIC</button>
+            <button id="login-btn" aria-label="Login or logout from the system">LOGIN</button>
         </div>
     </div>
 
@@ -2437,6 +2519,23 @@
                         a.download = `kelion_conversation_${Date.now()}.txt`;
                         a.click();
                         URL.revokeObjectURL(url);
+                    };
+                }
+
+                // ♿ HIGH CONTRAST TOGGLE
+                const contrastBtn = document.getElementById('contrast-toggle');
+                if (contrastBtn) {
+                    // Check saved preference
+                    if (localStorage.getItem('kelion_contrast') === 'high') {
+                        document.body.classList.add('high-contrast');
+                        contrastBtn.textContent = '♿ Normal';
+                    }
+
+                    contrastBtn.onclick = () => {
+                        document.body.classList.toggle('high-contrast');
+                        const isHigh = document.body.classList.contains('high-contrast');
+                        contrastBtn.textContent = isHigh ? '♿ Normal' : '♿ HC';
+                        localStorage.setItem('kelion_contrast', isHigh ? 'high' : 'normal');
                     };
                 }
 

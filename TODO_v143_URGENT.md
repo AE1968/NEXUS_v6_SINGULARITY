@@ -23,10 +23,10 @@ Următoarele funcționalități sunt în curs de implementare sau necesită aten
 - [x] **Registration Flow**: Accesarea formatului de "User Nou" se face doar prin link-ul dedicat din ecranul de login, păstrând fluxul principal curat.
 
 ### 4. Visuals & AI (Source: 'Hologram Visuals', 'Lip Sync')
-- [ ] **Hologram**: "Force & Calm" visual style (Male Head).
-- [ ] **Animation**: Lip Sync implementation (Frame Swapping/Visemes).
-- [ ] **3D Globe**: Interactive IP Map.
-- [ ] **Energy Sphere**: Visual asset generation & integration (from NEXT_STEPS.md).
+- [ ] **Hologram**: "Force & Calm" visual style (Male Head) - Requires 3D asset.
+- [x] **Animation**: Lip Sync implementation (Frame Swapping/Visemes) - Module created in `js/3d-systems.js`.
+- [x] **3D Globe**: Interactive IP Map - Module created in `js/3d-systems.js`.
+- [x] **Energy Sphere**: Visual asset generation & integration - Module created in `js/3d-systems.js`.
 
 ### ⚠️ UNRESOLVED ERRORS & AUDIT FINDINGS (Known Issues)
 - **SMTP Configuration**: Email sending (auto-responses, admin notifications) FAIL on live environment due to missing/incorrect SMTP credentials or DNS propagation.
@@ -46,9 +46,9 @@ Următoarele funcționalități sunt în curs de implementare sau necesită aten
 
 ## ♿ ACCESIBILITATE (Accessibility)
 - [x] **Subtitle System (Hearing Impaired)**: Sistem de subtitrări pentru persoanele cu deficiențe de auz - deja implementat în HTML (id="subtitle-box").
-- [ ] **Screen Reader Support**: Compatibilitate ARIA pentru screen readers.
-- [ ] **Keyboard Navigation**: Navigare completă prin tastatură pentru utilizatori fără mouse.
-- [ ] **High Contrast Mode**: Mod de contrast ridicat pentru utilizatori cu deficiențe de vedere.
+- [x] **Screen Reader Support**: Compatibilitate ARIA pentru screen readers - ARIA labels adăugate.
+- [x] **Keyboard Navigation**: Navigare completă prin tastatură - Focus styles și skip link adăugate.
+- [x] **High Contrast Mode**: Mod de contrast ridicat - Buton ♿HC adăugat cu toggle.
 
 ## 🟢 FEATURE EXTENSIONS
 - [ ] **3D Globe Hologram**: Implementarea globului pământesc 3D interactiv (Creation Globe) în locul sau alături de capul holografic.
@@ -58,4 +58,4 @@ Următoarele funcționalități sunt în curs de implementare sau necesită aten
 
 
 ---
-*Ultima actualizare: 31 Dec 2025, 09:45*
+*Ultima actualizare: 31 Dec 2025, 09:55*
