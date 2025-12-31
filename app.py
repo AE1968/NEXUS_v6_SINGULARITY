@@ -281,12 +281,12 @@ class VisitorLog(db.Model):
     country = db.Column(db.String(100))
     city = db.Column(db.String(100))
     
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+        user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     username = db.Column(db.String(80), nullable=True)
 
 
 class ExpiryNotification(db.Model):
-    """Tracking notificÄƒri expirare"""
+    """Tracking notificări expirare"""
     __tablename__ = 'expiry_notifications'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -294,6 +294,100 @@ class ExpiryNotification(db.Model):
     notification_type = db.Column(db.String(20))  # 2_days_before, expired, reactivation
     sent_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     email_sent = db.Column(db.Boolean, default=False)
+
+
+# ==============================================================================
+# v143+ UNLIMITED MEMORY SYSTEM
+# ==============================================================================
+
+class UserMemory(db.Model):
+    """Memorie permanentă pentru fiecare utilizator - învățare nelimitată"""
+    __tablename__ = 'user_memories'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False, index=True)
+    
+    # Tip de memorie: fact, preference, personality, context, important_date
+    memory_type = db.Column(db.String(30), default='fact')
+    
+    # Cheia memoriei (ex: "nume_real", "culoare_favorita", "zi_nastere")
+    memory_key = db.Column(db.String(100), nullable=False)
+    
+    # Valoarea memoriei
+    memory_value = db.Column(db.Text, nullable=False)
+    
+    # Importanță (1-10) - pentru prioritizare în context
+    importance = db.Column(db.Integer, default=5)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    last_used_at = db.Column(db.DateTime)
+    
+    # Câte ori a fost folosită această memorie
+    usage_count = db.Column(db.Integer, default=0)
+
+
+class ConversationSummary(db.Model):
+    """Rezumate ale conversațiilor pentru context eficient"""
+    __tablename__ = 'conversation_summaries'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False, index=True)
+    
+    # Data conversației
+    conversation_date = db.Column(db.Date, nullable=False)
+    
+    # Rezumat generat de AI
+    summary = db.Column(db.Text)
+    
+    # Subiecte principale discutate
+    topics = db.Column(db.Text)  # JSON array
+    
+    # Emoția dominantă
+    dominant_emotion = db.Column(db.String(20))
+    
+    # Număr de mesaje în acea zi
+    message_count = db.Column(db.Integer, default=0)
+    
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+
+# Helper functions for memory system
+def get_user_memories(username, limit=20):
+    """Obține memoriile cele mai importante pentru un utilizator"""
+    return UserMemory.query.filter_by(username=username)\
+        .order_by(UserMemory.importance.desc(), UserMemory.usage_count.desc())\
+        .limit(limit).all()
+
+def add_user_memory(username, key, value, memory_type='fact', importance=5):
+    """Adaugă sau actualizează o memorie"""
+    existing = UserMemory.query.filter_by(username=username, memory_key=key).first()
+    if existing:
+        existing.memory_value = value
+        existing.importance = importance
+        existing.updated_at = datetime.datetime.utcnow()
+    else:
+        memory = UserMemory(
+            username=username,
+            memory_key=key,
+            memory_value=value,
+            memory_type=memory_type,
+            importance=importance
+        )
+        db.session.add(memory)
+    db.session.commit()
+
+def build_memory_context(username):
+    """Construiește context din memorii pentru AI"""
+    memories = get_user_memories(username)
+    if not memories:
+        return ""
+    
+    context = "\\n[MEMORIE PERMANENTĂ DESPRE UTILIZATOR]:\\n"
+    for mem in memories:
+        context += f"- {mem.memory_key}: {mem.memory_value}\\n"
+    return context
 
 
 # ==============================================================================

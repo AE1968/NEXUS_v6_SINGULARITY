@@ -2334,9 +2334,22 @@
             clock: new THREE.Clock(),
             isSpeaking: false,
 
+            // Mouse tracking for eye following
+            mouseX: 0,
+            mouseY: 0,
+            targetLookX: 0,
+            targetLookY: 0,
+
             init: function () {
                 const container = document.getElementById('hologram-container');
                 if (!container) return;
+
+                // Setup mouse tracking
+                document.addEventListener('mousemove', (e) => {
+                    // Normalize mouse position to -1 to 1
+                    this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                    this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+                });
 
                 // Scene setup with transparent background
                 this.scene = new THREE.Scene();
@@ -2463,9 +2476,14 @@
                     // Gentle floating/breathing animation
                     this.model.position.y = -0.3 + Math.sin(time * 0.001) * 0.015;
 
-                    // Subtle head movement (like listening)
-                    this.model.rotation.y = Math.sin(time * 0.0003) * 0.08;
-                    this.model.rotation.x = Math.sin(time * 0.0005) * 0.02;
+                    // ===== EYE/HEAD TRACKING - Follow cursor =====
+                    // Smooth interpolation towards mouse position
+                    this.targetLookX += (this.mouseX * 0.15 - this.targetLookX) * 0.05;
+                    this.targetLookY += (this.mouseY * 0.1 - this.targetLookY) * 0.05;
+
+                    // Apply to head rotation (combine with subtle idle movement)
+                    this.model.rotation.y = this.targetLookX + Math.sin(time * 0.0003) * 0.03;
+                    this.model.rotation.x = -this.targetLookY + Math.sin(time * 0.0005) * 0.02;
 
                     // Natural blinking (every 3-5 seconds)
                     this.handleBlinking(time);
