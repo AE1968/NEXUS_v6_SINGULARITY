@@ -1623,6 +1623,22 @@
 
                 const data = await response.json();
 
+                // ===== CHECK IF USER IS BLOCKED =====
+                if (data.blocked) {
+                    thinking.remove();
+                    const blockedMsg = data.message || "Your access has expired. Please subscribe to continue.";
+                    write('bot', `⚠️ ${blockedMsg}`);
+                    speak(blockedMsg);
+
+                    // Show subscription modal after 2 seconds
+                    setTimeout(() => {
+                        if (data.redirect) {
+                            window.location.href = data.redirect;
+                        }
+                    }, 3000);
+                    return;
+                }
+
                 if (data.success) {
                     const reply = data.response;
                     thinking.remove();

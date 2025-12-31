@@ -715,6 +715,139 @@ COUNTRY_PHONE_CODES = {
 }
 
 # ==============================================================================
+# v143 AI EMAIL SYSTEM - Auto-categorization & Protocol Responses
+# contact@kelionai.app
+# ==============================================================================
+
+EMAIL_CATEGORIES = {
+    'support': {
+        'keywords': ['help', 'problem', 'issue', 'error', 'bug', 'not working', 'broken', 'ajutor', 'problema'],
+        'priority': 'high',
+        'auto_response': """Dear {name},
+
+Thank you for contacting KELION AI Support.
+
+We have received your message regarding: "{subject}"
+
+Our technical team has been notified and will respond within 24 hours.
+
+Ticket Reference: #{ticket_id}
+
+Best regards,
+KELION AI Support Team
+contact@kelionai.app"""
+    },
+    'sales': {
+        'keywords': ['price', 'pricing', 'buy', 'purchase', 'subscription', 'plan', 'pret', 'cumpara', 'abonament'],
+        'priority': 'high',
+        'auto_response': """Dear {name},
+
+Thank you for your interest in KELION AI!
+
+We offer the following subscription plans:
+- 1 Month: 10 EUR/month
+- 6 Months: 42 EUR (7 EUR/month - Save 30%)
+- 12 Months: 60 EUR (5 EUR/month - Save 50%)
+
+Visit https://kelionai.app/subscription to get started!
+
+Best regards,
+KELION AI Sales Team"""
+    },
+    'partnership': {
+        'keywords': ['partner', 'partnership', 'collaborate', 'business', 'b2b', 'enterprise', 'parteneriat'],
+        'priority': 'medium',
+        'auto_response': """Dear {name},
+
+Thank you for your partnership inquiry!
+
+Our business development team will review your proposal and contact you within 48 hours.
+
+Reference: #{ticket_id}
+
+Best regards,
+KELION AI Business Development"""
+    },
+    'feedback': {
+        'keywords': ['feedback', 'suggestion', 'idea', 'feature', 'improve', 'sugestie', 'idee'],
+        'priority': 'low',
+        'auto_response': """Dear {name},
+
+Thank you for your valuable feedback!
+
+We appreciate you taking the time to help us improve KELION AI.
+
+Best regards,
+KELION AI Team"""
+    },
+    'general': {
+        'keywords': [],
+        'priority': 'normal',
+        'auto_response': """Dear {name},
+
+Thank you for contacting KELION AI.
+
+We have received your message and will respond as soon as possible.
+
+Reference: #{ticket_id}
+
+Best regards,
+KELION AI Team
+contact@kelionai.app"""
+    }
+}
+
+
+def categorize_email(subject, message):
+    """AI-powered email categorization"""
+    combined_text = f"{subject} {message}".lower()
+    
+    for category, config in EMAIL_CATEGORIES.items():
+        if category == 'general':
+            continue
+        for keyword in config['keywords']:
+            if keyword in combined_text:
+                return category, config['priority']
+    
+    return 'general', 'normal'
+
+
+def generate_ticket_id():
+    """Generate unique ticket ID"""
+    return f"KEL{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}{random.randint(100,999)}"
+
+
+def get_auto_response(category, name, subject):
+    """Get protocol auto-response for category"""
+    ticket_id = generate_ticket_id()
+    template = EMAIL_CATEGORIES.get(category, EMAIL_CATEGORIES['general'])['auto_response']
+    
+    return template.format(
+        name=name or 'Valued Customer',
+        subject=subject or 'Your inquiry',
+        ticket_id=ticket_id
+    ), ticket_id
+
+
+def process_contact_email(email, name, topic, message):
+    """
+    Process incoming contact form email:
+    1. Categorize
+    2. Save to DB with category
+    3. Return auto-response for sending
+    """
+    category, priority = categorize_email(topic, message)
+    auto_response, ticket_id = get_auto_response(category, name, topic)
+    
+    return {
+        'category': category,
+        'priority': priority,
+        'ticket_id': ticket_id,
+        'auto_response': auto_response
+    }
+
+
+# ==============================================================================
 # PAYPAL UTILS
 # ==============================================================================
 # ... (rest of utils same)
@@ -834,6 +967,12 @@ def chat():
          db.session.commit()
     except Exception as e:
         print(f"Error saving history: {e}")
+    
+    # ===== UPDATE USAGE TIME (estimate 30 seconds per interaction) =====
+    if username and username not in ['User', 'Guest', '']:
+        update_user_usage(username, 30)
+    else:
+        update_guest_usage(ip_address, 30)
     
     return jsonify({
         "success": True,
