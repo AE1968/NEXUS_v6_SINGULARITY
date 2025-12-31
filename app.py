@@ -70,7 +70,10 @@ ALLOWED_ORIGINS = get_env("ALLOWED_ORIGINS", "*").split(",")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 FRONTEND_DIR = os.path.join(ROOT_DIR, 'frontend')
-DB_PATH = os.path.join(BASE_DIR, DB_NAME)
+if os.name == 'nt':
+    DB_PATH = os.path.join(BASE_DIR, DB_NAME)
+else:
+    DB_PATH = os.path.join('/tmp', DB_NAME)
 
 app = Flask(__name__, static_folder=BASE_DIR)
 app.config['SECRET_KEY'] = SECRET_KEY
