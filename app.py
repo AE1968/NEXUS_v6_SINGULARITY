@@ -6,7 +6,7 @@ import random
 import datetime
 import jwt
 from functools import wraps
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -182,10 +182,50 @@ class ChatHistory(db.Model):
 
 
 class DemoTracking(db.Model):
+    """Track usage for unregistered users by IP"""
     id = db.Column(db.Integer, primary_key=True)
-    ip_address = db.Column(db.String(50), nullable=False)
+    ip_address = db.Column(db.String(50), nullable=False, unique=True)
+    
+    # Daily usage tracking
     last_access = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    daily_seconds_used = db.Column(db.Integer, default=0)
+    last_daily_reset = db.Column(db.Date, default=datetime.date.today)
+    
+    # Monthly tracking
+    first_access = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     total_seconds_used = db.Column(db.Integer, default=0)
+    
+    # Block status
+    is_blocked = db.Column(db.Boolean, default=False)
+    blocked_reason = db.Column(db.String(100))
+
+    # Constants
+    DAILY_LIMIT_SECONDS = 20 * 60  # 20 minutes
+    TRIAL_DAYS = 30  # 1 month trial
+
+
+class TrialUser(db.Model):
+    """Track trial period for new registered users"""
+    __tablename__ = 'trial_users'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    username = db.Column(db.String(80), nullable=False)
+    
+    # Trial dates
+    trial_start = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    trial_end = db.Column(db.DateTime)
+    
+    # Daily usage
+    daily_seconds_used = db.Column(db.Integer, default=0)
+    last_daily_reset = db.Column(db.Date, default=datetime.date.today)
+    
+    # Status
+    is_trial_active = db.Column(db.Boolean, default=True)
+    
+    # Constants
+    DAILY_LIMIT_SECONDS = 20 * 60  # 20 minutes per day
+    TRIAL_DAYS = 30  # 1 month
 
 
 class OTP(db.Model):
@@ -475,7 +515,190 @@ def summarize_daily_conversation(username):
 
 
 # ==============================================================================
-# PLANURI ABONAMENT (Hardcoded)
+# v143 USAGE CONTROL & PAYMENT REDIRECT SYSTEM
+# ==============================================================================
+
+def check_guest_access(ip_address):
+    """
+    Check if unregistered guest can access (by IP).
+    Returns: (can_access: bool, message: str, redirect_url: str or None)
+    """
+    today = datetime.date.today()
+    
+    # Get or create tracking record
+    tracker = DemoTracking.query.filter_by(ip_address=ip_address).first()
+    
+    if not tracker:
+        # New guest - create tracking
+        tracker = DemoTracking(
+            ip_address=ip_address,
+            first_access=datetime.datetime.utcnow(),
+            last_access=datetime.datetime.utcnow(),
+            daily_seconds_used=0,
+            last_daily_reset=today
+        )
+        db.session.add(tracker)
+        db.session.commit()
+        return (True, "Welcome! You have 20 minutes daily for 30 days.", None)
+    
+    # Check if blocked
+    if tracker.is_blocked:
+        return (False, 
+                "Your trial period has expired. Please subscribe to continue using KELION AI.",
+                "/subscription")
+    
+    # Reset daily counter if new day
+    if tracker.last_daily_reset != today:
+        tracker.daily_seconds_used = 0
+        tracker.last_daily_reset = today
+        db.session.commit()
+    
+    # Check if trial period expired (30 days)
+    days_since_first = (datetime.datetime.utcnow() - tracker.first_access).days
+    if days_since_first > DemoTracking.TRIAL_DAYS:
+        tracker.is_blocked = True
+        tracker.blocked_reason = "Trial period expired"
+        db.session.commit()
+        return (False,
+                "Your 30-day trial has expired. Subscribe now to unlock unlimited access!",
+                "/subscription")
+    
+    # Check daily limit (20 minutes = 1200 seconds)
+    if tracker.daily_seconds_used >= DemoTracking.DAILY_LIMIT_SECONDS:
+        remaining_days = DemoTracking.TRIAL_DAYS - days_since_first
+        return (False,
+                f"Daily limit reached (20 min). Come back tomorrow! Trial: {remaining_days} days left.",
+                "/subscription")
+    
+    # Calculate remaining time
+    remaining_seconds = DemoTracking.DAILY_LIMIT_SECONDS - tracker.daily_seconds_used
+    remaining_minutes = remaining_seconds // 60
+    
+    return (True, f"Time remaining today: {remaining_minutes} minutes", None)
+
+
+def update_guest_usage(ip_address, seconds_used):
+    """Update usage time for guest"""
+    tracker = DemoTracking.query.filter_by(ip_address=ip_address).first()
+    if tracker:
+        tracker.daily_seconds_used += seconds_used
+        tracker.total_seconds_used += seconds_used
+        tracker.last_access = datetime.datetime.utcnow()
+        db.session.commit()
+
+
+def check_user_access(username):
+    """
+    Check if registered user can access.
+    Returns: (can_access: bool, message: str, redirect_url: str or None)
+    """
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return (False, "User not found", "/login")
+    
+    today = datetime.date.today()
+    
+    # Check if has active paid subscription
+    if user.subscription and user.subscription not in ['trial', 'free', 'demo']:
+        if user.subscription_end_date and user.subscription_end_date >= datetime.datetime.utcnow():
+            return (True, "Subscription active", None)
+        else:
+            # Subscription expired
+            return (False,
+                    "Your subscription has expired. Renew now to continue enjoying KELION AI!",
+                    "/subscription")
+    
+    # Check trial status
+    trial = TrialUser.query.filter_by(username=username).first()
+    
+    if not trial:
+        # Create trial for new user
+        trial_end = datetime.datetime.utcnow() + datetime.timedelta(days=TrialUser.TRIAL_DAYS)
+        trial = TrialUser(
+            user_id=user.id,
+            username=username,
+            trial_start=datetime.datetime.utcnow(),
+            trial_end=trial_end,
+            daily_seconds_used=0,
+            last_daily_reset=today
+        )
+        db.session.add(trial)
+        db.session.commit()
+        return (True, f"Welcome! Trial active until {trial_end.strftime('%d %B %Y')}", None)
+    
+    # Reset daily counter if new day
+    if trial.last_daily_reset != today:
+        trial.daily_seconds_used = 0
+        trial.last_daily_reset = today
+        db.session.commit()
+    
+    # Check if trial expired
+    if not trial.is_trial_active or datetime.datetime.utcnow() > trial.trial_end:
+        trial.is_trial_active = False
+        db.session.commit()
+        return (False,
+                "Your trial has ended. Subscribe now to unlock unlimited KELION AI!",
+                "/subscription")
+    
+    # Check daily limit
+    if trial.daily_seconds_used >= TrialUser.DAILY_LIMIT_SECONDS:
+        days_left = (trial.trial_end - datetime.datetime.utcnow()).days
+        return (False,
+                f"Daily limit reached (20 min). Come back tomorrow! Trial: {days_left} days left.",
+                "/subscription")
+    
+    remaining_seconds = TrialUser.DAILY_LIMIT_SECONDS - trial.daily_seconds_used
+    remaining_minutes = remaining_seconds // 60
+    days_left = (trial.trial_end - datetime.datetime.utcnow()).days
+    
+    return (True, f"Time today: {remaining_minutes} min | Trial: {days_left} days left", None)
+
+
+def update_user_usage(username, seconds_used):
+    """Update usage time for registered trial user"""
+    trial = TrialUser.query.filter_by(username=username).first()
+    if trial and trial.is_trial_active:
+        trial.daily_seconds_used += seconds_used
+        db.session.commit()
+
+
+def get_subscription_offers():
+    """Get available subscription packages"""
+    return {
+        "packages": [
+            {
+                "id": "1_month",
+                "name": "1 Month",
+                "price": 10.00,
+                "currency": "EUR",
+                "features": ["Unlimited daily usage", "Priority support", "All features"],
+                "popular": False
+            },
+            {
+                "id": "6_months",
+                "name": "6 Months",
+                "price": 42.00,
+                "currency": "EUR",
+                "per_month": 7.00,
+                "savings": "30%",
+                "features": ["Unlimited daily usage", "Priority support", "All features", "Save 30%"],
+                "popular": True
+            },
+            {
+                "id": "12_months",
+                "name": "12 Months",
+                "price": 60.00,
+                "currency": "EUR",
+                "per_month": 5.00,
+                "savings": "50%",
+                "features": ["Unlimited daily usage", "Priority support", "All features", "Save 50%", "Free updates"],
+                "popular": False
+            }
+        ],
+        "message": "Choose a plan to unlock unlimited KELION AI access!"
+    }
+
+
 # ==============================================================================
 SUBSCRIPTION_PLANS = {
     '1_month': {'name': '1 Month', 'days': 30, 'price': 10.00, 'per_month': 10.00},
@@ -535,6 +758,26 @@ def chat():
     username = data.get('username', 'User')
     gender = data.get('gender', 'male')
     conversation_id = data.get('conversation_id', username)
+    
+    # ===== ACCESS CONTROL CHECK =====
+    ip_address = request.remote_addr or request.headers.get('X-Forwarded-For', '0.0.0.0')
+    
+    # Check if registered user or guest
+    if username and username not in ['User', 'Guest', '']:
+        # Registered user - check subscription/trial
+        can_access, access_message, redirect_url = check_user_access(username)
+    else:
+        # Guest - check by IP
+        can_access, access_message, redirect_url = check_guest_access(ip_address)
+    
+    if not can_access:
+        return jsonify({
+            "success": False,
+            "blocked": True,
+            "message": access_message,
+            "redirect": redirect_url,
+            "offers": get_subscription_offers()
+        }), 403
     
     # Try ChatGPT first (Now with Persistent DB Memory)
     response_text = get_chatgpt_response(message, username, conversation_id, gender)
@@ -2477,37 +2720,72 @@ def check_ai_safety(message):
             return False, keyword
     return True, None
 
+
+# ==============================================================================
+# SECURITY: HTTPS REDIRECT (Production)
+# ==============================================================================
+@app.before_request
+def force_https():
+    """Redirect HTTP to HTTPS in production"""
+    if not request.is_secure and request.headers.get('X-Forwarded-Proto', 'http') != 'https':
+        if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('PRODUCTION'):
+            url = request.url.replace('http://', 'https://', 1)
+            return redirect(url, code=301)
+
+
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all() # Ensure all tables exist (including new ChatHistory)
+        db.create_all()  # Ensure all tables exist
         
-        # Create default users if they don't exist
-        if not User.query.filter_by(username='admin').first():
+        # ===== SECURE ADMIN CREATION =====
+        # All admin credentials from env variables
+        ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+        ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@kelion.ai')
+        ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
+        
+        if not User.query.filter_by(username=ADMIN_USERNAME).first():
+            if not ADMIN_PASSWORD:
+                # Generate secure random password if not set
+                import secrets
+                ADMIN_PASSWORD = secrets.token_urlsafe(16)
+                print(f"⚠️  ADMIN PASSWORD NOT SET! Generated: {ADMIN_PASSWORD}")
+                print("⚠️  Set ADMIN_PASSWORD, ADMIN_USERNAME, ADMIN_EMAIL in Railway!")
+            
             admin = User(
-                username='admin', 
-                email='admin@kelion.ai', 
-                password_hash=generate_password_hash('Andrada_1968!'), 
+                username=ADMIN_USERNAME, 
+                email=ADMIN_EMAIL, 
+                password_hash=generate_password_hash(ADMIN_PASSWORD), 
                 role='admin', 
-                subscription='enterprise'
+                subscription='enterprise',
+                subscription_end_date=datetime.datetime.utcnow() + datetime.timedelta(days=3650)
             )
             db.session.add(admin)
-            
+        
+        # ===== DEMO USER FOR TESTING =====
         if not User.query.filter_by(username='demo').first():
             demo = User(
                 username='demo', 
                 email='demo@kelion.ai', 
-                password_hash=generate_password_hash('demo'), 
+                password_hash=generate_password_hash('demo2024'), 
                 role='demo', 
-                subscription='demo',
-                subscription_end_date=datetime.datetime.utcnow() + datetime.timedelta(days=365)
+                subscription='trial',
+                subscription_end_date=datetime.datetime.utcnow() + datetime.timedelta(days=30)
             )
             db.session.add(demo)
             
         db.session.commit()
-        print("âœ“ Database check complete.")
+        print("✓ Database initialized securely.")
     
     # Get port from environment variable (for deployment) or use 5000 for local
     port = int(os.environ.get('PORT', 5000))
-    print(f"ðŸš€ KELION READY: http://localhost:{port}")
-    app.run(port=port, debug=False, host='0.0.0.0')
-
+    
+    # Disable debug in production
+    is_production = os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('PRODUCTION')
+    debug_mode = not is_production
+    
+    if is_production:
+        print(f"🚀 KELION PRODUCTION: https://kelionai.app")
+    else:
+        print(f"🔧 KELION DEV: http://localhost:{port}")
+    
+    app.run(port=port, debug=debug_mode, host='0.0.0.0')
