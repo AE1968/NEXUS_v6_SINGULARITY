@@ -524,6 +524,34 @@ class ConversationSummary(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 
+# ==============================================================================
+# DATABASE INITIALIZATION (Runs on module load for gunicorn)
+# ==============================================================================
+def init_database():
+    """Initialize database tables and demo user - runs on each worker start"""
+    with app.app_context():
+        db.create_all()  # Create all tables defined by models
+        
+        # Create demo user if not exists
+        if not User.query.filter_by(username='demo').first():
+            demo = User(
+                username='demo', 
+                email='demo@kelion.ai', 
+                password_hash=generate_password_hash('demo2024'), 
+                role='demo', 
+                subscription='trial',
+                subscription_end_date=datetime.datetime.utcnow() + datetime.timedelta(days=30)
+            )
+            db.session.add(demo)
+            db.session.commit()
+            logger.info("Demo user created: demo/demo2024")
+        
+        logger.info("Database initialized successfully.")
+
+# Run initialization when module loads (for gunicorn)
+init_database()
+
+
 # Helper functions for memory system
 def get_user_memories(username, limit=20):
     """Obține memoriile cele mai importante pentru un utilizator"""
