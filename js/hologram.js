@@ -790,7 +790,7 @@ const EmotionDetector = {
 
             'amazing', 'incredible', 'unbelievable', 'seriously', 'wow', '\u1f62e', '\u1f92f', '!'],
 
-        thinking: ['hmm', 'interesant', 'las\u0103-m\u0103 s\u0103 g\u00e2ndesc', 'procesez', 'analizez', 'caut',
+        thinking: ['hmm', 'interesant', 'las\u0103-m\u0103 s\u0103 gndesc', 'procesez', 'analizez', 'caut',
 
             'thinking', 'processing', 'analyzing', 'searching', 'let me', 'consider', '\u1f914']
 

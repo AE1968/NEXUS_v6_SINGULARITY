@@ -1944,7 +1944,7 @@ document.getElementById('forgot-send-btn')?.addEventListener('click', async func
 
 
 
-    this.textContent = '\u00e2\u008f\u00b3 Sending...';
+    this.textContent = '\u23f3 Sending...';
 
     this.disabled = true;
 
@@ -2010,7 +2010,7 @@ document.getElementById('forgot-reset-btn')?.addEventListener('click', async fun
 
 
 
-    this.textContent = '\u00e2\u008f\u00b3 Resetting...';
+    this.textContent = '\u23f3 Resetting...';
 
     this.disabled = true;
 
@@ -2120,7 +2120,7 @@ document.getElementById('do-register')?.addEventListener('click', async function
 
 
 
-    this.textContent = '\u00e2\u008f\u00b3 Creating...';
+    this.textContent = '\u23f3 Creating...';
 
     this.disabled = true;
 
