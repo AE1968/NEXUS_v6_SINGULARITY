@@ -1445,6 +1445,17 @@
         async function speak(text) {
             if (!state.voice) return;
 
+            // ===== ACCESSIBILITY: Show subtitles =====
+            if (window.SubtitleSystem) {
+                const lang = state.lang || 'EN';
+                window.SubtitleSystem.showText(text, lang);
+            }
+
+            // ===== HOLOGRAM: Start lip sync =====
+            if (window.HologramSystem) {
+                window.HologramSystem.startSpeaking();
+            }
+
             // Stop previous audio if playing
             if (currentAudio) {
                 currentAudio.pause();
@@ -1520,6 +1531,15 @@
                     document.body.classList.remove('speaking');
                     if (visualizer) visualizer.classList.remove('active');
                     if (visualizerID) cancelAnimationFrame(visualizerID);
+
+                    // ===== Stop hologram lip sync =====
+                    if (window.HologramSystem) {
+                        window.HologramSystem.stopSpeaking();
+                    }
+                    // ===== Clear subtitle animation =====
+                    if (window.SubtitleSystem) {
+                        window.SubtitleSystem.clear();
+                    }
                 };
 
                 currentAudio.play();
@@ -1539,6 +1559,15 @@
                     document.body.classList.remove('speaking');
                     const visualizer = $('voice-visualizer');
                     if (visualizer) visualizer.classList.remove('active');
+
+                    // ===== Stop hologram lip sync =====
+                    if (window.HologramSystem) {
+                        window.HologramSystem.stopSpeaking();
+                    }
+                    // ===== Clear subtitle animation =====
+                    if (window.SubtitleSystem) {
+                        window.SubtitleSystem.clear();
+                    }
                 };
                 window.speechSynthesis.speak(utterance);
             }
