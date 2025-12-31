@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-python-3.11.9
-=======
-python-3.9.18
->>>>>>> d873775 (GENEZA NEXUS KELION v12 - Production Ready - Single Avatar Edition)
+python-3.11.4

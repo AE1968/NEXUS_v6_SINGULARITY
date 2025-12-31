@@ -1,4 +1,4 @@
-&#65279;<!doctype html>
+<!doctype html>
 
 <html lang="en">
 
@@ -29,9 +29,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
-
         href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700&display=swap"
-
         rel="stylesheet">
 
 
@@ -73,7 +71,6 @@
         </div>
 
         <div style="margin-top:20px; font-size: 0.6rem; color: rgba(0,243,255,0.4); font-family: monospace;"
-
             id="load-detail">
 
             > EXECUTING CORE_V142_PROTOCOLS...
@@ -93,7 +90,6 @@
     <!-- &#9855; ACCESSIBILITY: High Contrast Toggle -->
 
     <button id="contrast-toggle" title="Toggle High Contrast Mode" aria-label="Toggle High Contrast Mode"
-
         style="position:fixed; bottom:60px; right:20px; z-index:9999; background:rgba(0,0,0,0.8); border:1px solid var(--cyan); color:var(--cyan); padding:8px 12px; border-radius:5px; cursor:pointer; font-size:12px;">
 
         &#9855; HC
@@ -151,11 +147,9 @@
                 <span id="user-display">USER: <span id="user-name" class="stat-val">OFFLINE</span></span>
 
                 <span id="cloud-display">CLOUD: <span id="sys-status"
-
                         class="stat-val offline">DISCONNECTED</span></span>
 
                 <span id="usage-display" style="display:none;">TIME: <span id="usage-timer" class="stat-val"
-
                         style="color:#00ff00;">20:00</span></span>
 
             </div>
@@ -185,7 +179,6 @@
         <div class="header-actions" role="navigation" aria-label="Main actions">
 
             <button id="export-btn" title="Download Conversation History"
-
                 aria-label="Export conversation to file">EXPORT</button>
 
             <button id="traffic-btn" aria-label="View network traffic and admin panel">TRAFFIC</button>
@@ -275,7 +268,6 @@
         <div id="chat-messages">
 
             <div id="typing-indicator" class="typing-indicator"
-
                 style="display:none; margin: 10px; align-items: center; gap: 8px;">
 
                 <span style="color: var(--cyan); font-size: 0.85rem; font-weight: 600;">KELION is thinking...</span>
@@ -320,7 +312,8 @@
 
                     <label>Security Key</label>
 
-                    <input type="password" id="p-input" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" value="demo2024">
+                    <input type="password" id="p-input"
+                        placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" value="demo2024">
 
                 </div>
 
@@ -329,7 +322,6 @@
                 <p style="margin-top:15px;">
 
                     <a href="#" id="forgot-pass-link"
-
                         style="color: var(--cyan); text-decoration: none; font-size: 0.8rem;"><i class="fas fa-key"></i>
 
                         Forgot Password?</a>
@@ -341,9 +333,7 @@
                 <p style="margin-top:15px;">
 
                     <a href="#" id="register-link"
-
                         style="color: var(--pink); text-decoration: none; font-size: 0.85rem; font-weight: 600;"><i
-
                             class="fas fa-user-plus"></i> Create Account</a>
 
                 </p>
@@ -357,7 +347,6 @@
         <!-- FORGOT PASSWORD MODAL -->
 
         <div id="forgot-modal"
-
             style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px);">
 
             <div class="modal-box" style="max-width:450px;">
@@ -403,7 +392,6 @@
                         <label>6-Digit Code</label>
 
                         <input type="text" id="forgot-code" placeholder="123456" maxlength="6"
-
                             style="letter-spacing:5px; text-align:center; font-size:1.4rem;" required>
 
                     </div>
@@ -417,7 +405,6 @@
                     </div>
 
                     <button id="forgot-reset-btn" class="modal-btn" style="background:var(--pink);"><i
-
                             class="fas fa-unlock"></i> RESET PASSWORD</button>
 
                 </div>
@@ -427,7 +414,6 @@
                 <p style="margin-top:20px;">
 
                     <a href="#" id="forgot-back-link" style="color:#888; font-size:0.8rem;"><i
-
                             class="fas fa-arrow-left"></i> Back to Login</a>
 
                 </p>
@@ -441,7 +427,6 @@
         <!-- REGISTER MODAL -->
 
         <div id="register-modal"
-
             style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px); overflow-y:auto;">
 
             <div class="modal-box" style="max-width:550px; margin:30px auto;">
@@ -499,7 +484,6 @@
                         <label>Country *</label>
 
                         <select id="reg-country" required
-
                             style="width:100%; padding:15px; background:rgba(0,0,0,0.6); border:1px solid var(--border); border-radius:8px; color:#fff;">
 
                             <option value="UK">UK</option>
@@ -563,13 +547,11 @@
                 <!-- Voucher Code Field -->
 
                 <div class="input-grp"
-
                     style="background:rgba(0,255,0,0.05); padding:15px; border-radius:10px; border:1px dashed rgba(0,255,0,0.3);">
 
                     <label style="color:#00ff00;"><i class="fas fa-ticket-alt"></i> Voucher Code *</label>
 
                     <input type="text" id="reg-voucher" placeholder="KEL-XXXXXXXX" style="text-transform:uppercase;"
-
                         required>
 
                     <small style="color:#888; font-size:0.7rem;">Enter your promotional code for access.</small>
@@ -579,7 +561,6 @@
 
 
                 <button id="do-register" class="modal-btn"
-
                     style="background:linear-gradient(135deg, var(--pink), var(--cyan));"><i class="fas fa-rocket"></i>
 
                     CREATE ACCOUNT</button>
@@ -605,7 +586,6 @@
             <div class="ae-modal-content">
 
                 <div class="ae-close-btn"
-
                     onclick="document.getElementById('ae-contact-modal').classList.remove('active')">
 
                     &#215;
@@ -683,7 +663,6 @@
                             <label>Your Message *</label>
 
                             <textarea id="ae-message" placeholder="Describe your question, issue, or suggestion..."
-
                                 required></textarea>
 
                         </div>
@@ -709,15 +688,12 @@
         <!-- ADMIN TRAFFIC & CERINTE MODAL -->
 
         <div id="admin-modal"
-
             style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(15px);">
 
             <div class="modal-box"
-
                 style="width:900px; max-width:95vw; max-height:95vh; background:#050a10; border:2px solid #ff00ff; border-radius:20px; padding:20px; box-shadow:0 0 50px rgba(255,0,255,0.2); overflow-y:auto; display:flex; flex-direction:column; gap:15px;">
 
                 <div
-
                     style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,0,255,0.3); padding-bottom:10px; position:sticky; top:0; background:#050a10; z-index:10;">
 
                     <h2 style="font-family:'Orbitron'; color:#ff00ff; margin:0; letter-spacing:4px; font-size:1.2rem;">
@@ -725,7 +701,6 @@
                         NETWORK TRAFFIC & REQUIREMENTS</h2>
 
                     <button onclick="document.getElementById('admin-modal').style.display='none'"
-
                         style="background:none; border:1px solid #ff00ff; color:#ff00ff; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">&#215;</button>
 
                 </div>
@@ -737,17 +712,14 @@
                 <div style="display:grid; grid-template-columns: 1fr; gap:15px;">
 
                     <div
-
                         style="background:rgba(0,0,0,0.5); padding:20px; border-radius:15px; border:1px solid #ff00ff; position:relative;">
 
                         <h3
-
                             style="font-family:'Orbitron'; color:#ff00ff; margin-bottom:15px; border-bottom:1px solid rgba(255,0,255,0.3); padding-bottom:5px;">
 
                             &#128203; URGENT TODO LIST</h3>
 
                         <div
-
                             style="height:400px; overflow-y:auto; font-family:monospace; color:#0f0; line-height:1.6; font-size:0.9rem;">
 
                             [ ] DB MIGRATION: Fix 500 Errors in nexus.db<br>
@@ -783,7 +755,6 @@
                 <!-- Bottom: Console Logs -->
 
                 <div id="admin-logs"
-
                     style="height:80px; background:#000; border:1px solid rgba(255,0,255,0.3); border-radius:8px; padding:10px; font-family:monospace; font-size:0.75rem; overflow-y:auto; color:#0f0; box-shadow:inset 0 0 20px rgba(0,255,0,0.05);">
 
                     > SYSTEM_ROLLBACK: SUCCESSFUL<br>
@@ -848,7 +819,7 @@
 
         <script src="js/hologram.js?v=143.FINAL.2" defer></script>
 
-    <script src="js/main.js?v=143.FINAL.2" defer></script>
+        <script src="js/main.js?v=143.FINAL.2" defer></script>
 
 
 
