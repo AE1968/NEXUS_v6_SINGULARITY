@@ -384,10 +384,94 @@ def build_memory_context(username):
     if not memories:
         return ""
     
-    context = "\\n[MEMORIE PERMANENTĂ DESPRE UTILIZATOR]:\\n"
+    context = "\n[MEMORIE PERMANENTĂ DESPRE UTILIZATOR]:\n"
     for mem in memories:
-        context += f"- {mem.memory_key}: {mem.memory_value}\\n"
+        context += f"- {mem.memory_key}: {mem.memory_value}\n"
+    
+    # Check for special dates (birthdays, anniversaries)
+    special_date_reminder = check_special_dates(username)
+    if special_date_reminder:
+        context += f"\n[REMINDER ZI SPECIALĂ]: {special_date_reminder}\n"
+    
     return context
+
+
+def check_special_dates(username):
+    """Verifică dacă azi e o zi specială pentru utilizator"""
+    today = datetime.datetime.now()
+    today_str = today.strftime("%d %B").lower()
+    today_day_month = today.strftime("%d/%m")
+    
+    # Get memories about special dates
+    birthday_mem = UserMemory.query.filter_by(
+        username=username, 
+        memory_key='birthday'
+    ).first()
+    
+    if birthday_mem:
+        bday_value = birthday_mem.memory_value.lower()
+        if today_str in bday_value or today_day_month in bday_value:
+            return f"🎂 Azi e ziua de naștere a lui {username}! Urează-i La mulți ani!"
+    
+    # Check anniversary
+    anniversary_mem = UserMemory.query.filter_by(
+        username=username,
+        memory_key='anniversary'
+    ).first()
+    
+    if anniversary_mem:
+        ann_value = anniversary_mem.memory_value.lower()
+        if today_str in ann_value or today_day_month in ann_value:
+            return f"💍 Azi e aniversarea lui {username}! Felicită-l!"
+    
+    return None
+
+
+def summarize_daily_conversation(username):
+    """Generează un rezumat al conversațiilor de azi"""
+    today = datetime.datetime.now().date()
+    
+    # Get today's messages
+    todays_chats = ChatHistory.query.filter(
+        ChatHistory.username == username,
+        db.func.date(ChatHistory.timestamp) == today
+    ).all()
+    
+    if len(todays_chats) < 3:
+        return None  # Not enough messages to summarize
+    
+    # Check if summary already exists
+    existing = ConversationSummary.query.filter_by(
+        username=username,
+        conversation_date=today
+    ).first()
+    
+    if existing:
+        return existing.summary
+    
+    # Create summary of topics discussed
+    topics = []
+    for chat in todays_chats:
+        # Extract key topics (simple approach)
+        words = chat.user_message.lower().split()
+        for word in words:
+            if len(word) > 5 and word not in topics:
+                topics.append(word)
+    
+    summary_text = f"Discuție cu {len(todays_chats)} mesaje. Subiecte: {', '.join(topics[:5])}"
+    
+    # Save summary
+    new_summary = ConversationSummary(
+        username=username,
+        conversation_date=today,
+        summary=summary_text,
+        topics=json.dumps(topics[:10]),
+        message_count=len(todays_chats)
+    )
+    db.session.add(new_summary)
+    db.session.commit()
+    
+    return summary_text
 
 
 # ==============================================================================
