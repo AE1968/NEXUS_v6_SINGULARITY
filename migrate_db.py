@@ -2,11 +2,15 @@ import sqlite3
 import os
 
 DB_NAME = 'nexus.db'
-
+if os.name != 'nt':
+    DB_NAME = '/tmp/nexus.db'
+    
 def migrate():
+    # Ensure DB exists if not present (create empty)
     if not os.path.exists(DB_NAME):
-        print(f"Error: {DB_NAME} not found.")
-        return
+        print(f"Creating empty DB at {DB_NAME}...")
+        conn = sqlite3.connect(DB_NAME)
+        conn.close()
 
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
