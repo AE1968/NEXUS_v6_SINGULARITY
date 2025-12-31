@@ -321,7 +321,7 @@ class VisitorLog(db.Model):
     country = db.Column(db.String(100))
     city = db.Column(db.String(100))
     
-        user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     username = db.Column(db.String(80), nullable=True)
 
 
@@ -1260,19 +1260,8 @@ def get_config():
     return jsonify({"paypal_client_id": PAYPAL_CLIENT_ID, "api_url": request.host_url.rstrip('/')})
 
 # ==============================================================================
-# v143: AI SAFETY & LEGAL COMPLIANCE
+# v143: AI SAFETY - check_ai_safety defined at end of file with AI_SAFETY_KEYWORDS
 # ==============================================================================
-
-def check_ai_safety(text):
-    """Verifică conformitatea AI cu regulile legale (COPPA, GDPR, etc)"""
-    unsafe_keywords = [
-        'child porn', 'hacking', 'how to kill', 'illegal drugs', 
-        'stolen credit cards', 'bomb instructions', 'terrorist'
-    ]
-    for kw in unsafe_keywords:
-        if kw in (text or "").lower():
-            return False, "I cannot fulfill this request due to legal safety policy standards. [[ACTION:BLOCKED]]"
-    return True, None
 
 @app.route('/api/chat', methods=['POST'])
 @token_required
@@ -2131,7 +2120,10 @@ def contact():
     timestamp = data.get('timestamp', datetime.datetime.utcnow().isoformat())
     
     try:
-        # Save to database
+        # AI Email Processing - categorize and get auto-response
+        email_result = process_contact_email(email, name, topic, message)
+        
+        # Save to database with AI category
         new_contact = ContactMessage(
             email=email,
             name=name,
@@ -2140,7 +2132,7 @@ def contact():
             message=message,
             user_agent=user_agent,
             source=source,
-            status='new'
+            status=f"{email_result['category']}_{email_result['priority']}"
         )
         
         db.session.add(new_contact)
