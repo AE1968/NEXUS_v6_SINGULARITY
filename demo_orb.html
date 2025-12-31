@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KELION v143.0 - Hologram Orb System</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="js/3d-systems.js"></script>
+    <style>
+        :root {
+            --cyan: #00f3ff;
+            --pink: #ff00ff;
+            --bg: #000;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--cyan);
+        }
+
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .ui-overlay {
+            position: fixed;
+            top: 40px;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 12px;
+            font-size: 1.2rem;
+            text-shadow: 0 0 15px var(--cyan);
+            text-transform: uppercase;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 10px 20px;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        button:hover {
+            background: var(--cyan);
+            color: #000;
+        }
+
+        #status {
+            position: fixed;
+            top: 100px;
+            left: 40px;
+            font-family: monospace;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ui-overlay">
+        <div class="header-title">KELION // HOLOGRAPHIC ORB</div>
+    </div>
+
+    <div id="status">
+        > SYSTEM: ONLINE<br>
+        > CORE: v143.0<br>
+        > HOLOGRAPHIC_ORB: ACTIVE<br>
+        > TEXTURES: MaleHeadHolo_Color.png
+    </div>
+
+    <div id="viewport"></div>
+
+    <div class="controls">
+        <button onclick="changeEmotion('happy')">HAPPY</button>
+        <button onclick="changeEmotion('thinking')">THINKING</button>
+        <button onclick="speakRomanian()">VORBEȘTE (RO)</button>
+    </div>
+
+    <script>
+        const HologramOrb = {
+            scene: null, camera: null, renderer: null, head: null, orb: null,
+            mixer: null, clock: new THREE.Clock(),
+            mouseX: 0, mouseY: 0, targetX: 0, targetY: 0,
+
+            init() {
+                const container = document.getElementById('viewport');
+                this.scene = new THREE.Scene();
+
+                this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera.position.set(0, 0, 4);
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(this.renderer.domElement);
+
+                // Lighting
+                this.scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+                const spot = new THREE.SpotLight(0x00f3ff, 1);
+                spot.position.set(5, 5, 5);
+                this.scene.add(spot);
+
+                // 1. CREATE THE GLOBE (ORB)
+                const texLoader = new THREE.TextureLoader();
+                const orbTex = texLoader.load('assets/kelion_holo/force_field_bg.png');
+                const orbGeom = new THREE.SphereGeometry(2.5, 64, 64);
+                const orbMat = new THREE.MeshPhongMaterial({
+                    map: orbTex,
+                    color: 0x00f3ff,
+                    transparent: true,
+                    opacity: 0.2,
+                    side: THREE.DoubleSide,
+                    blending: THREE.AdditiveBlending
+                });
+                this.orb = new THREE.Mesh(orbGeom, orbMat);
+                this.scene.add(this.orb);
+
+                // Wireframe shell for depth
+                const shellGeom = new THREE.SphereGeometry(2.52, 32, 32);
+                const shellMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.05 });
+                this.scene.add(new THREE.Mesh(shellGeom, shellMat));
+
+                // 2. LOAD HOLOGRAM HEAD
+                this.loadHead();
+
+                window.addEventListener('resize', () => this.onResize());
+                document.addEventListener('mousemove', (e) => {
+                    this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                    this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+                });
+
+                this.animate();
+            },
+
+            loadHead() {
+                const loader = new THREE.GLTFLoader();
+                const path = 'assets/kelion_holo/uploads_files_4723651_HologramMaleHead3DModelAnimatedWithFacialExpressions.glb';
+                const texLoader = new THREE.TextureLoader();
+
+                // Trying to load producer textures
+                const headTex = texLoader.load('assets/kelion_holo/Textures/Textures/MaleHeadHolo_Color.png');
+
+                loader.load(path, (gltf) => {
+                    this.head = gltf.scene;
+                    this.head.traverse(child => {
+                        if (child.isMesh) {
+                            child.material = new THREE.MeshPhongMaterial({
+                                map: headTex,
+                                color: 0x00f3ff,
+                                emissive: 0x003344,
+                                transparent: true,
+                                opacity: 0.85,
+                                side: THREE.DoubleSide
+                            });
+                            // Morph targets
+                            if (child.morphTargetInfluences) {
+                                this.morphTargets = child.morphTargetDictionary;
+                                this.childMesh = child;
+                            }
+                        }
+                    });
+                    this.head.position.y = -0.5;
+                    this.head.scale.set(1.6, 1.6, 1.6);
+                    this.scene.add(this.head);
+
+                    if (gltf.animations.length > 0) {
+                        this.mixer = new THREE.AnimationMixer(this.head);
+                        const idle = gltf.animations.find(a => a.name.toLowerCase().includes('idle')) || gltf.animations[0];
+                        this.mixer.clipAction(idle).play();
+                    }
+                });
+            },
+
+            onResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            },
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                const delta = this.clock.getDelta();
+                const time = Date.now();
+
+                if (this.mixer) this.mixer.update(delta);
+
+                if (this.head) {
+                    this.targetX += (this.mouseX * 0.15 - this.targetX) * 0.05;
+                    this.targetY += (this.mouseY * 0.1 - this.targetY) * 0.05;
+                    this.head.rotation.y = this.targetX;
+                    this.head.rotation.x = -this.targetY;
+                    this.head.position.y = -0.5 + Math.sin(time * 0.001) * 0.03;
+                }
+
+                if (this.orb) {
+                    this.orb.rotation.y += 0.001;
+                    this.orb.rotation.x += 0.0005;
+                    const scale = 1 + Math.sin(time * 0.001) * 0.01;
+                    this.orb.scale.set(scale, scale, scale);
+                }
+
+                // Lip sync simulation
+                if (window.isSpeaking && this.childMesh) {
+                    const mouthIdx = this.morphTargets['mouthOpen'] || this.morphTargets['jawOpen'] || 0;
+                    this.childMesh.morphTargetInfluences[mouthIdx] = Math.abs(Math.sin(time * 0.02)) * 0.6;
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        };
+
+        function changeEmotion(emotion) {
+            if (!HologramOrb.childMesh) return;
+            const morphs = emotion === 'happy' ? ['mouthSmile', 'smile'] : ['eyeSquintLeft', 'browUpRight'];
+            HologramOrb.childMesh.morphTargetInfluences.fill(0);
+            morphs.forEach(m => {
+                const idx = HologramOrb.morphTargets[m];
+                if (idx !== undefined) HologramOrb.childMesh.morphTargetInfluences[idx] = 0.8;
+            });
+        }
+
+        async function speakRomanian() {
+            const text = "Salutări. Sunt KELION, v143.0. Sistemul este complet operațional, integrând holograma în sfera de energie. Calm și putere absolută.";
+            window.isSpeaking = true;
+            try {
+                const res = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, gender: 'male', username: 'demo' })
+                });
+                const blob = await res.blob();
+                const audio = new Audio(URL.createObjectURL(blob));
+                audio.onended = () => { window.isSpeaking = false; HologramOrb.childMesh.morphTargetInfluences.fill(0); };
+                audio.play();
+            } catch (e) {
+                console.error(e);
+                window.isSpeaking = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => HologramOrb.init());
+    </script>
+</body>
+
+</html>

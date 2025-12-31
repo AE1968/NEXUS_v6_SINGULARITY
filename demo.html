@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KELION v143.0 - Full 3D System Demo</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="js/3d-systems.js"></script>
+    <style>
+        :root {
+            --cyan: #00f3ff;
+            --pink: #ff00ff;
+            --bg: #050505;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--cyan);
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #hologram-container {
+            width: 800px;
+            height: 600px;
+            position: relative;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.1);
+            background: radial-gradient(circle at center, rgba(0, 15, 30, 0.8) 0%, #000 100%);
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        button {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 12px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: var(--cyan);
+            color: #000;
+            box-shadow: 0 0 20px var(--cyan);
+        }
+
+        #speech-text {
+            position: absolute;
+            top: 40px;
+            width: 80%;
+            text-align: center;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px var(--cyan);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .visualizer-container {
+            position: absolute;
+            bottom: 100px;
+            display: flex;
+            gap: 3px;
+            height: 40px;
+            align-items: flex-end;
+        }
+
+        .v-bar {
+            width: 4px;
+            background: var(--cyan);
+            transition: height 0.1s;
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 243, 255, 0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="hologram-container">
+        <div class="scanline"></div>
+        <div id="speech-text"></div>
+        <div class="visualizer-container" id="visualizer">
+            <!-- Bars generated via JS -->
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="triggerSpeech('ro')">Vorbește (Română)</button>
+        <button onclick="triggerSpeech('en')">Speak (English)</button>
+        <button onclick="window.HologramSystem.setEmotion('happy')">Happy</button>
+        <button onclick="window.HologramSystem.setEmotion('thinking')">Thinking</button>
+    </div>
+
+    <script>
+        const HologramSystem = {
+            scene: null, camera: null, renderer: null, model: null, mixer: null,
+            morphTargets: {}, clock: new THREE.Clock(), isSpeaking: false,
+            mouseX: 0, mouseY: 0, targetLookX: 0, targetLookY: 0,
+
+            init() {
+                const container = document.getElementById('hologram-container');
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(45, 800/600, 0.1, 1000);
+                this.camera.position.set(0, 0, 3);
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(800, 600);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(this.renderer.domElement);
+
+                this.scene.add(new THREE.AmbientLight(0x00f3ff, 0.6));
+                const dLight = new THREE.DirectionalLight(0x00f3ff, 1);
+                dLight.position.set(0, 1, 2);
+                this.scene.add(dLight);
+
+                // Initialize Energy Sphere from 3d-systems.js
+                if (window.EnergySphere) {
+                    window.EnergySphere.init(this.scene);
+                }
+
+                this.loadModel();
+                this.animate();
+
+                document.addEventListener('mousemove', (e) => {
+                    this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                    this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+                });
+            },
+
+            loadModel() {
+                const loader = new THREE.GLTFLoader();
+                loader.load('assets/kelion_holo/uploads_files_4723651_HologramMaleHead3DModelAnimatedWithFacialExpressions.glb', (gltf) => {
+                    this.model = gltf.scene;
+                    this.model.traverse(child => {
+                        if (child.isMesh) {
+                            child.material = new THREE.MeshPhongMaterial({
+                                color: 0x00f3ff,
+                                emissive: 0x003344,
+                                transparent: true,
+                                opacity: 0.8,
+                                side: THREE.DoubleSide
+                            });
+                            if (child.morphTargetInfluences) {
+                                this.morphTargets[child.name] = chil           }
+                        }
+                    });
+                    this.model.position.y = -0.5;
+                    this.model.scale.set(1.8, 1.8, 1.8);
+                    this.scene.add(this.model);
+                });
+            },
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                const delta = this.clock.getDelta();
+                const time = Date.now();
+
+                if (this.model) {
+                    this.targetLookX += (this.mouseX * 0.2 - this.targetLookX) * 0.05;
+                    this.targetLookY += (this.mouseY * 0.15 - this.targetLookY) * 0.05;
+                    this.model.rotation.y = this.targetLookX;
+                    this.model.rotation.x = -this.targetLookY;
+                }
+
+                if (window.EnergySphere) {
+                    window.EnergySphere.update();
+                }
+
+                if (this.isSpeaking) {
+                    this.simulateLipSync();
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            },
+
+            simulateLipSync() {
+                // Using LipSyncSystem if available
+                if (window.LipSyncSystem && window.LipSyncSystem.analyser) {
+                    const viseme = window.LipSyncSystem.getViseme();
+                    Object.values(this.morphTargets).forEach(mesh => {
+        const idx = mesh.morphTargetDictionary['jawOpen'] || mesh.morphTargetDictionary['mouthOpen'] || 0;
+                        let val = 0;
+                        if (viseme === 'aa' || viseme === 'oo') val = 0.8;
+                                    me === 'ee' || viseme === 'ch') val = 0.4;
+                        else if (viseme === 'mm') val =                             mesh.morphTargetInfluen                                   });
+                } else {
+                    // Fallb                              Object.values(this.morphTargets).forEach(mesh => {
+                        const idx = mesh                    y['jawOpen'] ||                    ionary['mouthOpen'] || 0;
+                        mesh.morphTargetInfluences[idx] = Math.abs(Math.sin(Date                                          });
+                }
+            },
+
+            setEmotion(emotion) {
+                                     {
+                    happy: ['smile', 'mouthSmile'],
+                    thinking: ['eyeSquintLeft', 'browUpRight'],
+                    neutral: []
+                };
+                const targets = emotionMorphs[emotion] || [];
+                Object.values(this.morphTargets).forEach(mesh => {
+                    mesh.morphTargetInfluences.fill(0);
+                    targets.forEach(name => {
+                        const idx = mesh.morphTargetDictionary[name];
+                        if (idx !== undefined) mesh.morphTargetInfluences[idx] = 0.8;
+                    });
+    });
+            }
+        };
+
+        window.HologramSystem = HologramSystem;
+
+        async function triggerSpeech(lang) {
+            const text = lang === 'ro' 
+                ? "Sistemul KELION v143.0 este acum complet activat. Toate funcțiile 3D, in clusiv Sfera de Energie și Sincron izarea Buzelor, sunt operaționale. Puterea și calmul absolut sunt elementele mele definitorii. Cum pot continu                : "The KELION v143.0 system is now fully activated. All 3D functions, including the Energy Sphere and Lip Sync, are operational. Absolute power and calm are my defining elements. How can I continue to assist you?";
+            
+            const speechEl = document.getElementById('speech-text');
+            speechEl.textContent = text;
+            speechEl.style.opacity = '1';
+
+            try {
+                // Initializing LipSyncSystem
+                if (window.LipSyncSystem) {
+                    window.LipSyncSystem.init();
+                }
+
+                const response = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text: text, gender: 'male', username: 'demo'})
+                });
+                
+                if (!response.ok) throw new Error("TTS failed");
+                      const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
+                
+                if (window.LipSyncSystem) {
+                    window.LipSyncSystem.connectAudio(audio);
+                }
+
+                HologramSystem.isSpeaking = true;
+                if (window.EnergySphere) window.EnergySphere.intensify();
+
+                audio.onended = () => {
+                    HologramSystem.isSpeaking = false;
+                    speechEl.style.opacity = '0';
+                    if (window.EnergySphere) window.EnergySphere.calm();
+                };
+
+                audio.play().catch(e => console.error("Audio play error:", e));
+
+                // Visualizer bars
+                const viz = document.getElementById('visualizer');
+                viz.innerHTML = '';
+                for(let i=0; i<20; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'v-bar';
+                    viz.appendChild(bar);
+                }
+
+                function updateViz() {
+                    if (!HologramSystem.isSpeaking) return;
+                    const bars = document.querySelectorAll('.v-bar');
+                    bars.forEach(bar => {
+                        bar.style.height = (5 + Math.random() * 35) + 'px';
+                    });
+                    requestAnimationFrame(updateViz);
+                }
+                updateViz();
+
+            } catch (err) {
+                console.error(err);
+                alert("Speech error: " + err.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => HologramSystem.init());
+    </script>
+</body>
+
+</html>

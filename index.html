@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>KELION v143.0 - GLOBAL_EYE OS</title>
 
-    <!-- ðŸ›‘ FORCE NO-CACHE (AUTO-REFRESH LOGIC) -->
+    <!-- FORCE NO-CACHE (AUTO-REFRESH LOGIC) -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -208,11 +208,12 @@
             text-shadow: 0 0 10px var(--cyan);
         }
 
-        /* Dark background - no robot image */
+        /* Background image - robot + galaxy combined */
         #bg-image {
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse at center, #0a0a15 0%, #050505 70%, #000000 100%);
+            background: url("https://raw.githubusercontent.com/AE1968/NEXUS_v6_SINGULARITY/main/assets/kelion_robot_galaxy.png") no-repeat center top 85px / auto 100vh;
+            background-color: #050505;
             z-index: -1;
             pointer-events: none;
             opacity: 0;
@@ -1576,8 +1577,7 @@
                         </div>
                     </div>
 
-                    <form id="ae-contact-form"
-                        onsubmit="event.preventDefault(); alert('Message sent! (Simulation)'); document.getElementById('ae-contact-modal').classList.remove('active');">
+                    <form id="ae-contact-form">
                         <div class="ae-form-group">
                             <label>Your Email *</label>
                             <input type="email" id="ae-email" placeholder="example@email.com" required>
@@ -1627,42 +1627,26 @@
                         style="background:none; border:1px solid #ff00ff; color:#ff00ff; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
                 </div>
 
+                <!-- Requirements & TODO List -->
                 <div style="display:grid; grid-template-columns: 1fr; gap:15px;">
-                    <!-- Full Width Flat Map Monitor -->
                     <div
-                        style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border:1px solid rgba(0, 243, 255, 0.1); position:relative;">
-                        <div id="status-title"
-                            style="font-family:'Orbitron'; font-size:1rem; color:var(--cyan); margin-bottom:10px;">
-                            GLOBAL
-                            NETWORK MONITOR :: ACTIVE SCAN</div>
-
+                        style="background:rgba(0,0,0,0.5); padding:20px; border-radius:15px; border:1px solid #ff00ff; position:relative;">
+                        <h3
+                            style="font-family:'Orbitron'; color:#ff00ff; margin-bottom:15px; border-bottom:1px solid rgba(255,0,255,0.3); padding-bottom:5px;">
+                            📋 URGENT TODO LIST</h3>
                         <div
-                            style="width:100%; height:280px; background:#001020 url('assets/world_map.png') no-repeat center center / contain; border:1px solid rgba(0, 243, 255, 0.2); border-radius:10px; position:relative; overflow:hidden;">
-                            <canvas id="traffic-canvas" width="800" height="280"
-                                style="width:100%; height:100%; position:relative; z-index:5;"></canvas>
-                            <!-- Scanline Effect -->
-                            <div
-                                style="position:absolute; inset:0; background: linear-gradient(to bottom, transparent, rgba(0, 243, 255, 0.05) 50%, transparent); background-size: 100% 4px; animation: scanLine 4s linear infinite; pointer-events:none; z-index:6;">
-                            </div>
-                        </div>
-
-                        <!-- IP Connections Table -->
-                        <div
-                            style="margin-top:10px; height:120px; overflow-y:auto; background:rgba(0,0,0,0.3); border:1px solid rgba(0, 243, 255, 0.1); border-radius:8px;">
-                            <table
-                                style="width:100%; border-collapse:collapse; font-family:monospace; text-align:left;">
-                                <thead
-                                    style="position:sticky; top:0; background:#001020; color:var(--cyan); font-size:11px; text-transform:uppercase;">
-                                    <tr>
-                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">IP ADDRESS</th>
-                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">LOCATION</th>
-                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">ISP/ORG</th>
-                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">STATUS</th>
-                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">TIME</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ip-table-body" style="color:#fff; font-size:12px;"></tbody>
-                            </table>
+                            style="height:400px; overflow-y:auto; font-family:monospace; color:#0f0; line-height:1.6; font-size:0.9rem;">
+                            [ ] DB MIGRATION: Fix 500 Errors in nexus.db<br>
+                            [ ] JS CONVERGENCE: Clean redundant inline logic<br>
+                            [ ] UTF-8 ENFORCEMENT: Fix corrupted icons (ðŸŠ)<br>
+                            [ ] SESSION RESTORATION: Allow AI memory to persist<br>
+                            [ ] API HARMONIZATION: Connect real backend routes<br>
+                            <hr style="border:0; border-top:1px solid rgba(255,0,255,0.2); margin:15px 0;">
+                            [x] Auto-Response Email: contact@kelionai.app active<br>
+                            [x] Logging: Backend structured logs implemented<br>
+                            [x] Health Check: /health endpoint deployed<br>
+                            [x] System Prompt: Defaulting to English<br>
+                            [x] Mandatory Fields: Backend validation enforced
                         </div>
                     </div>
                 </div>
@@ -1670,8 +1654,9 @@
                 <!-- Bottom: Console Logs -->
                 <div id="admin-logs"
                     style="height:80px; background:#000; border:1px solid rgba(255,0,255,0.3); border-radius:8px; padding:10px; font-family:monospace; font-size:0.75rem; overflow-y:auto; color:#0f0; box-shadow:inset 0 0 20px rgba(0,255,0,0.05);">
-                    > SYNCING WITH NEURAL GRID...<br>
-                    > ACCESS GRANTED: ARCHITECT MODE...
+                    > SYSTEM_ROLLBACK: SUCCESSFUL<br>
+                    > AE_CORE: INITIALIZED<br>
+                    > REQUIREMENTS_LIST: ACTIVE
                 </div>
             </div>
         </div>
@@ -2135,9 +2120,9 @@
 
             // 🚀 INITIALIZATION
             document.addEventListener('DOMContentLoaded', () => {
-                // 🔒 SECURITY: Force logout on every access (Requested by Architect)
-                localStorage.clear();
-                sessionStorage.clear();
+                // 🔒 SECURITY: Sesiune persistenta v143 (Architect Override)
+                // localStorage.clear(); // Dezactivat pentru a permite Personalizare / Welcome back
+                // sessionStorage.clear();
 
                 // 🚀 NEURAL INITIALIZATION SEQUENCE
                 const initSequence = async () => {
@@ -2587,6 +2572,45 @@
                 speak(welcomeMsg);
             }
 
+            // 📩 CONTACT FORM HANDLER v143
+            document.getElementById('ae-contact-form')?.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const btn = this.querySelector('button');
+                const origText = btn.textContent;
+
+                btn.textContent = '🚀 SENDING...';
+                btn.disabled = true;
+
+                const formData = {
+                    email: document.getElementById('ae-email').value,
+                    name: document.getElementById('ae-name').value,
+                    topic: document.getElementById('ae-topic').value,
+                    message: document.getElementById('ae-message').value
+                };
+
+                try {
+                    const res = await fetch('/api/contact', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        alert('✅ Message sent! Your ticket ID is: ' + (data.ticket_id || 'N/A'));
+                        document.getElementById('ae-contact-modal').classList.remove('active');
+                        this.reset();
+                    } else {
+                        alert('❌ Error: ' + data.error);
+                    }
+                } catch (err) {
+                    alert('❌ Connection failed. Please try again.');
+                } finally {
+                    btn.textContent = origText;
+                    btn.disabled = false;
+                }
+            });
+
             // ðŸŒŸ KELIONAI WELCOME MESSAGE (Page Load)
             function showKelionaiWelcome() {
                 const hour = new Date().getHours();
@@ -2989,7 +3013,7 @@
 
                 loadModel: function () {
                     const loader = new THREE.GLTFLoader();
-                    const modelPath = '/assets/kelion_holo/uploads_files_4723651_HologramMaleHead3DModelAnimatedWithFacialExpressions.glb';
+                    const modelPath = 'assets/kelion_holo/uploads_files_4723651_HologramMaleHead3DModelAnimatedWithFacialExpressions.glb';
 
                     loader.load(
                         modelPath,

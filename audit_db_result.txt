@@ -1,0 +1,24 @@
+--- Checking nexus.db ---
+Tables found: ['user', 'chat_history', 'demo_tracking', 'otp', 'contact_message']
+Table 'user' columns: ['id', 'username', 'email', 'password_hash', 'first_name', 'last_name', 'phone', 'country', 'role', 'subscription', 'subscription_end_date', 'account_status', 'created_at', 'billing_history']
+Table 'user' entry count: 2
+Table 'chat_history' columns: ['id', 'username', 'user_message', 'ai_response', 'timestamp', 'gender']
+Table 'chat_history' entry count: 22
+Table 'demo_tracking' columns: ['id', 'ip_address', 'last_access', 'total_seconds_used']
+Table 'demo_tracking' entry count: 0
+Table 'otp' columns: ['id', 'email', 'code', 'created_at']
+Table 'otp' entry count: 0
+Table 'contact_message' columns: ['id', 'email', 'name', 'topic', 'topic_label', 'message', 'timestamp', 'user_agent', 'source', 'status', 'admin_notes']
+Table 'contact_message' entry count: 0
+--- Checking kelion_mainframe.db ---
+Tables found: ['user', 'chat_history', 'demo_tracking', 'otp', 'contact_message']
+Table 'user' columns: ['id', 'username', 'email', 'password_hash', 'first_name', 'last_name', 'phone', 'country', 'role', 'subscription', 'subscription_end_date', 'account_status', 'created_at', 'billing_history']
+Table 'user' entry count: 2
+Table 'chat_history' columns: ['id', 'username', 'user_message', 'ai_response', 'timestamp', 'gender']
+Table 'chat_history' entry count: 2
+Table 'demo_tracking' columns: ['id', 'ip_address', 'last_access', 'total_seconds_used']
+Table 'demo_tracking' entry count: 0
+Table 'otp' columns: ['id', 'email', 'code', 'created_at']
+Table 'otp' entry count: 0
+Table 'contact_message' columns: ['id', 'email', 'name', 'topic', 'topic_label', 'message', 'timestamp', 'user_agent', 'source', 'status', 'admin_notes']
+Table 'contact_message' entry count: 0
