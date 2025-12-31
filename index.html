@@ -657,10 +657,12 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
+            width: 700px;
+            height: 700px;
             z-index: 10;
             pointer-events: none;
+            background: url('/assets/kelion_holo/force_field_bg.png') center/contain no-repeat;
+            border-radius: 50%;
         }
 
         #hologram-container canvas {
@@ -2376,7 +2378,7 @@
                     alpha: true,
                     powerPreference: "high-performance"
                 });
-                this.renderer.setSize(600, 600);
+                this.renderer.setSize(700, 700);
                 this.renderer.setPixelRatio(window.devicePixelRatio);
                 this.renderer.setClearColor(0x000000, 0);
                 this.renderer.outputEncoding = THREE.sRGBEncoding;
