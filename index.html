@@ -78,19 +78,31 @@
 
 
 
-    <!-- &#9855; ACCESSIBILITY: Skip to main content -->
+    <!-- SIDE INDICATORS (4 Buttons) -->
+    <div id="side-indicators"
+        style="position:fixed; left:20px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:20px; z-index:1000;">
+        <div class="indicator voice" title="TTS Active"
+            style="background:rgba(0,243,255,0.1); border:1px solid var(--cyan); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--cyan); cursor:pointer;">
+            &#128266;</div>
+        <div class="indicator vision" title="Vision Scan Ready"
+            style="background:rgba(0,243,255,0.1); border:1px solid var(--cyan); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--cyan); cursor:pointer;">
+            &#128065;</div>
+        <div class="indicator processing" title="AI Core Usage"
+            style="background:rgba(0,243,255,0.1); border:1px solid var(--cyan); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--cyan); cursor:pointer;">
+            &#9889;</div>
+        <div class="indicator storage" title="Encrypted Database"
+            style="background:rgba(0,243,255,0.1); border:1px solid var(--cyan); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--cyan); cursor:pointer;">
+            &#128190;</div>
+    </div>
 
     <a href="#chat-input" class="skip-link" aria-label="Skip to main content">Skip to Chat</a>
 
 
 
-    <!-- &#9855; ACCESSIBILITY: High Contrast Toggle -->
-
+    <!-- ♿ ACCESSIBILITY: High Contrast Toggle -->
     <button id="contrast-toggle" title="Toggle High Contrast Mode" aria-label="Toggle High Contrast Mode"
         style="position:fixed; bottom:60px; right:20px; z-index:9999; background:rgba(0,0,0,0.8); border:1px solid var(--cyan); color:var(--cyan); padding:8px 12px; border-radius:5px; cursor:pointer; font-size:12px;">
-
-        &#9855; HC
-
+        ♿ HC
     </button>
 
 
