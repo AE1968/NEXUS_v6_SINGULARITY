@@ -1,15 +1,31 @@
 --- Checking nexus.db ---
-Tables found: ['user', 'chat_history', 'demo_tracking', 'otp', 'contact_message']
-Table 'user' columns: ['id', 'username', 'email', 'password_hash', 'first_name', 'last_name', 'phone', 'country', 'role', 'subscription', 'subscription_end_date', 'account_status', 'created_at', 'billing_history']
+Tables found: ['user', 'chat_history', 'demo_tracking', 'otp', 'contact_message', 'trial_users', 'sqlite_sequence', 'voucher_codes', 'payment_records', 'visitor_logs', 'expiry_notifications', 'user_memories', 'conversation_summaries']
+Table 'user' columns: ['id', 'username', 'email', 'password_hash', 'first_name', 'last_name', 'phone', 'country', 'role', 'subscription', 'subscription_end_date', 'account_status', 'created_at', 'billing_history', 'address_line1', 'address_line2', 'city', 'postal_code', 'phone_country_code', 'email_verified', 'phone_verified', 'bank_verified', 'sms_verification_code', 'sms_code_sent_at', 'paypal_subscription_id', 'reset_token', 'reset_token_expires', 'vouchers_used_count']
 Table 'user' entry count: 2
 Table 'chat_history' columns: ['id', 'username', 'user_message', 'ai_response', 'timestamp', 'gender']
 Table 'chat_history' entry count: 22
-Table 'demo_tracking' columns: ['id', 'ip_address', 'last_access', 'total_seconds_used']
+Table 'demo_tracking' columns: ['id', 'ip_address', 'last_access', 'total_seconds_used', 'daily_seconds_used', 'last_daily_reset', 'first_access', 'is_blocked', 'blocked_reason']
 Table 'demo_tracking' entry count: 0
-Table 'otp' columns: ['id', 'email', 'code', 'created_at']
+Table 'otp' columns: ['id', 'email', 'code', 'created_at', 'otp_type']
 Table 'otp' entry count: 0
 Table 'contact_message' columns: ['id', 'email', 'name', 'topic', 'topic_label', 'message', 'timestamp', 'user_agent', 'source', 'status', 'admin_notes']
 Table 'contact_message' entry count: 0
+Table 'trial_users' columns: ['id', 'user_id', 'username', 'trial_start', 'trial_end', 'daily_seconds_used', 'last_daily_reset', 'is_trial_active']
+Table 'trial_users' entry count: 0
+Table 'sqlite_sequence' columns: ['name', 'seq']
+Table 'sqlite_sequence' entry count: 0
+Table 'voucher_codes' columns: ['id', 'code', 'value_months', 'created_at', 'created_by', 'allocated_to_user_id', 'allocated_at', 'is_used', 'used_at', 'used_by_user_id', 'expires_at']
+Table 'voucher_codes' entry count: 0
+Table 'payment_records' columns: ['id', 'user_id', 'amount_gbp', 'currency', 'payment_method', 'paypal_order_id', 'paypal_subscription_id', 'voucher_code', 'plan_id', 'subscription_start', 'subscription_end', 'status', 'created_at', 'completed_at', 'confirmation_email_sent']
+Table 'payment_records' entry count: 0
+Table 'visitor_logs' columns: ['id', 'ip_address', 'user_agent', 'page_visited', 'referrer', 'timestamp', 'year', 'month', 'day', 'hour', 'country', 'city', 'user_id', 'username']
+Table 'visitor_logs' entry count: 0
+Table 'expiry_notifications' columns: ['id', 'user_id', 'notification_type', 'sent_at', 'email_sent']
+Table 'expiry_notifications' entry count: 0
+Table 'user_memories' columns: ['id', 'username', 'memory_key', 'memory_value', 'memory_type', 'importance', 'created_at', 'last_recalled', 'recall_count']
+Table 'user_memories' entry count: 0
+Table 'conversation_summaries' columns: ['id', 'username', 'summary', 'last_updated', 'token_count']
+Table 'conversation_summaries' entry count: 0
 --- Checking kelion_mainframe.db ---
 Tables found: ['user', 'chat_history', 'demo_tracking', 'otp', 'contact_message']
 Table 'user' columns: ['id', 'username', 'email', 'password_hash', 'first_name', 'last_name', 'phone', 'country', 'role', 'subscription', 'subscription_end_date', 'account_status', 'created_at', 'billing_history']

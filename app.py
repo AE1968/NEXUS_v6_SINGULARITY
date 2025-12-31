@@ -528,11 +528,52 @@ class ConversationSummary(db.Model):
 # DATABASE INITIALIZATION (Runs on module load for gunicorn)
 # ==============================================================================
 def init_database():
-    """Initialize database tables and demo user - runs on each worker start"""
+    """Initialize database tables, run migrations, create demo user - runs on each worker start"""
     with app.app_context():
-        db.create_all()  # Create all tables defined by models
+        # 1. Create all tables defined by models
+        db.create_all()
         
-        # Create demo user if not exists
+        # 2. Run migrations for existing tables (add missing columns)
+        try:
+            from sqlalchemy import text
+            conn = db.engine.connect()
+            
+            # Get existing demo_tracking columns
+            result = conn.execute(text("PRAGMA table_info(demo_tracking)"))
+            demo_cols = [row[1] for row in result.fetchall()]
+            
+            # Add missing columns to demo_tracking
+            missing_cols = [
+                ('daily_seconds_used', 'INTEGER DEFAULT 0'),
+                ('last_daily_reset', 'DATE'),
+                ('first_access', 'DATETIME'),
+                ('is_blocked', 'BOOLEAN DEFAULT 0'),
+                ('blocked_reason', 'TEXT')
+            ]
+            for col_name, col_type in missing_cols:
+                if col_name not in demo_cols:
+                    try:
+                        conn.execute(text(f"ALTER TABLE demo_tracking ADD COLUMN {col_name} {col_type}"))
+                        logger.info(f"Added column {col_name} to demo_tracking")
+                    except Exception:
+                        pass  # Column might already exist
+            
+            # Add otp_type to otp table if missing
+            result = conn.execute(text("PRAGMA table_info(otp)"))
+            otp_cols = [row[1] for row in result.fetchall()]
+            if 'otp_type' not in otp_cols:
+                try:
+                    conn.execute(text("ALTER TABLE otp ADD COLUMN otp_type TEXT DEFAULT 'registration'"))
+                    logger.info("Added column otp_type to otp")
+                except Exception:
+                    pass
+            
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            logger.warning(f"Migration check: {e}")
+        
+        # 3. Create demo user if not exists
         if not User.query.filter_by(username='demo').first():
             demo = User(
                 username='demo', 

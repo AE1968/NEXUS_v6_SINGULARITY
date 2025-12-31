@@ -43,6 +43,36 @@ def migrate():
             except Exception as e:
                 print(f"Error adding {col_name}: {e}")
 
+    # 1b. Update 'demo_tracking' table with missing columns
+    cursor.execute("PRAGMA table_info(demo_tracking)")
+    demo_columns = [c[1] for c in cursor.fetchall()]
+    
+    demo_new_columns = [
+        ('daily_seconds_used', 'INTEGER DEFAULT 0'),
+        ('last_daily_reset', 'DATE'),
+        ('first_access', 'DATETIME'),
+        ('is_blocked', 'BOOLEAN DEFAULT 0'),
+        ('blocked_reason', 'TEXT')
+    ]
+    
+    for col_name, col_type in demo_new_columns:
+        if col_name not in demo_columns:
+            print(f"Adding column '{col_name}' to 'demo_tracking' table...")
+            try:
+                cursor.execute(f"ALTER TABLE demo_tracking ADD COLUMN {col_name} {col_type}")
+            except Exception as e:
+                print(f"Error adding {col_name}: {e}")
+
+    # 1c. Update 'otp' table with otp_type column
+    cursor.execute("PRAGMA table_info(otp)")
+    otp_columns = [c[1] for c in cursor.fetchall()]
+    if 'otp_type' not in otp_columns:
+        print("Adding column 'otp_type' to 'otp' table...")
+        try:
+            cursor.execute("ALTER TABLE otp ADD COLUMN otp_type TEXT DEFAULT 'registration'")
+        except Exception as e:
+            print(f"Error adding otp_type: {e}")
+
     # 2. Create missing tables
     tables_to_create = {
         'trial_users': """
@@ -144,6 +174,19 @@ def migrate():
                 summary TEXT NOT NULL,
                 last_updated DATETIME,
                 token_count INTEGER DEFAULT 0
+            )
+        """,
+        'demo_tracking': """
+            CREATE TABLE IF NOT EXISTS demo_tracking (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ip_address TEXT UNIQUE NOT NULL,
+                last_access DATETIME,
+                daily_seconds_used INTEGER DEFAULT 0,
+                last_daily_reset DATE,
+                first_access DATETIME,
+                total_seconds_used INTEGER DEFAULT 0,
+                is_blocked BOOLEAN DEFAULT 0,
+                blocked_reason TEXT
             )
         """
     }
