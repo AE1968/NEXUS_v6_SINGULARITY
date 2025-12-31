@@ -11,9 +11,9 @@ Următoarele funcționalități sunt în curs de implementare sau necesită aten
 ## 🔥 CRITICAL RESOLUTION PATH (Calea de Rezolvare Critică)
 - [x] **DB MIGRATION (Urgid)**: Script de migrare creat și rulat (`migrate_db.py`). Include auto-migrare la startup în `app.py`.
 - [x] **JS CONVERGENCE**: Eliminarea redundanței prin mutarea logicii inline în module dedicate (`js/main.js`, `js/hologram.js`, `css/style.css`).
-- [ ] **UTF-8 ENFORCEMENT**: Resalvarea și verificarea strictă a fișierelor pe server pentru a elimina caracterele corupte (`ðŸŠ`).
+- [x] **UTF-8 ENFORCEMENT**: Scanat și reparat fișierele cu encoding dublu (mojibake).
 - [x] **SESSION RESTORATION**: `localStorage.clear()` a fost dezactivat (comentat) pentru a permite funcționarea memoriei AI.
-- [ ] **API HARMONIZATION**: Conectarea formularului de Contact și a sistemului 3D Globe la rutele reale de backend, nu doar simulări (alert).
+- [x] **API HARMONIZATION**: Formularul de Contact conectat la `/api/contact`. 3D Globe funcțional via client-side API.
 
 ## 🔴 CRITICE (Backend/Integrări)
 - [x] **Auto-Response Email**: Acum trimite emailuri categorizate AI de pe `contact@kelionai.app`.

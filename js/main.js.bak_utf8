@@ -924,7 +924,7 @@ document.getElementById('ae-contact-form')?.addEventListener('submit', async fun
     }
 });
 
-// 🌟 KELIONAI WELCOME MESSAGE (Page Load)
+// ðŸŒŸ KELIONAI WELCOME MESSAGE (Page Load)
 function showKelionaiWelcome() {
     const hour = new Date().getHours();
     let greeting;
@@ -992,7 +992,7 @@ document.getElementById('forgot-send-btn')?.addEventListener('click', async func
         alert('Network error');
     }
 
-    this.textContent = '📧 SEND CODE';
+    this.textContent = 'ðŸ“§ SEND CODE';
     this.disabled = false;
 });
 
@@ -1016,7 +1016,7 @@ document.getElementById('forgot-reset-btn')?.addEventListener('click', async fun
         const data = await res.json();
 
         if (data.success) {
-            alert('✅ Password reset! You can now login.');
+            alert('âœ… Password reset! You can now login.');
             document.getElementById('forgot-modal').style.display = 'none';
             document.getElementById('login-modal').style.display = 'flex';
         } else {
@@ -1026,7 +1026,7 @@ document.getElementById('forgot-reset-btn')?.addEventListener('click', async fun
         alert('Network error');
     }
 
-    this.textContent = '🔓 RESET PASSWORD';
+    this.textContent = 'ðŸ”“ RESET PASSWORD';
     this.disabled = false;
 });
 
@@ -1098,7 +1098,7 @@ document.getElementById('do-register')?.addEventListener('click', async function
                 }
             }
 
-            alert('✅ Account created! You can now login.');
+            alert('âœ… Account created! You can now login.');
             document.getElementById('register-modal').style.display = 'none';
             document.getElementById('login-modal').style.display = 'flex';
         } else {
@@ -1108,7 +1108,7 @@ document.getElementById('do-register')?.addEventListener('click', async function
         alert('Network error');
     }
 
-    this.textContent = '🚀 CREATE ACCOUNT';
+    this.textContent = 'ðŸš€ CREATE ACCOUNT';
     this.disabled = false;
 });
 
