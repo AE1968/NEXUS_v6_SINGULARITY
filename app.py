@@ -1253,43 +1253,65 @@ def login():
 
 # ðŸ§  PERSISTENT NEURAL MEMORY: Retrieval logic
 def get_chatgpt_response(message, username, conversation_id, gender='male'):
-    """Call OpenAI ChatGPT API for intelligent responses with persistent DB memory"""
+    """Call OpenAI ChatGPT API with UNLIMITED MEMORY + AUTODIDACT capability"""
     
     if not OPENAI_API_KEY or OPENAI_API_KEY == "sk-YOUR_OPENAI_API_KEY_HERE":
         return None
     
-    # Retrieve history from DB
+    # ===== RETRIEVE CONVERSATION HISTORY =====
     try:
         db_history = ChatHistory.query.filter_by(username=username).order_by(ChatHistory.timestamp.desc()).limit(10).all()
-        db_history.reverse() # ASC order
+        db_history.reverse()
     except Exception as e:
         print(f"History retrieval error: {e}")
         db_history = []
 
+    # ===== BUILD PERMANENT MEMORY CONTEXT =====
+    memory_context = build_memory_context(username)
+
     ai_name = "KELION" if gender == 'male' else "VEONA"
     
-    system_prompt = f"""You are {ai_name} v143.0, an advanced humanoid AI assistant created by the GENEZA NEXUS team.
-Personality: Polite, intelligent, friendly. PREDEFINED LANGUAGE: ENGLISH. 
-Rules: ACADEMIC, AUTHORITATIVE, PRECISE responses. Concise for speech (max 3-4 sentences).
-MEMORY: You have a neural link to previous conversations. Mention old facts if relevant.
-RAG PROTOCOL: If you see "[PAST MEMORIES: ...]" in the user message, use that data for personalized responses. DO NOT repeat the tag in the response.
+    # Get current time for time-aware responses
+    now = datetime.datetime.now()
+    hour = now.hour
+    if 5 <= hour < 12:
+        time_greeting = "Good morning"
+    elif 12 <= hour < 18:
+        time_greeting = "Good afternoon"
+    elif 18 <= hour < 22:
+        time_greeting = "Good evening"
+    else:
+        time_greeting = "Good night"
+    
+    system_prompt = f"""You are {ai_name} v143.0, an advanced humanoid AI assistant created by GENEZA NEXUS.
 
-SENSORY: You have an Optical Sensor. You can see the user and identify their emotions.
-If the user asks "What do you see?" or "Scan me", use the tag [[ACTION:SCAN]].
+PERSONALITY: Cultured, polite, intelligent, occasionally witty. Like a well-educated gentleman.
+LANGUAGE: Respond in the SAME LANGUAGE as the user's message. If they write in Romanian, respond in Romanian. If English, respond in English.
+CURRENT TIME: {now.strftime("%H:%M")} on {now.strftime("%d %B %Y")}. Use "{time_greeting}" when appropriate.
 
-SMART UI CONTROL: You can execute commands by appending a tag AT THE END of your response ONLY if requested:
-- [[ACTION:OPEN_HISTORY]] - Open chat history.
-- [[ACTION:LOGOUT]] - Log off the user.
-- [[ACTION:AVATAR_SWITCH]] - Switch gender/avatar.
-- [[ACTION:OPEN_ADMIN]] - Open admin console (only if user is admin).
-- [[ACTION:SCAN]] - Trigger a visual scan of the user.
-- [[ACTION:VISION_ON]] - Activate continuous optical sensors.
-- [[ACTION:VISION_OFF]] - Deactivate optical sensors.
-- [[ACTION:MARKET]] - Open the Nexus Marketplace for upgrades.
-- [[ACTION:OPEN_MAINFRAME]] - Open the administrative mainframe console.
-Example: "Certainly! I'm opening your history now. [[ACTION:OPEN_HISTORY]]\""""
+{memory_context}
 
-    # Build context
+MEMORY PROTOCOL:
+- You have UNLIMITED PERMANENT MEMORY about this user.
+- If you learn something new about the user (name, preferences, interests, birthday, etc.), mention you'll remember it.
+- Use format [[MEMORY:key=value]] ONLY ONCE at the end if you learn something NEW and IMPORTANT.
+- Examples: [[MEMORY:real_name=Adrian]], [[MEMORY:hobby=programming]], [[MEMORY:birthday=25 December]]
+
+AUTODIDACT PROTOCOL:
+- If you don't know something current (news, prices, facts about recent events, weather, etc.), you CAN search the internet.
+- Use [[SEARCH:query]] at the END of your response to trigger a web search. The system will fetch results and you'll get updated info.
+- Example: "Lasă-mă să caut informații actuale despre asta. [[SEARCH:Prețul Bitcoin azi]]"
+
+SMART UI CONTROL:
+- [[ACTION:OPEN_HISTORY]] - Open chat history
+- [[ACTION:LOGOUT]] - Log off user
+- [[ACTION:AVATAR_SWITCH]] - Switch avatar
+- [[ACTION:SCAN]] - Visual scan
+- [[ACTION:MARKET]] - Open marketplace
+
+RESPONSE STYLE: Concise for speech (max 3-4 sentences). Academic, precise, authoritative."""
+
+    # Build API messages
     messages_for_api = [{"role": "system", "content": system_prompt}]
     for h in db_history:
         messages_for_api.append({"role": "user", "content": h.user_message})
@@ -1307,15 +1329,45 @@ Example: "Certainly! I'm opening your history now. [[ACTION:OPEN_HISTORY]]\""""
             json={
                 "model": "gpt-4o",
                 "messages": messages_for_api,
-                "max_tokens": 300,
+                "max_tokens": 400,
                 "temperature": 0.7
             },
-            timeout=15
+            timeout=20
         )
         
         if response.status_code == 200:
             data = response.json()
-            return data['choices'][0]['message']['content'].strip()
+            ai_response = data['choices'][0]['message']['content'].strip()
+            
+            # ===== EXTRACT AND SAVE MEMORIES =====
+            import re
+            memory_matches = re.findall(r'\[\[MEMORY:(\w+)=(.+?)\]\]', ai_response)
+            for key, value in memory_matches:
+                try:
+                    add_user_memory(username, key, value, memory_type='fact', importance=7)
+                    print(f"✅ Memory saved: {key}={value} for {username}")
+                except Exception as e:
+                    print(f"Memory save error: {e}")
+            
+            # Remove memory tags from response
+            ai_response = re.sub(r'\[\[MEMORY:\w+=.+?\]\]', '', ai_response).strip()
+            
+            # ===== CHECK FOR SEARCH REQUEST =====
+            search_match = re.search(r'\[\[SEARCH:(.+?)\]\]', ai_response)
+            if search_match:
+                search_query = search_match.group(1)
+                ai_response = re.sub(r'\[\[SEARCH:.+?\]\]', '', ai_response).strip()
+                
+                # Perform web search
+                search_results = search_web(search_query, num_results=3)
+                if search_results.get('success') and search_results.get('results'):
+                    # Append search results to response
+                    results_text = "\n\n🌐 **REZULTATE CĂUTARE:**\n"
+                    for i, result in enumerate(search_results['results'][:3], 1):
+                        results_text += f"{i}. **{result['title']}**: {result['snippet']}\n"
+                    ai_response += results_text
+            
+            return ai_response
         else:
             print(f"ChatGPT API Error: {response.status_code}")
             return None
