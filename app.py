@@ -56,8 +56,9 @@ PAYPAL_API_BASE = "https://api-m.paypal.com" if PAYPAL_MODE == "live" else "http
 
 SMTP_EMAIL = get_env("SMTP_EMAIL", "contact@kelionai.app")
 SMTP_PASSWORD = get_env("SMTP_PASSWORD", "")
-SMTP_SERVER = get_env("SMTP_SERVER", "smtp.gmail.com")
-SMTP_PORT = int(get_env("SMTP_PORT", "587"))
+SMTP_SERVER = get_env("SMTP_SERVER", "smtp.privateemail.com")
+SMTP_PORT = int(get_env("SMTP_PORT", "465"))
+SMTP_USE_SSL = True  # Port 465 requires SSL
 
 # CORS
 ALLOWED_ORIGINS = get_env("ALLOWED_ORIGINS", "*").split(",")
@@ -119,6 +120,98 @@ def search_web(query, num_results=5):
             return {"error": f"Serper API error: {response.status_code}"}
     except Exception as e:
         return {"error": str(e)}
+
+
+# ==============================================================================
+# EMAIL SYSTEM (SMTP with SSL)
+# ==============================================================================
+def send_email(to_email, subject, body_html, body_text=None):
+    """
+    Send email using SMTP SSL (Port 465) for Namecheap Private Email.
+    Returns: (success: bool, message: str)
+    """
+    if not SMTP_PASSWORD:
+        logger.warning("SMTP_PASSWORD not configured. Email not sent.")
+        return False, "SMTP password not configured"
+    
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = f"KELION AI <{SMTP_EMAIL}>"
+        msg['To'] = to_email
+        
+        # Attach plain text and HTML versions
+        if body_text:
+            msg.attach(MIMEText(body_text, 'plain'))
+        msg.attach(MIMEText(body_html, 'html'))
+        
+        # Use SSL connection (port 465)
+        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            server.send_message(msg)
+        
+        logger.info(f"Email sent successfully to {to_email}")
+        return True, "Email sent successfully"
+        
+    except smtplib.SMTPAuthenticationError as e:
+        logger.error(f"SMTP Authentication Error: {e}")
+        return False, "Authentication failed"
+    except smtplib.SMTPException as e:
+        logger.error(f"SMTP Error: {e}")
+        return False, str(e)
+    except Exception as e:
+        logger.error(f"Email Error: {e}")
+        return False, str(e)
+
+
+def send_admin_notification(subject, body):
+    """Send notification to admin email"""
+    admin_html = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background: #1a1a2e; color: #00f3ff; padding: 20px;">
+        <h2 style="color: #ff00ff;">🔔 KELION AI Admin Notification</h2>
+        <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; border: 1px solid #00f3ff;">
+            {body}
+        </div>
+        <p style="color: #888; font-size: 12px; margin-top: 20px;">
+            This is an automated message from KELION AI v143.0
+        </p>
+    </body>
+    </html>
+    """
+    return send_email(SMTP_EMAIL, subject, admin_html)
+
+
+def send_welcome_email(to_email, username):
+    """Send welcome email to new user"""
+    html = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background: #1a1a2e; color: white; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: rgba(0,15,30,0.95); padding: 30px; border-radius: 15px; border: 1px solid #00f3ff;">
+            <h1 style="color: #00f3ff; text-align: center;">Welcome to KELION AI! 🚀</h1>
+            <p style="font-size: 18px;">Hello <strong>{username}</strong>,</p>
+            <p>Thank you for registering with KELION AI - Your Intelligent Assistant.</p>
+            <p>Your account has been created successfully. You now have access to:</p>
+            <ul>
+                <li>🧠 Advanced AI Conversations</li>
+                <li>🌐 Real-time Web Search</li>
+                <li>🎤 Voice Interaction</li>
+                <li>🦻 Accessibility Features</li>
+            </ul>
+            <p style="text-align: center; margin-top: 30px;">
+                <a href="https://kelionai.app" style="background: linear-gradient(135deg, #00f3ff, #ff00ff); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">
+                    Access KELION AI
+                </a>
+            </p>
+            <p style="color: #888; font-size: 12px; margin-top: 30px; text-align: center;">
+                © 2025 KELION AI • Powered by OpenAI
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+    return send_email(to_email, "Welcome to KELION AI! 🚀", html)
+
 
 # ==============================================================================
 # MODELS
