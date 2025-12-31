@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENTITY: KEY</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00f3ff;
+        }
+
+        #key-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            background: radial-gradient(circle at center, #0a1122 0%, #000000 80%);
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-size: 24px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #00f3ff;
+            margin: 0;
+        }
+
+        .status {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 15px #00f3ff;
+        }
+    </style>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GLTFLoader CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+
+<body>
+
+    <div class="ui-overlay">
+        <h1>Entity: KEY</h1>
+        <div class="status">SYSTEM: ONLINE | VESSEL: STABLE | ESSENCE: INTEGRATED</div>
+    </div>
+
+    <div id="key-container"></div>
+
+    <div class="controls">
+        <button onclick="keyEntity.intensify()">Intensify</button>
+        <button onclick="keyEntity.calm()">Calm</button>
+        <button onclick="keyEntity.speak('System initialized.')">Test Speak</button>
+    </div>
+
+    <!-- Import our Class -->
+    <script src="js/key_entity.js"></script>
+
+    <script>
+        // Check if Three.js is loaded
+        if (typeof THREE === 'undefined') {
+            console.error("Three.js not loaded!");
+            document.body.innerHTML += "<div style='color:red; z-index:100; position:absolute; top:50%; width:100%; text-align:center;'>ERROR: Three.js Failed to Load</div>";
+        } else {
+            console.log("Three.js loaded. Initializing Key...");
+
+            // Initialize the Entity
+            const keyEntity = new KeyEntity('key-container');
+
+            // Expose to window for buttons
+            window.keyEntity = keyEntity;
+        }
+    </script>
+</body>
+
+</html>

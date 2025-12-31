@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI_key: ENTITY INTERFACE</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        #ai-key-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            /* High Z-Index for Overlay */
+        }
+
+        .controls {
+            display: none;
+            /* Hidden by default, exposed only via console/code */
+        }
+
+        button {
+            background: rgba(0, 20, 40, 0.6);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 10px 25px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+        }
+
+        .api-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #ff00ff;
+            font-size: 12px;
+            z-index: 200;
+        }
+    </style>
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+
+<body>
+
+    <!-- Container pentru AI_key -->
+    <div id="ai-key-container"></div>
+
+    <div class="api-status">API READY: window.AI_key</div>
+
+    <div class="controls">
+        <button onclick="entity.listen()">LISTEN</button>
+        <button onclick="entity.speak('System fully operational.')">SPEAK</button>
+        <button onclick="entity.calm()">CALM</button>
+    </div>
+
+    <!-- Import Entitatea -->
+    <script src="js/AI_key.js"></script>
+
+    <script>
+        // Initializare Simulata (pentru Demo)
+        // In productia v143, se va apela: new AI_key('target-div-id');
+        let entity;
+
+        window.addEventListener('load', () => {
+            if (typeof AI_key !== 'undefined') {
+                console.log("Initializing AI_key System...");
+                entity = new AI_key('ai-key-container');
+                window.entity = entity; // Expose for console testing
+            } else {
+                console.error("Critical Error: AI_key class not found.");
+            }
+        });
+    </script>
+</body>
+
+</html>

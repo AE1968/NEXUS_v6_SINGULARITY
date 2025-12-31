@@ -857,15 +857,22 @@ window.EmotionDetector = EmotionDetector;
 
 
 // Initialize hologram when page ready
-
 document.addEventListener('DOMContentLoaded', () => {
-
     setTimeout(() => {
-
-        HologramSystem.init();
-
+        // Verifică dacă AI_key (sfera plasma animată) este disponibilă
+        if (window.AI_key) {
+            // Folosește AI_key pentru sfera plasma cu animații
+            const hologramContainer = document.getElementById('hologram-container');
+            if (hologramContainer) {
+                window.aiKeyEntity = new AI_key('hologram-container');
+                console.log('✅ AI_key Plasma Sphere activated');
+            }
+        } else {
+            // Fallback la sistemul vechi HologramSystem
+            HologramSystem.init();
+            console.log('✅ HologramSystem (legacy) activated');
+        }
     }, 2000); // Wait for loading screen
-
 });
 
 
