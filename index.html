@@ -30,6 +30,55 @@
             --panel: rgba(0, 15, 30, 0.95);
             --border: rgba(0, 243, 255, 0.35);
             --glow: 0 0 20px rgba(0, 243, 255, 0.25);
+            --text: #ffffff;
+        }
+
+        /* Light Mode Theme */
+        body.light-mode {
+            --cyan: #0088aa;
+            --pink: #cc00cc;
+            --bg: #f0f4f8;
+            --panel: rgba(255, 255, 255, 0.95);
+            --border: rgba(0, 136, 170, 0.35);
+            --glow: 0 0 20px rgba(0, 136, 170, 0.15);
+            --text: #1a1a2e;
+        }
+
+        body.light-mode {
+            background: var(--bg) !important;
+            color: var(--text);
+        }
+
+        body.light-mode #bg-image {
+            background: radial-gradient(ellipse at center, #e8f4fc 0%, #f0f4f8 70%, #ffffff 100%) !important;
+        }
+
+        body.light-mode .message.bot {
+            background: rgba(0, 136, 170, 0.1);
+            color: #1a1a2e;
+        }
+
+        body.light-mode .message.user {
+            background: rgba(200, 0, 200, 0.1);
+            color: #1a1a2e;
+        }
+
+        body.light-mode #chat-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: var(--border);
+        }
+
+        body.light-mode .modal-box {
+            background: rgba(255, 255, 255, 0.98);
+            color: #1a1a2e;
+        }
+
+        body.light-mode input,
+        body.light-mode select,
+        body.light-mode textarea {
+            background: rgba(0, 0, 0, 0.05) !important;
+            color: #1a1a2e !important;
+            border-color: var(--border) !important;
         }
 
         * {
@@ -125,15 +174,71 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom,
-                    transparent 50%,
-                    rgba(0, 243, 255, 0.05) 50%,
-                    rgba(0, 243, 255, 0.05) 51%,
-                    transparent 51%);
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 243, 255, 0.05) 50%, rgba(0, 243, 255, 0.05) 51%, transparent 51%);
             background-size: 100% 4px;
             z-index: 1;
             pointer-events: none;
             opacity: 0.3;
+        }
+
+        /* DASHBOARD FRAME (INCADRARE PAGINA) */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 10px;
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: inset 0 0 30px rgba(0, 243, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            border: 20px solid #000;
+            z-index: 9998;
+            pointer-events: none;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+                    2% 2%, 2% 98%, 98% 98%, 98% 2%, 2% 2%);
+        }
+
+        .corner-h {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--cyan);
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        .c-tl {
+            top: 10px;
+            left: 10px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .c-tr {
+            top: 10px;
+            right: 10px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .c-bl {
+            bottom: 10px;
+            left: 10px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .c-br {
+            bottom: 10px;
+            right: 10px;
+            border-left: none;
+            border-top: none;
         }
 
         #header,
@@ -646,8 +751,115 @@
                 opacity: 0.3;
             }
 
+            100% {}
+        }
+
+        /* USAGE TIMER UI */
+        #usage-timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(0, 10, 20, 0.85);
+            border: 1px solid var(--cyan);
+            border-radius: 8px;
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        #usage-timer i {
+            font-size: 1.1rem;
+        }
+
+        #usage-timer .time {
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 5px var(--cyan);
+        }
+
+        #usage-timer.low-time {
+            border-color: var(--magenta);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+        }
+
+        /* THEME TOGGLE */
+        #theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 10, 20, 0.85);
+            border: 1px solid var(--cyan);
+            border-radius: 50%;
+            color: var(--cyan);
+            cursor: pointer;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        #theme-toggle:hover {
+            transform: rotate(180deg) scale(1.1);
+        }
+
+        body.light-theme {
+            --cyan: #007bff;
+            --magenta: #d63384;
+            background: #f8f9fa;
+        }
+
+        /* TYPING INDICATOR */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 15px;
+            background: rgba(0, 243, 255, 0.05);
+            border-radius: 12px;
+            width: fit-content;
+            margin: 5px 0;
+            border: 1px solid rgba(0, 243, 255, 0.1);
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--cyan);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+            box-shadow: 0 0 5px var(--cyan);
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
             100% {
-                opacity: 0.7;
+                transform: scale(0);
+                opacity: 0.3;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
             }
         }
 
@@ -1022,6 +1234,21 @@
     <div id="bg-image"></div>
     <div class="scan-line"></div>
 
+    <div class="corner-h c-tl"></div>
+    <div class="corner-h c-tr"></div>
+    <div class="corner-h c-bl"></div>
+    <div class="corner-h c-br"></div>
+
+    <!-- v143 UI COMPONENTS -->
+    <div id="usage-timer" title="Time remaining today">
+        <i class="fas fa-hourglass-half"></i>
+        <span class="time" id="remaining-time">Calculating...</span>
+    </div>
+
+    <button id="theme-toggle" title="Toggle Light/Dark Theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
     <div id="header">
         <div id="status-display">
             <div class="status-row top">
@@ -1029,6 +1256,8 @@
                 <span id="user-display">USER: <span id="user-name" class="stat-val">OFFLINE</span></span>
                 <span id="cloud-display">CLOUD: <span id="sys-status"
                         class="stat-val offline">DISCONNECTED</span></span>
+                <span id="usage-display" style="display:none;">TIME: <span id="usage-timer" class="stat-val"
+                        style="color:#00ff00;">20:00</span></span>
             </div>
             <div class="status-row bottom">
                 <div id="system-clock">
@@ -1042,6 +1271,7 @@
             </div>
         </div>
         <div class="header-actions">
+            <button id="export-btn" title="Download Conversation History">EXPORT</button>
             <button id="traffic-btn">TRAFFIC</button>
             <button id="login-btn">LOGIN</button>
         </div>
@@ -1084,1797 +1314,2075 @@
             <span>NEURAL INTERFACE v143.0</span>
             <span style="color: #00ff00; letter-spacing: 2px;">ONLINE</span>
         </div>
-        <div id="chat-messages"></div>
-    </div>
-
-    <div id="input-bar">
-        <input type="text" id="chat-input" placeholder="Enter neural command..." autocomplete="off">
-        <button id="mic-btn" class="icon-btn">ðŸŽ™ï¸</button>
-    </div>
-
-    <div id="login-modal">
-        <div class="modal-box">
-            <h2>SYSTEM ACCESS</h2>
-            <div class="input-grp">
-                <label>Architect ID</label>
-                <input type="text" id="u-input" placeholder="Email or Username" value="">
+        <div id="chat-messages">
+            <div id="typing-indicator" class="typing-indicator"
+                style="display:none; margin: 10px; align-items: center; gap: 8px;">
+                <span style="color: var(--cyan); font-size: 0.85rem; font-weight: 600;">KELION is thinking...</span>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
             </div>
-            <div class="input-grp">
-                <label>Security Key</label>
-                <input type="password" id="p-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" value="">
-            </div>
-            <button id="do-login" class="modal-btn">INITIALIZE</button>
-            <p style="margin-top:15px;">
-                <a href="#" id="forgot-pass-link"
-                    style="color: var(--cyan); text-decoration: none; font-size: 0.8rem;">ðŸ”‘ Forgot Password?</a>
-            </p>
-            <p style="margin-top:10px; font-size:0.75rem; color:#556;">Note: Connection secured with RSA-4096</p>
-            <p style="margin-top:15px;">
-                <a href="#" id="register-link"
-                    style="color: var(--pink); text-decoration: none; font-size: 0.85rem; font-weight: 600;">ðŸ“ Create
-                    Account</a>
-            </p>
         </div>
-    </div>
 
-    <!-- FORGOT PASSWORD MODAL -->
-    <div id="forgot-modal"
-        style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px);">
-        <div class="modal-box" style="max-width:450px;">
-            <h2 style="color:var(--cyan);">ðŸ” PASSWORD RESET</h2>
+        <div id="input-bar">
+            <input type="text" id="chat-input" placeholder="Enter neural command..." autocomplete="off">
+            <button id="mic-btn" class="icon-btn">🎤</button>
+        </div>
 
-            <!-- Step 1: Enter Email -->
-            <div id="forgot-step1">
-                <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">Enter your email to receive a reset code.
+        <div id="login-modal">
+            <div class="modal-box">
+                <h2>SYSTEM ACCESS</h2>
+                <div class="input-grp">
+                    <label>Architect ID</label>
+                    <input type="text" id="u-input" placeholder="User ID" value="demo">
+                </div>
+                <div class="input-grp">
+                    <label>Security Key</label>
+                    <input type="password" id="p-input" placeholder="••••••••" value="demo2024">
+                </div>
+                <button id="do-login" class="modal-btn">INITIALIZE</button>
+                <p style="margin-top:15px;">
+                    <a href="#" id="forgot-pass-link"
+                        style="color: var(--cyan); text-decoration: none; font-size: 0.8rem;"><i class="fas fa-key"></i>
+                        Forgot Password?</a>
                 </p>
-                <div class="input-grp">
-                    <label>Email Address</label>
-                    <input type="email" id="forgot-email" placeholder="your@email.com">
-                </div>
-                <button id="forgot-send-btn" class="modal-btn">ðŸ“§ SEND CODE</button>
+                <p style="margin-top:10px; font-size:0.75rem; color:#556;">Note: Connection secured with RSA-4096</p>
+                <p style="margin-top:15px;">
+                    <a href="#" id="register-link"
+                        style="color: var(--pink); text-decoration: none; font-size: 0.85rem; font-weight: 600;"><i
+                            class="fas fa-user-plus"></i> Create Account</a>
+                </p>
             </div>
-
-            <!-- Step 2: Enter Code + New Password -->
-            <div id="forgot-step2" style="display:none;">
-                <p style="color:#00ff00; font-size:0.85rem; margin-bottom:20px;">âœ… Code sent! Check your email.</p>
-                <div class="input-grp">
-                    <label>6-Digit Code</label>
-                    <input type="text" id="forgot-code" placeholder="123456" maxlength="6"
-                        style="letter-spacing:5px; text-align:center; font-size:1.4rem;">
-                </div>
-                <div class="input-grp">
-                    <label>New Password (min 8 chars)</label>
-                    <input type="password" id="forgot-newpass" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
-                </div>
-                <button id="forgot-reset-btn" class="modal-btn" style="background:var(--pink);">ðŸ”“ RESET
-                    PASSWORD</button>
-            </div>
-
-            <p style="margin-top:20px;">
-                <a href="#" id="forgot-back-link" style="color:#888; font-size:0.8rem;">â† Back to Login</a>
-            </p>
         </div>
-    </div>
 
-    <!-- REGISTER MODAL -->
-    <div id="register-modal"
-        style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px); overflow-y:auto;">
-        <div class="modal-box" style="max-width:550px; margin:30px auto;">
-            <h2 style="color:var(--pink);">ðŸ“ CREATE ACCOUNT</h2>
+        <!-- FORGOT PASSWORD MODAL -->
+        <div id="forgot-modal"
+            style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px);">
+            <div class="modal-box" style="max-width:450px;">
+                <h2 style="color:var(--cyan);"><i class="fas fa-lock"></i> PASSWORD RESET</h2>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                <div class="input-grp">
-                    <label>First Name *</label>
-                    <input type="text" id="reg-firstname" placeholder="John" required>
+                <!-- Step 1: Enter Email -->
+                <div id="forgot-step1">
+                    <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">Enter your email to receive a reset
+                        code.
+                    </p>
+                    <div class="input-grp">
+                        <label>Email Address</label>
+                        <input type="email" id="forgot-email" placeholder="your@email.com" required>
+                    </div>
+                    <button id="forgot-send-btn" class="modal-btn"><i class="fas fa-envelope"></i> SEND CODE</button>
                 </div>
-                <div class="input-grp">
-                    <label>Last Name *</label>
-                    <input type="text" id="reg-lastname" placeholder="Doe" required>
+
+                <!-- Step 2: Enter Code + New Password -->
+                <div id="forgot-step2" style="display:none;">
+                    <p style="color:#00ff00; font-size:0.85rem; margin-bottom:20px;"><i class="fas fa-check-circle"></i>
+                        Code sent! Check your email.</p>
+                    <div class="input-grp">
+                        <label>6-Digit Code</label>
+                        <input type="text" id="forgot-code" placeholder="123456" maxlength="6"
+                            style="letter-spacing:5px; text-align:center; font-size:1.4rem;" required>
+                    </div>
+                    <div class="input-grp">
+                        <label>New Password (min 8 chars)</label>
+                        <input type="password" id="forgot-newpass" placeholder="********" required>
+                    </div>
+                    <button id="forgot-reset-btn" class="modal-btn" style="background:var(--pink);"><i
+                            class="fas fa-unlock"></i> RESET PASSWORD</button>
                 </div>
+
+                <p style="margin-top:20px;">
+                    <a href="#" id="forgot-back-link" style="color:#888; font-size:0.8rem;"><i
+                            class="fas fa-arrow-left"></i> Back to Login</a>
+                </p>
             </div>
-
-            <div class="input-grp">
-                <label>Email *</label>
-                <input type="email" id="reg-email" placeholder="john@example.com" required>
-            </div>
-
-            <div class="input-grp">
-                <label>Password * (min 8 chars)</label>
-                <input type="password" id="reg-password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required>
-            </div>
-
-            <div style="display:grid; grid-template-columns:100px 1fr; gap:10px;">
-                <div class="input-grp">
-                    <label>Country</label>
-                    <select id="reg-country"
-                        style="width:100%; padding:15px; background:rgba(0,0,0,0.6); border:1px solid var(--border); border-radius:8px; color:#fff;">
-                        <option value="UK">ðŸ‡¬ðŸ‡§ UK</option>
-                        <option value="RO">ðŸ‡·ðŸ‡´ RO</option>
-                        <option value="US">ðŸ‡ºðŸ‡¸ US</option>
-                        <option value="DE">ðŸ‡©ðŸ‡ª DE</option>
-                        <option value="FR">ðŸ‡«ðŸ‡· FR</option>
-                    </select>
-                </div>
-                <div class="input-grp">
-                    <label>Phone (Optional)</label>
-                    <input type="tel" id="reg-phone" placeholder="7123456789">
-                </div>
-            </div>
-
-            <div class="input-grp">
-                <label>Address (Optional)</label>
-                <input type="text" id="reg-address" placeholder="123 Main Street">
-            </div>
-
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                <div class="input-grp">
-                    <label>City</label>
-                    <input type="text" id="reg-city" placeholder="London">
-                </div>
-                <div class="input-grp">
-                    <label>Postal Code</label>
-                    <input type="text" id="reg-postal" placeholder="SW1A 1AA">
-                </div>
-            </div>
-
-            <!-- Voucher Code Field -->
-            <div class="input-grp"
-                style="background:rgba(0,255,0,0.05); padding:15px; border-radius:10px; border:1px dashed rgba(0,255,0,0.3);">
-                <label style="color:#00ff00;">ðŸŽŸï¸ Voucher Code (Optional)</label>
-                <input type="text" id="reg-voucher" placeholder="KEL-XXXXXXXX" style="text-transform:uppercase;">
-                <small style="color:#888; font-size:0.7rem;">If you have a promotional code, enter it here for free
-                    access.</small>
-            </div>
-
-            <button id="do-register" class="modal-btn"
-                style="background:linear-gradient(135deg, var(--pink), var(--cyan));">ðŸš€ CREATE ACCOUNT</button>
-
-            <p style="margin-top:15px;">
-                <a href="#" id="register-back-link" style="color:#888; font-size:0.8rem;">â† Back to Login</a>
-            </p>
         </div>
-    </div>
 
-    <!-- AE CONTACT SYSTEM (Integrated) -->
-    <div id="ae-contact-modal">
-        <div class="ae-modal-content">
-            <div class="ae-close-btn" onclick="document.getElementById('ae-contact-modal').classList.remove('active')">
-                Ã—
-            </div>
+        <!-- REGISTER MODAL -->
+        <div id="register-modal"
+            style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px); overflow-y:auto;">
+            <div class="modal-box" style="max-width:550px; margin:30px auto;">
+                <h2 style="color:var(--pink);"><i class="fas fa-user-plus"></i> CREATE ACCOUNT</h2>
 
-            <div id="ae-form-container">
-                <div class="ae-modal-header">
-                    <!-- LOGO REMOVED AS REQUESTED -->
-                    <div>
-                        <h2>Contact Us</h2>
-                        <p>We're here for you! ðŸ’™</p>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                    <div class="input-grp">
+                        <label>First Name *</label>
+                        <input type="text" id="reg-firstname" placeholder="John" required>
+                    </div>
+                    <div class="input-grp">
+                        <label>Last Name *</label>
+                        <input type="text" id="reg-lastname" placeholder="Doe" required>
                     </div>
                 </div>
 
-                <form id="ae-contact-form"
-                    onsubmit="event.preventDefault(); alert('Message sent! (Simulation)'); document.getElementById('ae-contact-modal').classList.remove('active');">
-                    <div class="ae-form-group">
-                        <label>ðŸ“§ Your Email</label>
-                        <input type="email" id="ae-email" placeholder="example@email.com" required>
-                    </div>
+                <div class="input-grp">
+                    <label>Email *</label>
+                    <input type="email" id="reg-email" placeholder="john@example.com" required>
+                </div>
 
-                    <div class="ae-form-group">
-                        <label>ðŸ‘¤ Name (Optional)</label>
-                        <input type="text" id="ae-name" placeholder="Your name">
-                    </div>
+                <div class="input-grp">
+                    <label>Password * (min 8 chars)</label>
+                    <input type="password" id="reg-password" placeholder="********" required>
+                </div>
 
-                    <div class="ae-form-group">
-                        <label>ðŸ“‹ Subject</label>
-                        <select id="ae-topic" required>
-                            <option value="">Select a topic...</option>
-                            <option value="general">ðŸ’¬ General Question</option>
-                            <option value="technical">ðŸ”§ Technical Support</option>
-                            <option value="business">ðŸ’¼ Business Collaboration</option>
-                            <option value="feedback">â­ Feedback & Suggestions</option>
-                            <option value="other">ðŸ“‹ Other</option>
+                <div style="display:grid; grid-template-columns:100px 1fr; gap:10px;">
+                    <div class="input-grp">
+                        <label>Country *</label>
+                        <select id="reg-country" required
+                            style="width:100%; padding:15px; background:rgba(0,0,0,0.6); border:1px solid var(--border); border-radius:8px; color:#fff;">
+                            <option value="UK">UK</option>
+                            <option value="RO">RO</option>
+                            <option value="US">US</option>
+                            <option value="DE">DE</option>
+                            <option value="FR">FR</option>
                         </select>
                     </div>
-
-                    <div class="ae-form-group">
-                        <label>ðŸ’­ Your Message</label>
-                        <textarea id="ae-message" placeholder="Describe your question, issue, or suggestion..."
-                            required></textarea>
+                    <div class="input-grp">
+                        <label>Phone *</label>
+                        <input type="tel" id="reg-phone" placeholder="7123456789" required>
                     </div>
+                </div>
 
-                    <button type="submit" class="ae-submit-btn">
-                        ðŸ“¨ Send Message
-                    </button>
-                </form>
+                <div class="input-grp">
+                    <label>Address *</label>
+                    <input type="text" id="reg-address" placeholder="123 Main Street" required>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                    <div class="input-grp">
+                        <label>City *</label>
+                        <input type="text" id="reg-city" placeholder="London" required>
+                    </div>
+                    <div class="input-grp">
+                        <label>Postal Code *</label>
+                        <input type="text" id="reg-postal" placeholder="SW1A 1AA" required>
+                    </div>
+                </div>
+
+                <!-- Voucher Code Field -->
+                <div class="input-grp"
+                    style="background:rgba(0,255,0,0.05); padding:15px; border-radius:10px; border:1px dashed rgba(0,255,0,0.3);">
+                    <label style="color:#00ff00;"><i class="fas fa-ticket-alt"></i> Voucher Code *</label>
+                    <input type="text" id="reg-voucher" placeholder="KEL-XXXXXXXX" style="text-transform:uppercase;"
+                        required>
+                    <small style="color:#888; font-size:0.7rem;">Enter your promotional code for access.</small>
+                </div>
+
+                <button id="do-register" class="modal-btn"
+                    style="background:linear-gradient(135deg, var(--pink), var(--cyan));"><i class="fas fa-rocket"></i>
+                    CREATE ACCOUNT</button>
+
+                <p style="margin-top:15px;">
+                    <a href="#" id="register-back-link" style="color:#888; font-size:0.8rem;">← Back to Login</a>
+                </p>
             </div>
         </div>
-    </div>
 
-    <!-- ADMIN TRAFFIC & CERINTE MODAL -->
-    <div id="admin-modal"
-        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(15px);">
-        <div class="modal-box"
-            style="width:900px; max-width:95vw; max-height:95vh; background:#050a10; border:2px solid #ff00ff; border-radius:20px; padding:20px; box-shadow:0 0 50px rgba(255,0,255,0.2); overflow-y:auto; display:flex; flex-direction:column; gap:15px;">
-            <div
-                style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,0,255,0.3); padding-bottom:10px; position:sticky; top:0; background:#050a10; z-index:10;">
-                <h2 style="font-family:'Orbitron'; color:#ff00ff; margin:0; letter-spacing:4px; font-size:1.2rem;">
-                    NETWORK TRAFFIC & REQUIREMENTS</h2>
-                <button onclick="document.getElementById('admin-modal').style.display='none'"
-                    style="background:none; border:1px solid #ff00ff; color:#ff00ff; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">Ã—</button>
-            </div>
+        <!-- AE CONTACT SYSTEM (Integrated) -->
+        <div id="ae-contact-modal">
+            <div class="ae-modal-content">
+                <div class="ae-close-btn"
+                    onclick="document.getElementById('ae-contact-modal').classList.remove('active')">
+                    ×
+                </div>
 
-            <div style="display:grid; grid-template-columns: 1fr; gap:15px;">
-                <!-- Full Width Flat Map Monitor -->
-                <div
-                    style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border:1px solid rgba(0, 243, 255, 0.1); position:relative;">
-                    <div id="status-title"
-                        style="font-family:'Orbitron'; font-size:1rem; color:var(--cyan); margin-bottom:10px;">GLOBAL
-                        NETWORK MONITOR :: ACTIVE SCAN</div>
-
-                    <div
-                        style="width:100%; height:280px; background:#001020 url('assets/world_map.png') no-repeat center center / contain; border:1px solid rgba(0, 243, 255, 0.2); border-radius:10px; position:relative; overflow:hidden;">
-                        <canvas id="traffic-canvas" width="800" height="280"
-                            style="width:100%; height:100%; position:relative; z-index:5;"></canvas>
-                        <!-- Scanline Effect -->
-                        <div
-                            style="position:absolute; inset:0; background: linear-gradient(to bottom, transparent, rgba(0, 243, 255, 0.05) 50%, transparent); background-size: 100% 4px; animation: scanLine 4s linear infinite; pointer-events:none; z-index:6;">
+                <div id="ae-form-container">
+                    <div class="ae-modal-header">
+                        <!-- LOGO REMOVED AS REQUESTED -->
+                        <div>
+                            <h2>Contact Us</h2>
+                            <p>We're here for you! 💕</p>
                         </div>
                     </div>
 
-                    <!-- IP Connections Table -->
-                    <div
-                        style="margin-top:10px; height:120px; overflow-y:auto; background:rgba(0,0,0,0.3); border:1px solid rgba(0, 243, 255, 0.1); border-radius:8px;">
-                        <table style="width:100%; border-collapse:collapse; font-family:monospace; text-align:left;">
-                            <thead
-                                style="position:sticky; top:0; background:#001020; color:var(--cyan); font-size:11px; text-transform:uppercase;">
-                                <tr>
-                                    <th style="padding:8px; border-bottom:1px solid var(--cyan);">IP ADDRESS</th>
-                                    <th style="padding:8px; border-bottom:1px solid var(--cyan);">LOCATION</th>
-                                    <th style="padding:8px; border-bottom:1px solid var(--cyan);">ISP/ORG</th>
-                                    <th style="padding:8px; border-bottom:1px solid var(--cyan);">STATUS</th>
-                                    <th style="padding:8px; border-bottom:1px solid var(--cyan);">TIME</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ip-table-body" style="color:#fff; font-size:12px;"></tbody>
-                        </table>
-                    </div>
+                    <form id="ae-contact-form"
+                        onsubmit="event.preventDefault(); alert('Message sent! (Simulation)'); document.getElementById('ae-contact-modal').classList.remove('active');">
+                        <div class="ae-form-group">
+                            <label>Your Email *</label>
+                            <input type="email" id="ae-email" placeholder="example@email.com" required>
+                        </div>
+
+                        <div class="ae-form-group">
+                            <label>Name *</label>
+                            <input type="text" id="ae-name" placeholder="Your name" required>
+                        </div>
+
+                        <div class="ae-form-group">
+                            <label>Subject *</label>
+                            <select id="ae-topic" required>
+                                <option value="">Select a topic...</option>
+                                <option value="general">General Question</option>
+                                <option value="technical">Technical Support</option>
+                                <option value="business">Business Collaboration</option>
+                                <option value="feedback">Feedback & Suggestions</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="ae-form-group">
+                            <label>Your Message *</label>
+                            <textarea id="ae-message" placeholder="Describe your question, issue, or suggestion..."
+                                required></textarea>
+                        </div>
+
+                        <button type="submit" class="ae-submit-btn">
+                            Send Message
+                        </button>
+                    </form>
                 </div>
             </div>
+        </div>
 
-            <!-- Bottom: Console Logs -->
-            <div id="admin-logs"
-                style="height:80px; background:#000; border:1px solid rgba(255,0,255,0.3); border-radius:8px; padding:10px; font-family:monospace; font-size:0.75rem; overflow-y:auto; color:#0f0; box-shadow:inset 0 0 20px rgba(0,255,0,0.05);">
-                > SYNCING WITH NEURAL GRID...<br>
-                > ACCESS GRANTED: ARCHITECT MODE...
+        <!-- ADMIN TRAFFIC & CERINTE MODAL -->
+        <div id="admin-modal"
+            style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(15px);">
+            <div class="modal-box"
+                style="width:900px; max-width:95vw; max-height:95vh; background:#050a10; border:2px solid #ff00ff; border-radius:20px; padding:20px; box-shadow:0 0 50px rgba(255,0,255,0.2); overflow-y:auto; display:flex; flex-direction:column; gap:15px;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,0,255,0.3); padding-bottom:10px; position:sticky; top:0; background:#050a10; z-index:10;">
+                    <h2 style="font-family:'Orbitron'; color:#ff00ff; margin:0; letter-spacing:4px; font-size:1.2rem;">
+                        NETWORK TRAFFIC & REQUIREMENTS</h2>
+                    <button onclick="document.getElementById('admin-modal').style.display='none'"
+                        style="background:none; border:1px solid #ff00ff; color:#ff00ff; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr; gap:15px;">
+                    <!-- Full Width Flat Map Monitor -->
+                    <div
+                        style="background:rgba(0,0,0,0.5); padding:10px; border-radius:15px; border:1px solid rgba(0, 243, 255, 0.1); position:relative;">
+                        <div id="status-title"
+                            style="font-family:'Orbitron'; font-size:1rem; color:var(--cyan); margin-bottom:10px;">
+                            GLOBAL
+                            NETWORK MONITOR :: ACTIVE SCAN</div>
+
+                        <div
+                            style="width:100%; height:280px; background:#001020 url('assets/world_map.png') no-repeat center center / contain; border:1px solid rgba(0, 243, 255, 0.2); border-radius:10px; position:relative; overflow:hidden;">
+                            <canvas id="traffic-canvas" width="800" height="280"
+                                style="width:100%; height:100%; position:relative; z-index:5;"></canvas>
+                            <!-- Scanline Effect -->
+                            <div
+                                style="position:absolute; inset:0; background: linear-gradient(to bottom, transparent, rgba(0, 243, 255, 0.05) 50%, transparent); background-size: 100% 4px; animation: scanLine 4s linear infinite; pointer-events:none; z-index:6;">
+                            </div>
+                        </div>
+
+                        <!-- IP Connections Table -->
+                        <div
+                            style="margin-top:10px; height:120px; overflow-y:auto; background:rgba(0,0,0,0.3); border:1px solid rgba(0, 243, 255, 0.1); border-radius:8px;">
+                            <table
+                                style="width:100%; border-collapse:collapse; font-family:monospace; text-align:left;">
+                                <thead
+                                    style="position:sticky; top:0; background:#001020; color:var(--cyan); font-size:11px; text-transform:uppercase;">
+                                    <tr>
+                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">IP ADDRESS</th>
+                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">LOCATION</th>
+                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">ISP/ORG</th>
+                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">STATUS</th>
+                                        <th style="padding:8px; border-bottom:1px solid var(--cyan);">TIME</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ip-table-body" style="color:#fff; font-size:12px;"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Console Logs -->
+                <div id="admin-logs"
+                    style="height:80px; background:#000; border:1px solid rgba(255,0,255,0.3); border-radius:8px; padding:10px; font-family:monospace; font-size:0.75rem; overflow-y:auto; color:#0f0; box-shadow:inset 0 0 20px rgba(0,255,0,0.05);">
+                    > SYNCING WITH NEURAL GRID...<br>
+                    > ACCESS GRANTED: ARCHITECT MODE...
+                </div>
             </div>
         </div>
-    </div>
 
 
 
-    <!-- AE Contact Button (Bottom Right) -->
-    <div id="ae-contact-btn" onclick="document.getElementById('ae-contact-modal').classList.add('active')">
-        CONTACT
-    </div>
-
-    <div id="footer-ticker">
-        <div class="ticker-text" style="color: #00f3ff;">
-            GENEZA KELION v143.0 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="/terms.html" style="color: #888; text-decoration: none;">Terms</a>
-            &nbsp;•&nbsp;
-            <a href="/privacy.html" style="color: #888; text-decoration: none;">Privacy</a>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            GENEZA KELION v143.0 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="/terms.html" style="color: #888; text-decoration: none;">Terms</a>
-            &nbsp;•&nbsp;
-            <a href="/privacy.html" style="color: #888; text-decoration: none;">Privacy</a>
+        <!-- AE Contact Button (Bottom Right) -->
+        <div id="ae-contact-btn" onclick="document.getElementById('ae-contact-modal').classList.add('active')">
+            CONTACT
         </div>
-    </div>
 
-    <script>
-        "use strict";
+        <div id="footer-ticker">
+            <div class="ticker-text" style="color: #00f3ff;">
+                GENEZA KELION v143.0 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="/terms.html" style="color: #888; text-decoration: none;">Terms</a>
+                &nbsp;•&nbsp;
+                <a href="/privacy.html" style="color: #888; text-decoration: none;">Privacy</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                GENEZA KELION v143.0 // ARTIFICIAL GENERAL INTELLIGENCE // Developed by Adrian Enciulescu
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="/terms.html" style="color: #888; text-decoration: none;">Terms</a>
+                &nbsp;•&nbsp;
+                <a href="/privacy.html" style="color: #888; text-decoration: none;">Privacy</a>
+            </div>
+        </div>
 
-        // ðŸ”‘ API CONFIGURATION - All API calls routed through Flask backend
-        // Backend endpoints: /api/chat, /api/tts, /api/search, /api/whisper
-        // API keys are securely stored in Railway environment variables
-        // No frontend API keys needed - all handled by backend (app.py)
+        <script>
+            "use strict";
 
-        const state = {
-            isLogged: false,
-            isAdmin: false,
-            user: "N/A",
-            voice: true,
-            language: 'en'  // English default
-        };
+            // 🔑 API CONFIGURATION - All API calls routed through Flask backend
+            // Backend endpoints: /api/chat, /api/tts, /api/search, /api/whisper
+            // API keys are securely stored in Railway environment variables
+            // No frontend API keys needed - all handled by backend (app.py)
 
-        const $ = id => document.getElementById(id);
+            const state = {
+                isLogged: false,
+                isAdmin: false,
+                user: "N/A",
+                voice: true,
+                language: 'en'  // English default
+            };
 
-        // ðŸ“ CHAT SYSTEM
-        function write(who, text, isError = false) {
-            const msg = document.createElement('div');
-            msg.className = `message ${who} ${isError ? 'error' : ''}`;
-            msg.textContent = text;
-            $('chat-messages').appendChild(msg);
-            $('chat-messages').scrollTop = $('chat-messages').scrollHeight;
-            return msg;
-        }
+            const $ = id => document.getElementById(id);
 
-        // ðŸŒ REAL-TIME WEB SEARCH (via Backend /api/search)
-        async function searchWeb(query) {
-            console.log(`ðŸŒ Searching web via backend for: ${query}`);
-            try {
-                const response = await fetch("/api/search", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ query: query })
-                });
+            // 📝 CHAT SYSTEM
+            function write(who, text, isError = false) {
+                const msg = document.createElement('div');
+                msg.className = `message ${who} ${isError ? 'error' : ''}`;
+                msg.textContent = text;
+                $('chat-messages').appendChild(msg);
+                $('chat-messages').scrollTop = $('chat-messages').scrollHeight;
 
-                if (!response.ok) throw new Error("Search API Error");
-
-                const data = await response.json();
-
-                if (!data.success) {
-                    return `Error: ${data.error || 'Search failed'}`;
+                // 🔊 Sound Effect for bot messages
+                if (who === 'bot' && !isError) {
+                    try {
+                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        const oscillator = audioCtx.createOscillator();
+                        const gainNode = audioCtx.createGain();
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioCtx.destination);
+                        oscillator.frequency.value = 800;
+                        oscillator.type = 'sine';
+                        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); // Very quiet
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.stop(audioCtx.currentTime + 0.1);
+                    } catch (e) { /* Sound disabled or not supported */ }
                 }
 
-                let results = [];
-                if (data.results && data.results.length > 0) {
-                    data.results.forEach((item, i) => {
-                        results.push(`[${i + 1}] ${item.title}: ${item.snippet}`);
+                return msg;
+            }
+
+            // 🌐 REAL-TIME WEB SEARCH (via Backend /api/search)
+            async function searchWeb(query) {
+                console.log(`🌐 Searching web via backend for: ${query}`);
+                try {
+                    const response = await fetch("/api/search", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ query: query })
                     });
-                }
 
-                if (results.length === 0) return "No results found for this query.";
+                    if (!response.ok) throw new Error("Search API Error");
 
-                return "ðŸŒ LIVE WEB SEARCH RESULTS:\n" + results.join("\n\n");
+                    const data = await response.json();
 
-            } catch (err) {
-                console.error("Web Search Error:", err);
-                return "Error: Could not connect to search service.";
-            }
-        }
-
-        // ðŸ”Š VOICE SYSTEM (OPENAI TTS)
-        let currentAudio = null;
-        let audioCtx = null;
-        let analyser = null;
-        let dataArray = null;
-        let visualizerID = null;
-
-        async function speak(text) {
-            if (!state.voice) return;
-
-            // ===== ACCESSIBILITY: Show subtitles =====
-            if (window.SubtitleSystem) {
-                const lang = state.lang || 'EN';
-                window.SubtitleSystem.showText(text, lang);
-            }
-
-            // ===== HOLOGRAM: Start lip sync + emotion detection =====
-            if (window.HologramSystem) {
-                window.HologramSystem.startSpeaking();
-                window.HologramSystem.setColor('speaking');
-            }
-            if (window.EmotionDetector) {
-                window.EmotionDetector.applyToHologram(text);
-            }
-
-            // Stop previous audio if playing
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
-            }
-            if (visualizerID) {
-                cancelAnimationFrame(visualizerID);
-            }
-
-            // Cancel any browser synthesis
-            window.speechSynthesis.cancel();
-
-            try {
-                // Visual indicator start
-                document.body.classList.add('speaking');
-                const visualizer = $('voice-visualizer');
-                if (visualizer) visualizer.classList.add('active');
-
-                // Use backend /api/tts endpoint (has API key configured)
-                const response = await fetch("/api/tts", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        text: text,
-                        gender: "male",
-                        username: state.user
-                    })
-                });
-
-                if (!response.ok) throw new Error("TTS API Error");
-
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-
-                currentAudio = new Audio(url);
-                currentAudio.crossOrigin = "anonymous";
-
-                // Setup Audio Visualizer
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    analyser = audioCtx.createAnalyser();
-                    analyser.fftSize = 32;
-                    dataArray = new Uint8Array(analyser.frequencyBinCount);
-                }
-
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-
-                const source = audioCtx.createMediaElementSource(currentAudio);
-                source.connect(analyser);
-                analyser.connect(audioCtx.destination);
-
-                function updateVisualizer() {
-                    analyser.getByteFrequencyData(dataArray);
-                    const bars = document.querySelectorAll('.voice-bar');
-                    bars.forEach((bar, i) => {
-                        // Map frequency data to height (10px to 60px)
-                        const val = dataArray[i % dataArray.length];
-                        const height = 10 + (val / 255) * 50;
-                        bar.style.height = height + 'px';
-                    });
-                    visualizerID = requestAnimationFrame(updateVisualizer);
-                }
-
-                currentAudio.onplay = () => {
-                    updateVisualizer();
-                };
-
-                currentAudio.onended = () => {
-                    document.body.classList.remove('speaking');
-                    if (visualizer) visualizer.classList.remove('active');
-                    if (visualizerID) cancelAnimationFrame(visualizerID);
-
-                    // ===== Stop hologram lip sync =====
-                    if (window.HologramSystem) {
-                        window.HologramSystem.stopSpeaking();
-                        window.HologramSystem.setColor('default');
+                    if (!data.success) {
+                        return `Error: ${data.error || 'Search failed'}`;
                     }
-                    // ===== Clear subtitle animation =====
-                    if (window.SubtitleSystem) {
-                        window.SubtitleSystem.clear();
+
+                    let results = [];
+                    if (data.results && data.results.length > 0) {
+                        data.results.forEach((item, i) => {
+                            results.push(`[${i + 1}] ${item.title}: ${item.snippet}`);
+                        });
                     }
-                };
 
-                currentAudio.play();
+                    if (results.length === 0) return "No results found for this query.";
 
-            } catch (err) {
-                console.error("Backend TTS Failed. Using browser fallback:", err);
-                const utterance = new SpeechSynthesisUtterance(text);
-                const voices = window.speechSynthesis.getVoices();
-                // Try to find a male/romanian voice
-                utterance.voice = voices.find(v => v.lang.includes('ro') || v.name.includes('Male')) || voices[0];
-                utterance.onstart = () => {
+                    return "🌐 LIVE WEB SEARCH RESULTS:\n" + results.join("\n\n");
+
+                } catch (err) {
+                    console.error("Web Search Error:", err);
+                    return "Error: Could not connect to search service.";
+                }
+            }
+
+            // 🎤 VOICE SYSTEM (OPENAI TTS)
+            let currentAudio = null;
+            let audioCtx = null;
+            let analyser = null;
+            let dataArray = null;
+            let visualizerID = null;
+
+            async function speak(text) {
+                if (!state.voice) return;
+
+                // ===== ACCESSIBILITY: Show subtitles =====
+                if (window.SubtitleSystem) {
+                    const lang = state.lang || 'EN';
+                    window.SubtitleSystem.showText(text, lang);
+                }
+
+                // ===== HOLOGRAM: Start lip sync + emotion detection =====
+                if (window.HologramSystem) {
+                    window.HologramSystem.startSpeaking();
+                    window.HologramSystem.setColor('speaking');
+                }
+                if (window.EmotionDetector) {
+                    window.EmotionDetector.applyToHologram(text);
+                }
+
+                // Stop previous audio if playing
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                }
+                if (visualizerID) {
+                    cancelAnimationFrame(visualizerID);
+                }
+
+                // Cancel any browser synthesis
+                window.speechSynthesis.cancel();
+
+                try {
+                    // Visual indicator start
                     document.body.classList.add('speaking');
                     const visualizer = $('voice-visualizer');
                     if (visualizer) visualizer.classList.add('active');
-                };
-                utterance.onend = () => {
-                    document.body.classList.remove('speaking');
-                    const visualizer = $('voice-visualizer');
-                    if (visualizer) visualizer.classList.remove('active');
 
-                    // ===== Stop hologram lip sync =====
-                    if (window.HologramSystem) {
-                        window.HologramSystem.stopSpeaking();
+                    // Use backend /api/tts endpoint (has API key configured)
+                    const response = await fetch("/api/tts", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            text: text,
+                            gender: "male",
+                            username: state.user
+                        })
+                    });
+
+                    if (!response.ok) throw new Error("TTS API Error");
+
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+
+                    currentAudio = new Audio(url);
+                    currentAudio.crossOrigin = "anonymous";
+
+                    // Setup Audio Visualizer
+                    if (!audioCtx) {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        analyser = audioCtx.createAnalyser();
+                        analyser.fftSize = 32;
+                        dataArray = new Uint8Array(analyser.frequencyBinCount);
                     }
-                    // ===== Clear subtitle animation =====
-                    if (window.SubtitleSystem) {
-                        window.SubtitleSystem.clear();
+
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
                     }
-                };
-                window.speechSynthesis.speak(utterance);
-            }
-        }
 
+                    const source = audioCtx.createMediaElementSource(currentAudio);
+                    source.connect(analyser);
+                    analyser.connect(audioCtx.destination);
 
-        // ðŸ§  AI PROCESSOR (INTELLIGENT RESOLVER v142 + WEB SEARCH via Backend)
-        async function execute() {
-            const input = $('chat-input');
-            const msg = input.value.trim();
-            if (!msg) return;
+                    function updateVisualizer() {
+                        analyser.getByteFrequencyData(dataArray);
+                        const bars = document.querySelectorAll('.voice-bar');
+                        bars.forEach((bar, i) => {
+                            // Map frequency data to height (10px to 60px)
+                            const val = dataArray[i % dataArray.length];
+                            const height = 10 + (val / 255) * 50;
+                            bar.style.height = height + 'px';
+                        });
+                        visualizerID = requestAnimationFrame(updateVisualizer);
+                    }
 
-            write('user', msg);
-            input.value = "";
+                    currentAudio.onplay = () => {
+                        updateVisualizer();
+                    };
 
-            const thinking = write('bot', "Synapsing...");
+                    currentAudio.onended = () => {
+                        document.body.classList.remove('speaking');
+                        if (visualizer) visualizer.classList.remove('active');
+                        if (visualizerID) cancelAnimationFrame(visualizerID);
 
-            try {
-                // START VISUAL PROCESSING
-                if (window.HologramSystem) {
-                    window.HologramSystem.startProcessing();
-                }
-
-                // Use backend /api/chat endpoint (has API keys configured)
-                thinking.textContent = "Connecting to neural core...";
-
-                const response = await fetch("/api/chat", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: msg,
-                        username: state.user,
-                        gender: "male",
-                        conversation_id: state.user
-                    })
-                });
-
-                // STOP VISUAL PROCESSING
-                if (window.HologramSystem) {
-                    window.HologramSystem.stopProcessing();
-                }
-
-                if (!response.ok) throw new Error("Chat API Error");
-
-                const data = await response.json();
-
-                // ===== CHECK IF USER IS BLOCKED =====
-                if (data.blocked) {
-                    thinking.remove();
-                    const blockedMsg = data.message || "Your access has expired. Please subscribe to continue.";
-                    write('bot', `⚠️ ${blockedMsg}`);
-                    speak(blockedMsg);
-
-                    // Show subscription modal after 2 seconds
-                    setTimeout(() => {
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
+                        // ===== Stop hologram lip sync =====
+                        if (window.HologramSystem) {
+                            window.HologramSystem.stopSpeaking();
+                            window.HologramSystem.setColor('default');
                         }
-                    }, 3000);
-                    return;
-                }
+                        // ===== Clear subtitle animation =====
+                        if (window.SubtitleSystem) {
+                            window.SubtitleSystem.clear();
+                        }
+                    };
 
-                if (data.success) {
-                    const reply = data.response;
+                    currentAudio.play();
+
+                } catch (err) {
+                    console.error("Backend TTS Failed. Using browser fallback:", err);
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    const voices = window.speechSynthesis.getVoices();
+                    // Try to find a male/romanian voice
+                    utterance.voice = voices.find(v => v.lang.includes('ro') || v.name.includes('Male')) || voices[0];
+                    utterance.onstart = () => {
+                        document.body.classList.add('speaking');
+                        const visualizer = $('voice-visualizer');
+                        if (visualizer) visualizer.classList.add('active');
+                    };
+                    utterance.onend = () => {
+                        document.body.classList.remove('speaking');
+                        const visualizer = $('voice-visualizer');
+                        if (visualizer) visualizer.classList.remove('active');
+
+                        // ===== Stop hologram lip sync =====
+                        if (window.HologramSystem) {
+                            window.HologramSystem.stopSpeaking();
+                        }
+                        // ===== Clear subtitle animation =====
+                        if (window.SubtitleSystem) {
+                            window.SubtitleSystem.clear();
+                        }
+                    };
+                    window.speechSynthesis.speak(utterance);
+                }
+            }
+
+
+            // 🧠 AI PROCESSOR (INTELLIGENT RESOLVER v142 + WEB SEARCH via Backend)
+            async function execute() {
+                const input = $('chat-input');
+                const msg = input.value.trim();
+                if (!msg) return;
+
+                write('user', msg);
+                input.value = "";
+
+                // Show typing indicator
+                const typingInd = $('typing-indicator');
+                if (typingInd) typingInd.style.display = 'flex';
+                $('chat-messages').scrollTop = $('chat-messages').scrollHeight;
+
+                try {
+                    // START VISUAL PROCESSING
+                    if (window.HologramSystem) {
+                        window.HologramSystem.startProcessing();
+                    }
+
+                    // Use backend /api/chat endpoint (has API keys configured)
+                    thinking.textContent = "Connecting to neural core...";
+
+                    const response = await fetch("/api/chat", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: msg,
+                            username: state.user,
+                            gender: "male",
+                            conversation_id: state.user
+                        })
+                    });
+
+                    // STOP VISUAL PROCESSING
+                    if (window.HologramSystem) {
+                        window.HologramSystem.stopProcessing();
+                    }
+
+                    if (!response.ok) throw new Error("Chat API Error");
+
+                    const data = await response.json();
+
+                    // Hide typing indicator
+                    if (typingInd) typingInd.style.display = 'none';
+
+                    // ===== CHECK IF USER IS BLOCKED =====
+                    if (data.blocked) {
+                        thinking.remove();
+                        const blockedMsg = data.message || "Your access has expired. Please subscribe to continue.";
+                        write('bot', `⚠️ ${blockedMsg}`);
+                        speak(blockedMsg);
+
+                        // Show subscription modal after 2 seconds
+                        setTimeout(() => {
+                            if (data.redirect) {
+                                window.location.href = data.redirect;
+                            }
+                        }, 3000);
+                        return;
+                    }
+
+                    if (data.success) {
+                        const reply = data.response;
+                        thinking.remove();
+                        write('bot', reply);
+                        speak(reply);
+
+                        // Detect language from response for future use
+                        if (data.lang) state.language = data.lang;
+                    } else {
+                        throw new Error(data.error || "Unknown error");
+                    }
+
+                } catch (err) {
+                    console.error("AI Processor Error:", err);
                     thinking.remove();
-                    write('bot', reply);
-                    speak(reply);
+                    const errStatus = "Neural Link unstable. Please try again.";
+                    write('bot', errStatus);
+                    speak(errStatus);
+                }
+            }
 
-                    // Detect language from response for future use
-                    if (data.lang) state.language = data.lang;
-                } else {
-                    throw new Error(data.error || "Unknown error");
+
+            // 🌌 BACKGROUND PARTICLES
+            function starfield() {
+                const canvas = $('bg-canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                const stars = [];
+                for (let i = 0; i < 60; i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        s: Math.random() * 2,
+                        v: Math.random() * 0.3
+                    });
                 }
 
-            } catch (err) {
-                console.error("AI Processor Error:", err);
-                thinking.remove();
-                const errStatus = "Neural Link unstable. Please try again.";
-                write('bot', errStatus);
-                speak(errStatus);
-            }
-        }
-
-
-        // ðŸŒŒ BACKGROUND PARTICLES
-        function starfield() {
-            const canvas = $('bg-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const stars = [];
-            for (let i = 0; i < 60; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    s: Math.random() * 2,
-                    v: Math.random() * 0.3
-                });
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "rgba(0, 243, 255, 0.2)";
-                stars.forEach(s => {
-                    s.y -= s.v;
-                    if (s.y < 0) s.y = canvas.height;
-                    ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2); ctx.fill();
-                });
-                requestAnimationFrame(animate);
-            }
-            animate();
-        }
-
-        // ========== FLAT MAP + ADVANCED TRACKING ==========
-        let mapRAF = null;
-        let ipMarkers = [];
-
-        function latLonToXY(lat, lon, width, height) {
-            const x = ((lon + 180) / 360) * width;
-            const y = ((90 - lat) / 180) * height;
-            return { x, y };
-        }
-
-        function renderFlatMap() {
-            const canvas = document.getElementById("traffic-canvas");
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-            const width = canvas.width;
-            const height = canvas.height;
-
-            function frame() {
-                ctx.clearRect(0, 0, width, height);
-
-                ctx.strokeStyle = "rgba(0,243,255,0.3)";
-                ctx.lineWidth = 0.5;
-
-                for (let lat = -90; lat <= 90; lat += 15) {
-                    ctx.beginPath();
-                    const y = ((90 - lat) / 180) * height;
-                    ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "rgba(0, 243, 255, 0.2)";
+                    stars.forEach(s => {
+                        s.y -= s.v;
+                        if (s.y < 0) s.y = canvas.height;
+                        ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2); ctx.fill();
+                    });
+                    requestAnimationFrame(animate);
                 }
-                for (let lon = -180; lon <= 180; lon += 15) {
-                    ctx.beginPath();
-                    const x = ((lon + 180) / 360) * width;
-                    ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
-                }
-
-                ipMarkers.forEach(marker => {
-                    const pos = latLonToXY(marker.lat, marker.lon, width, height);
-                    ctx.shadowBlur = 15; ctx.shadowColor = marker.color;
-                    ctx.beginPath(); ctx.arc(pos.x, pos.y, 6, 0, Math.PI * 2);
-                    ctx.fillStyle = marker.color; ctx.fill();
-                    ctx.shadowBlur = 0;
-                    ctx.fillStyle = "#fff"; ctx.font = "10px 'Orbitron'";
-                    ctx.fillText(marker.city || marker.ip, pos.x + 10, pos.y - 10);
-                });
-                mapRAF = requestAnimationFrame(frame);
+                animate();
             }
-            frame();
-        }
 
-        function addIPMarker(ip, lat, lon, city, country, org, status) {
-            const color = status.includes("YOU") ? "#00f3ff" : "#ff00ff";
-            ipMarkers.push({ ip, lat, lon, city, country, color });
-            const tbody = document.getElementById("ip-table-body");
-            if (!tbody) return;
-            const row = document.createElement("tr");
-            row.innerHTML = `
+            // ========== FLAT MAP + ADVANCED TRACKING ==========
+            let mapRAF = null;
+            let ipMarkers = [];
+
+            function latLonToXY(lat, lon, width, height) {
+                const x = ((lon + 180) / 360) * width;
+                const y = ((90 - lat) / 180) * height;
+                return { x, y };
+            }
+
+            function renderFlatMap() {
+                const canvas = document.getElementById("traffic-canvas");
+                if (!canvas) return;
+                const ctx = canvas.getContext("2d");
+                const width = canvas.width;
+                const height = canvas.height;
+
+                function frame() {
+                    ctx.clearRect(0, 0, width, height);
+
+                    ctx.strokeStyle = "rgba(0,243,255,0.3)";
+                    ctx.lineWidth = 0.5;
+
+                    for (let lat = -90; lat <= 90; lat += 15) {
+                        ctx.beginPath();
+                        const y = ((90 - lat) / 180) * height;
+                        ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+                    }
+                    for (let lon = -180; lon <= 180; lon += 15) {
+                        ctx.beginPath();
+                        const x = ((lon + 180) / 360) * width;
+                        ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+                    }
+
+                    ipMarkers.forEach(marker => {
+                        const pos = latLonToXY(marker.lat, marker.lon, width, height);
+                        ctx.shadowBlur = 15; ctx.shadowColor = marker.color;
+                        ctx.beginPath(); ctx.arc(pos.x, pos.y, 6, 0, Math.PI * 2);
+                        ctx.fillStyle = marker.color; ctx.fill();
+                        ctx.shadowBlur = 0;
+                        ctx.fillStyle = "#fff"; ctx.font = "10px 'Orbitron'";
+                        ctx.fillText(marker.city || marker.ip, pos.x + 10, pos.y - 10);
+                    });
+                    mapRAF = requestAnimationFrame(frame);
+                }
+                frame();
+            }
+
+            function addIPMarker(ip, lat, lon, city, country, org, status) {
+                const color = status.includes("YOU") ? "#00f3ff" : "#ff00ff";
+                ipMarkers.push({ ip, lat, lon, city, country, color });
+                const tbody = document.getElementById("ip-table-body");
+                if (!tbody) return;
+                const row = document.createElement("tr");
+                row.innerHTML = `
                     <td style="padding:10px; border-bottom:1px solid rgba(0,243,255,.1);">${ip}</td>
                     <td style="padding:10px; border-bottom:1px solid rgba(0,243,255,.1);">${city}, ${country}</td>
                     <td style="padding:10px; border-bottom:1px solid rgba(0,243,255,.1);">${org}</td>
                     <td style="padding:10px; border-bottom:1px solid rgba(0,243,255,.1); color:${color}">${status}</td>
                     <td style="padding:10px; border-bottom:1px solid rgba(0,243,255,.1);">${new Date().toLocaleTimeString()}</td>
                 `;
-            tbody.prepend(row);
-        }
-
-        async function detectRealIP() {
-            const apis = ["https://ipapi.co/json/", "https://api.ipify.org?format=json"];
-            for (const api of apis) {
-                try {
-                    const res = await fetch(api);
-                    const data = await res.json();
-                    if (data.ip) return {
-                        ip: data.ip, city: data.city || "Unknown", country: data.country_name || "Unknown",
-                        lat: data.latitude || 0, lon: data.longitude || 0, org: data.org || "Unknown"
-                    };
-                } catch (e) { continue; }
+                tbody.prepend(row);
             }
-            return null;
-        }
 
-        async function startTrafficTracking() {
-            const tbody = document.getElementById("ip-table-body");
-            if (tbody) tbody.innerHTML = "";
-            ipMarkers = [];
-            if (!mapRAF) renderFlatMap();
-
-            const ipData = await detectRealIP();
-            if (ipData) {
-                addIPMarker(ipData.ip, ipData.lat, ipData.lon, ipData.city, ipData.country, ipData.org, "ACTIVE (YOU)");
-            }
-        }
-
-        // ðŸš€ INITIALIZATION
-        document.addEventListener('DOMContentLoaded', () => {
-            // ðŸ›‘ SECURITY: Force logout on every access (Requested by Architect)
-            localStorage.clear();
-            sessionStorage.clear();
-
-            // ðŸš€ NEURAL INITIALIZATION SEQUENCE
-            const initSequence = async () => {
-                const bar = $('load-bar');
-                const status = $('load-status');
-                const detail = $('load-detail');
-                const steps = [
-                    { p: 10, s: "CONNECTING TO NEURAL HUB...", d: "> HANDSHAKE_REQUEST_SENT" },
-                    { p: 30, s: "AUTHENTICATING BIO-SIGNATURES...", d: "> USER_RECOGNIZED: ARCHITECT" },
-                    { p: 50, s: "LOADING CORE AI MATRICES...", d: "> GPT-4O_CORE_LOADED" },
-                    { p: 80, s: "SYNCHRONIZING GLOBAL_EYES...", d: "> SATELLITE_UPLINK_STABLE" },
-                    { p: 100, s: "SYSTEM READY", d: "> WELCOME TO KELION v143.0" }
-                ];
-
-                for (let step of steps) {
-                    await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
-                    bar.style.width = step.p + "%";
-                    status.textContent = step.s;
-                    detail.textContent = step.d;
+            async function detectRealIP() {
+                const apis = ["https://ipapi.co/json/", "https://api.ipify.org?format=json"];
+                for (const api of apis) {
+                    try {
+                        const res = await fetch(api);
+                        const data = await res.json();
+                        if (data.ip) return {
+                            ip: data.ip, city: data.city || "Unknown", country: data.country_name || "Unknown",
+                            lat: data.latitude || 0, lon: data.longitude || 0, org: data.org || "Unknown"
+                        };
+                    } catch (e) { continue; }
                 }
+                return null;
+            }
 
-                await new Promise(r => setTimeout(r, 800));
-                $('loading-screen').style.opacity = '0';
-                setTimeout(() => {
-                    $('loading-screen').style.visibility = 'hidden';
-                    $('bg-image').classList.add('active');
-                    document.body.classList.add('ready');
+            async function startTrafficTracking() {
+                const tbody = document.getElementById("ip-table-body");
+                if (tbody) tbody.innerHTML = "";
+                ipMarkers = [];
+                if (!mapRAF) renderFlatMap();
 
-                    // ðŸŽ¤ Play welcome message AFTER robot appears (always visitor since we clear session)
+                const ipData = await detectRealIP();
+                if (ipData) {
+                    addIPMarker(ipData.ip, ipData.lat, ipData.lon, ipData.city, ipData.country, ipData.org, "ACTIVE (YOU)");
+                }
+            }
+
+            // 🚀 INITIALIZATION
+            document.addEventListener('DOMContentLoaded', () => {
+                // 🔒 SECURITY: Force logout on every access (Requested by Architect)
+                localStorage.clear();
+                sessionStorage.clear();
+
+                // 🚀 NEURAL INITIALIZATION SEQUENCE
+                const initSequence = async () => {
+                    const bar = $('load-bar');
+                    const status = $('load-status');
+                    const detail = $('load-detail');
+                    const steps = [
+                        { p: 10, s: "CONNECTING TO NEURAL HUB...", d: "> HANDSHAKE_REQUEST_SENT" },
+                        { p: 30, s: "AUTHENTICATING BIO-SIGNATURES...", d: "> USER_RECOGNIZED: ARCHITECT" },
+                        { p: 50, s: "LOADING CORE AI MATRICES...", d: "> GPT-4O_CORE_LOADED" },
+                        { p: 80, s: "SYNCHRONIZING GLOBAL_EYES...", d: "> SATELLITE_UPLINK_STABLE" },
+                        { p: 100, s: "SYSTEM READY", d: "> WELCOME TO KELION v143.0" }
+                    ];
+
+                    for (let step of steps) {
+                        await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
+                        bar.style.width = step.p + "%";
+                        status.textContent = step.s;
+                        detail.textContent = step.d;
+                    }
+
+                    await new Promise(r => setTimeout(r, 800));
+                    $('loading-screen').style.opacity = '0';
                     setTimeout(() => {
-                        showKelionaiWelcome();
-                    }, 1500); // 1.5s after robot appears
-                }, 1000);
-            };
+                        $('loading-screen').style.visibility = 'hidden';
+                        $('bg-image').classList.add('active');
+                        document.body.classList.add('ready');
 
-            initSequence();
-
-            // ðŸ”“ PRE-POPULATE DEMO
-            $('u-input').value = "demo";
-            $('p-input').value = "demo";
-
-            // No session restoration - user must login every time
-            $('input-bar').style.display = 'none';
-
-            // starfield(); // Disabled - using Matrix Rain (initThreeJS) instead
-
-            function updatePart(id, val) {
-                const container = $(id);
-                if (!container) return;
-                const current = container.querySelector('span:last-child');
-                if (current && current.textContent === val) return;
-
-                const next = document.createElement('span');
-                next.textContent = val;
-                container.appendChild(next);
-
-                // Ensure transition is active
-                container.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
-
-                // Force layout reflow
-                container.offsetHeight;
-
-                const offset = (container.children.length - 1) * 1.2;
-                container.style.transform = `translateY(-${offset}em)`;
-
-                setTimeout(() => {
-                    if (container.children.length > 1) {
-                        const last = container.lastElementChild;
-                        container.style.transition = 'none';
-                        container.style.transform = 'translateY(0)';
-                        container.innerHTML = '';
-                        container.appendChild(last);
-                    }
-                }, 650);
-            }
-
-            function updateClock() {
-                const now = new Date();
-                const h = String(now.getHours()).padStart(2, '0');
-                const m = String(now.getMinutes()).padStart(2, '0');
-                const s = String(now.getSeconds()).padStart(2, '0');
-
-                updatePart('h-part', h);
-                updatePart('m-part', m);
-                updatePart('s-part', s);
-
-                const dateString = now.toLocaleDateString('en-US');
-                if ($('system-date').textContent !== dateString) {
-                    $('system-date').textContent = dateString;
-                }
-            }
-            setInterval(updateClock, 1000);
-            updateClock();
-
-            // ðŸ”„ LOGIN HANDLERS
-            $('login-btn').onclick = () => {
-                if (state.isLogged) {
-                    state.isLogged = false;
-                    state.user = "N/A";
-                    state.isAdmin = false;
-                    sessionStorage.removeItem('kelion_user');
-                    sessionStorage.removeItem('kelion_admin');
-                    localStorage.removeItem('kelion_user');
-                    localStorage.removeItem('kelion_admin');
-                    location.reload(); // Hard reset on logout
-                } else {
-                    $('login-modal').style.display = 'flex';
-                }
-            };
-
-            $('do-login').onclick = async () => {
-                const username = $('u-input').value.trim();
-                const password = $('p-input').value.trim();
-
-                if (!username || !password) {
-                    alert("âš ï¸ Please enter both Architect ID and Security Key.");
-                    return;
-                }
-
-                $('do-login').textContent = "AUTHENTICATING...";
-                $('do-login').disabled = true;
-
-                try {
-                    const response = await fetch("/api/login", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ username, password })
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        state.user = data.username || username;
-                        state.isLogged = true;
-                        state.isAdmin = (data.role === 'admin');
-
-                        // Storage (though we clear it on load, it helps within same session)
-                        sessionStorage.setItem('kelion_user', state.user);
-                        sessionStorage.setItem('kelion_admin', state.isAdmin);
-                        localStorage.setItem('kelion_user', state.user);
-                        localStorage.setItem('kelion_admin', state.isAdmin);
-
-                        // UI UPDATE
-                        $('login-modal').style.display = 'none';
-                        $('user-name').textContent = state.user.toUpperCase();
-                        $('sys-status').textContent = "CONNECTED";
-                        $('sys-status').className = "stat-val online";
-                        $('login-btn').textContent = "LOG OFF";
-                        $('login-btn').classList.add('logged');
-                        $('input-bar').style.display = 'flex';
-                        $('chat-container').style.display = 'flex';
-
-                        if (state.isAdmin) {
-                            const tb = $('traffic-btn');
-                            if (tb) {
-                                tb.style.display = 'inline-block';
-                                tb.style.opacity = '1';
-                                tb.style.pointerEvents = 'auto';
-                            }
-                        }
-
-                        // ðŸ•’ GREETING AFTER LOGIN
-                        greetUser(state.user);
-                    } else {
-                        alert("âš ï¸ ACCESS DENIED: " + (data.error || "Invalid Credentials"));
-                    }
-                } catch (err) {
-                    console.error("Login Error:", err);
-                    alert("âš ï¸ CONNECTION ERROR: Neural core unreachable.");
-                } finally {
-                    $('do-login').textContent = "INITIALIZE";
-                    $('do-login').disabled = false;
-                }
-            };
-
-            const tBtn = $('traffic-btn');
-            if (tBtn) {
-                tBtn.onclick = () => {
-                    $('admin-modal').style.display = 'flex';
-                    startTrafficTracking();
+                        // 🗣️ Play welcome message AFTER robot appears (always visitor since we clear session)
+                        setTimeout(() => {
+                            showKelionaiWelcome();
+                        }, 1500); // 1.5s after robot appears
+                    }, 1000);
                 };
-            }
 
-            // ðŸŽ¤ VOICE RECOGNITION (WHISPER)
-            let mediaRecorder;
-            let audioChunks = [];
-            const micBtn = $('mic-btn');
-            let isRecording = false;
+                initSequence();
 
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                // CORRECT PROCEDURE: HOLD TO RECORD, RELEASE TO SEND
+                // 🔓 PRE-POPULATE DEMO CREDENTIALS
+                $('u-input').value = "demo";
+                $('p-input').value = "demo2024";
 
-                const startRecording = async (e) => {
-                    // Prevent default text selection etc.
-                    if (e.type !== 'mousedown') e.preventDefault();
-                    if (isRecording) return;
+                // No session restoration - user must login every time
+                $('input-bar').style.display = 'none';
+
+                // starfield(); // Disabled - using Matrix Rain (initThreeJS) instead
+
+                function updatePart(id, val) {
+                    const container = $(id);
+                    if (!container) return;
+                    const current = container.querySelector('span:last-child');
+                    if (current && current.textContent === val) return;
+
+                    const next = document.createElement('span');
+                    next.textContent = val;
+                    container.appendChild(next);
+
+                    // Ensure transition is active
+                    container.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+
+                    // Force layout reflow
+                    container.offsetHeight;
+
+                    const offset = (container.children.length - 1) * 1.2;
+                    container.style.transform = `translateY(-${offset}em)`;
+
+                    setTimeout(() => {
+                        if (container.children.length > 1) {
+                            const last = container.lastElementChild;
+                            container.style.transition = 'none';
+                            container.style.transform = 'translateY(0)';
+                            container.innerHTML = '';
+                            container.appendChild(last);
+                        }
+                    }, 650);
+                }
+
+                function updateClock() {
+                    const now = new Date();
+                    const h = String(now.getHours()).padStart(2, '0');
+                    const m = String(now.getMinutes()).padStart(2, '0');
+                    const s = String(now.getSeconds()).padStart(2, '0');
+
+                    updatePart('h-part', h);
+                    updatePart('m-part', m);
+                    updatePart('s-part', s);
+
+                    const dateString = now.toLocaleDateString('en-US');
+                    if ($('system-date').textContent !== dateString) {
+                        $('system-date').textContent = dateString;
+                    }
+                }
+                setInterval(updateClock, 1000);
+                updateClock();
+
+                // ⚙️ LOGIN HANDLERS
+                $('login-btn').onclick = () => {
+                    if (state.isLogged) {
+                        // === LOGOUT PROTOCOL ===
+                        state.isLogged = false;
+                        state.user = "N/A";
+                        state.isAdmin = false;
+                        state.language = 'en'; // Reset to English default
+
+                        // Clear all storage
+                        sessionStorage.removeItem('kelion_user');
+                        sessionStorage.removeItem('kelion_admin');
+                        localStorage.removeItem('kelion_user');
+                        localStorage.removeItem('kelion_admin');
+
+                        // Reset all form fields
+                        $('u-input').value = 'demo';
+                        $('p-input').value = 'demo2024';
+
+                        // Clear registration form if exists
+                        const regFields = ['reg-email', 'reg-pass', 'reg-first', 'reg-last', 'reg-phone', 'reg-address', 'reg-city', 'reg-postal'];
+                        regFields.forEach(id => { const el = $(id); if (el) el.value = ''; });
+
+                        // Hard reset on logout
+                        location.reload();
+                    } else {
+                        $('login-modal').style.display = 'flex';
+                    }
+                };
+
+                $('do-login').onclick = async () => {
+                    const username = $('u-input').value.trim();
+                    const password = $('p-input').value.trim();
+
+                    if (!username || !password) {
+                        alert("⚠️ Please enter both Architect ID and Security Key.");
+                        return;
+                    }
+
+                    $('do-login').textContent = "AUTHENTICATING...";
+                    $('do-login').disabled = true;
 
                     try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        mediaRecorder = new MediaRecorder(stream);
-                        audioChunks = [];
+                        const response = await fetch("/api/login", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ username, password })
+                        });
 
-                        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                        const data = await response.json();
 
-                        mediaRecorder.onstart = () => {
-                            isRecording = true;
-                            micBtn.classList.add('recording');
-                            micBtn.innerHTML = "ðŸ”´";
-                            micBtn.style.color = "#f00";
-                            micBtn.style.textShadow = "0 0 15px #f00";
-                            $('chat-input').placeholder = "Listening... (Release to Send)";
-                        };
+                        if (data.success) {
+                            state.user = data.username || username;
+                            state.isLogged = true;
+                            state.isAdmin = (data.role === 'admin');
 
-                        mediaRecorder.onstop = async () => {
-                            isRecording = false; // Reset state immediately
+                            // Storage (though we clear it on load, it helps within same session)
+                            sessionStorage.setItem('kelion_user', state.user);
+                            sessionStorage.setItem('kelion_admin', state.isAdmin);
+                            localStorage.setItem('kelion_user', state.user);
+                            localStorage.setItem('kelion_admin', state.isAdmin);
 
-                            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                            // UI UPDATE
+                            $('login-modal').style.display = 'none';
+                            $('user-name').textContent = state.user.toUpperCase();
+                            $('sys-status').textContent = "CONNECTED";
+                            $('sys-status').className = "stat-val online";
+                            $('login-btn').textContent = "LOG OFF";
+                            $('login-btn').classList.add('logged');
+                            $('input-bar').style.display = 'flex';
+                            $('chat-container').style.display = 'flex';
 
-                            // Visual: Processing
-                            $('chat-input').placeholder = "Transcribing & Sending...";
-                            micBtn.innerHTML = "â³";
-                            micBtn.style.color = "#00f3ff"; // Processing color
-                            micBtn.style.textShadow = "";
-
-                            const formData = new FormData();
-                            formData.append("file", audioBlob, "voice.webm");
-                            formData.append("model", "whisper-1");
-
-                            try {
-                                // Use backend /api/whisper endpoint (has API key configured)
-                                const res = await fetch("/api/whisper", {
-                                    method: "POST",
-                                    body: formData
-                                });
-                                const data = await res.json();
-                                if (data.text) {
-                                    $('chat-input').value = data.text;
-
-                                    // AUTO-SEND ON RELEASE
-                                    const finalMsg = $('chat-input').value.trim();
-                                    if (finalMsg !== "") {
-                                        console.log("Mic released. Auto-sending:", finalMsg);
-                                        execute();
-                                    }
+                            if (state.isAdmin) {
+                                const tb = $('traffic-btn');
+                                if (tb) {
+                                    tb.style.display = 'inline-block';
+                                    tb.style.opacity = '1';
+                                    tb.style.pointerEvents = 'auto';
                                 }
-                            } catch (e) {
-                                console.error("Whisper Error:", e);
-                                $('chat-input').placeholder = "Error Transcribing";
                             }
 
-                            // Cleanup UI
-                            micBtn.classList.remove('recording');
-                            micBtn.innerHTML = "ðŸŽ™ï¸";
-                            micBtn.style.color = "";
-                            stream.getTracks().forEach(t => t.stop());
-                        };
+                            // 🕐 USAGE TIMER - Fetch and display remaining time
+                            try {
+                                const usageRes = await fetch('/api/usage', {
+                                    headers: { 'Content-Type': 'application/json' },
+                                    method: 'POST',
+                                    body: JSON.stringify({ username: state.user })
+                                });
+                                const usageData = await usageRes.json();
+                                if (usageData.success && usageData.remaining_seconds !== undefined) {
+                                    const mins = Math.floor(usageData.remaining_seconds / 60);
+                                    const secs = usageData.remaining_seconds % 60;
+                                    $('usage-timer').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                                    $('usage-display').style.display = 'inline';
 
-                        mediaRecorder.start();
+                                    // Color coding: green > 10min, yellow > 5min, red < 5min
+                                    if (mins < 5) {
+                                        $('usage-timer').style.color = '#ff0000';
+                                    } else if (mins < 10) {
+                                        $('usage-timer').style.color = '#ffff00';
+                                    } else {
+                                        $('usage-timer').style.color = '#00ff00';
+                                    }
+                                }
+                            } catch (e) { console.log('Usage API not available'); }
 
+                            // 🗣️ GREETING AFTER LOGIN
+                            greetUser(state.user);
+                        } else {
+                            alert("⚠️ ACCESS DENIED: " + (data.error || "Invalid Credentials"));
+                        }
                     } catch (err) {
-                        console.error("Mic Access Error:", err);
-                        alert("Microphone access denied.");
+                        console.error("Login Error:", err);
+                        alert("⚠️ CONNECTION ERROR: Neural core unreachable.");
+                    } finally {
+                        $('do-login').textContent = "INITIALIZE";
+                        $('do-login').disabled = false;
                     }
                 };
 
-                const stopRecording = (e) => {
-                    if (e && e.cancelable) e.preventDefault();
-                    if (mediaRecorder && mediaRecorder.state === "recording") {
-                        mediaRecorder.stop();
+                const tBtn = $('traffic-btn');
+                if (tBtn) {
+                    tBtn.onclick = () => {
+                        $('admin-modal').style.display = 'flex';
+                        startTrafficTracking();
+                    };
+                }
+
+                // 🎙️ VOICE RECOGNITION (WHISPER)
+                let mediaRecorder;
+                let audioChunks = [];
+                const micBtn = $('mic-btn');
+                let isRecording = false;
+
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    // CORRECT PROCEDURE: HOLD TO RECORD, RELEASE TO SEND
+
+                    const startRecording = async (e) => {
+                        // Prevent default text selection etc.
+                        if (e.type !== 'mousedown') e.preventDefault();
+                        if (isRecording) return;
+
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            mediaRecorder = new MediaRecorder(stream);
+                            audioChunks = [];
+
+                            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+                            mediaRecorder.onstart = () => {
+                                isRecording = true;
+                                micBtn.classList.add('recording');
+                                micBtn.innerHTML = "🔴";
+                                micBtn.style.color = "#f00";
+                                micBtn.style.textShadow = "0 0 15px #f00";
+                                $('chat-input').placeholder = "Listening... (Release to Send)";
+                            };
+
+                            mediaRecorder.onstop = async () => {
+                                isRecording = false; // Reset state immediately
+
+                                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+                                // Visual: Processing
+                                $('chat-input').placeholder = "Transcribing & Sending...";
+                                micBtn.innerHTML = "⏳";
+                                micBtn.style.color = "#00f3ff"; // Processing color
+                                micBtn.style.textShadow = "";
+
+                                const formData = new FormData();
+                                formData.append("file", audioBlob, "voice.webm");
+                                formData.append("model", "whisper-1");
+
+                                try {
+                                    // Use backend /api/whisper endpoint (has API key configured)
+                                    const res = await fetch("/api/whisper", {
+                                        method: "POST",
+                                        body: formData
+                                    });
+                                    const data = await res.json();
+                                    if (data.text) {
+                                        $('chat-input').value = data.text;
+
+                                        // AUTO-SEND ON RELEASE
+                                        const finalMsg = $('chat-input').value.trim();
+                                        if (finalMsg !== "") {
+                                            console.log("Mic released. Auto-sending:", finalMsg);
+                                            execute();
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error("Whisper Error:", e);
+                                    $('chat-input').placeholder = "Error Transcribing";
+                                }
+
+                                // Cleanup UI
+                                micBtn.classList.remove('recording');
+                                micBtn.innerHTML = "🎤";
+                                micBtn.style.color = "";
+                                stream.getTracks().forEach(t => t.stop());
+                            };
+
+                            mediaRecorder.start();
+
+                        } catch (err) {
+                            console.error("Mic Access Error:", err);
+                            alert("Microphone access denied.");
+                        }
+                    };
+
+                    const stopRecording = (e) => {
+                        if (e && e.cancelable) e.preventDefault();
+                        if (mediaRecorder && mediaRecorder.state === "recording") {
+                            mediaRecorder.stop();
+                        }
+                    };
+
+                    // Add Event Listeners for HOLD Interaction
+                    micBtn.addEventListener('mousedown', startRecording);
+                    micBtn.addEventListener('touchstart', startRecording, { passive: false });
+
+                    micBtn.addEventListener('mouseup', stopRecording);
+                    micBtn.addEventListener('touchend', stopRecording, { passive: false });
+                    micBtn.addEventListener('mouseleave', stopRecording); // Safety: Stop if mouse leaves button
+
+                    // Prevent context menu on right click
+                    micBtn.addEventListener('contextmenu', e => e.preventDefault());
+
+                    // Clear any Click handlers
+                    micBtn.onclick = null;
+                }
+
+                $('chat-input').onkeypress = e => { if (e.key === "Enter") execute(); };
+
+
+                // Update Version
+                const vTag = document.querySelector('.version-tag');
+                if (vTag) vTag.textContent = "v143.0";
+
+                // 🌓 THEME TOGGLE
+                const themeBtn = document.getElementById('theme-toggle');
+                if (themeBtn) {
+                    // Check saved preference
+                    if (localStorage.getItem('kelion_theme') === 'light') {
+                        document.body.classList.add('light-mode');
+                        themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
                     }
-                };
 
-                // Add Event Listeners for HOLD Interaction
-                micBtn.addEventListener('mousedown', startRecording);
-                micBtn.addEventListener('touchstart', startRecording, { passive: false });
-
-                micBtn.addEventListener('mouseup', stopRecording);
-                micBtn.addEventListener('touchend', stopRecording, { passive: false });
-                micBtn.addEventListener('mouseleave', stopRecording); // Safety: Stop if mouse leaves button
-
-                // Prevent context menu on right click
-                micBtn.addEventListener('contextmenu', e => e.preventDefault());
-
-                // Clear any Click handlers
-                micBtn.onclick = null;
-            }
-
-            $('chat-input').onkeypress = e => { if (e.key === "Enter") execute(); };
-
-
-            // Update Version
-            const vTag = document.querySelector('.version-tag');
-            if (vTag) vTag.textContent = "v143.0";
-
-            // initThreeJS(); // DISABLED - shows robot background instead
-        });
-
-        // Matrix effect removed - keeping clean background
-
-        // ðŸŒŸ GREETING HELPER (After Login)
-        function greetUser(username) {
-            // Clear chat history - keep only the last message (this one)
-            const chatMessages = $('chat-messages');
-            if (chatMessages) {
-                chatMessages.innerHTML = ''; // Clear all previous messages
-            }
-
-            // Simple, direct greeting in English
-            const welcomeMsg = `How can I help you today, ${username}?`;
-
-            console.log("Greeting:", welcomeMsg);
-            write('bot', welcomeMsg);
-            speak(welcomeMsg);
-        }
-
-        // ðŸŒŸ KELIONAI WELCOME MESSAGE (Page Load)
-        function showKelionaiWelcome() {
-            const hour = new Date().getHours();
-            let greeting;
-
-            if (hour >= 5 && hour < 12) greeting = "Good morning";
-            else if (hour >= 12 && hour < 18) greeting = "Good afternoon";
-            else greeting = "Good evening";
-
-            const welcomeText = `${greeting}, visitor! Welcome to KELIONAI - Your Intelligent Assistant. Please click LOGIN to continue.`;
-
-            write('bot', welcomeText);
-            speak(welcomeText);
-        }
-
-        // =====================================================================
-        // v143: NEW FEATURES - Password Reset, Register, Tracking, Security
-        // =====================================================================
-
-        // Track visitor on page load
-        (function trackVisit() {
-            fetch('/api/track', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ page: window.location.pathname, username: localStorage.getItem('username') || null })
-            }).catch(() => { });
-        })();
-
-        // FORGOT PASSWORD MODAL
-        document.getElementById('forgot-pass-link')?.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.getElementById('login-modal').style.display = 'none';
-            document.getElementById('forgot-modal').style.display = 'flex';
-            document.getElementById('forgot-step1').style.display = 'block';
-            document.getElementById('forgot-step2').style.display = 'none';
-        });
-
-        document.getElementById('forgot-back-link')?.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.getElementById('forgot-modal').style.display = 'none';
-            document.getElementById('login-modal').style.display = 'flex';
-        });
-
-        document.getElementById('forgot-send-btn')?.addEventListener('click', async function () {
-            const email = document.getElementById('forgot-email').value.trim();
-            if (!email) return alert('Please enter your email');
-
-            this.textContent = 'â³ Sending...';
-            this.disabled = true;
-
-            try {
-                const res = await fetch('/api/forgot-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    document.getElementById('forgot-step1').style.display = 'none';
-                    document.getElementById('forgot-step2').style.display = 'block';
-                } else {
-                    alert(data.error || 'Failed to send code');
+                    themeBtn.onclick = () => {
+                        document.body.classList.toggle('light-mode');
+                        const isLight = document.body.classList.contains('light-mode');
+                        themeBtn.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                        localStorage.setItem('kelion_theme', isLight ? 'light' : 'dark');
+                    };
                 }
-            } catch (e) {
-                alert('Network error');
-            }
 
-            this.textContent = 'ðŸ“§ SEND CODE';
-            this.disabled = false;
-        });
+                // 📥 EXPORT CONVERSATION
+                const exportBtn = $('export-btn');
+                if (exportBtn) {
+                    exportBtn.onclick = () => {
+                        const messages = document.querySelectorAll('#chat-messages .message');
+                        if (messages.length === 0) {
+                            alert('No conversation to export.');
+                            return;
+                        }
 
-        document.getElementById('forgot-reset-btn')?.addEventListener('click', async function () {
-            const email = document.getElementById('forgot-email').value.trim();
-            const code = document.getElementById('forgot-code').value.trim();
-            const newPass = document.getElementById('forgot-newpass').value;
+                        let content = '=== KELION AI CONVERSATION EXPORT ===\n';
+                        content += `Date: ${new Date().toLocaleString()}\n`;
+                        content += `User: ${state.user || 'Unknown'}\n`;
+                        content += '=====================================\n\n';
 
-            if (!code || code.length !== 6) return alert('Please enter the 6-digit code');
-            if (!newPass || newPass.length < 8) return alert('Password must be at least 8 characters');
-
-            this.textContent = 'â³ Resetting...';
-            this.disabled = true;
-
-            try {
-                const res = await fetch('/api/reset-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, code, new_password: newPass })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    alert('âœ… Password reset! You can now login.');
-                    document.getElementById('forgot-modal').style.display = 'none';
-                    document.getElementById('login-modal').style.display = 'flex';
-                } else {
-                    alert(data.error || 'Reset failed');
-                }
-            } catch (e) {
-                alert('Network error');
-            }
-
-            this.textContent = 'ðŸ”“ RESET PASSWORD';
-            this.disabled = false;
-        });
-
-        // REGISTER MODAL
-        document.getElementById('register-link')?.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.getElementById('login-modal').style.display = 'none';
-            document.getElementById('register-modal').style.display = 'flex';
-        });
-
-        document.getElementById('register-back-link')?.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.getElementById('register-modal').style.display = 'none';
-            document.getElementById('login-modal').style.display = 'flex';
-        });
-
-        document.getElementById('do-register')?.addEventListener('click', async function () {
-            const firstName = document.getElementById('reg-firstname').value.trim();
-            const lastName = document.getElementById('reg-lastname').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value;
-            const country = document.getElementById('reg-country').value;
-            const phone = document.getElementById('reg-phone').value.trim();
-            const address = document.getElementById('reg-address').value.trim();
-            const city = document.getElementById('reg-city').value.trim();
-            const postal = document.getElementById('reg-postal').value.trim();
-            const voucher = document.getElementById('reg-voucher').value.trim().toUpperCase();
-
-            if (!firstName || !lastName) return alert('First and Last name required');
-            if (!email) return alert('Email is required');
-            if (!password || password.length < 8) return alert('Password must be at least 8 characters');
-
-            this.textContent = 'â³ Creating...';
-            this.disabled = true;
-
-            try {
-                const res = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email, password, first_name: firstName, last_name: lastName,
-                        country, phone, address_line1: address, city, postal_code: postal,
-                        subscription: voucher ? 'voucher' : 'demo'
-                    })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    // If voucher was provided, try to redeem it
-                    if (voucher) {
-                        // Login first to get token
-                        const loginRes = await fetch('/api/login', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ username: data.username, password })
+                        messages.forEach(msg => {
+                            const who = msg.classList.contains('user') ? 'YOU' : 'KELION';
+                            content += `[${who}]: ${msg.textContent}\n\n`;
                         });
-                        const loginData = await loginRes.json();
 
-                        if (loginData.success && loginData.token) {
-                            // Redeem voucher
-                            await fetch('/api/voucher/redeem', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': 'Bearer ' + loginData.token
-                                },
-                                body: JSON.stringify({ code: voucher })
-                            });
+                        content += '=====================================\n';
+                        content += 'Exported from KELION AI v143.0\n';
+
+                        // Create download
+                        const blob = new Blob([content], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `kelion_conversation_${Date.now()}.txt`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    };
+                }
+
+                // initThreeJS(); // DISABLED - shows robot background instead
+            });
+
+            // Matrix effect removed - keeping clean background
+
+            // 🌟 GREETING HELPER (After Login) - With Personalized Memory
+            async function greetUser(username) {
+                // Clear chat history - keep only the last message (this one)
+                const chatMessages = $('chat-messages');
+                if (chatMessages) {
+                    chatMessages.innerHTML = ''; // Clear all previous messages
+                }
+
+                // Fetch personalized memories from backend
+                let personalNote = '';
+                try {
+                    const memRes = await fetch('/api/memories', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: username })
+                    });
+                    const memData = await memRes.json();
+                    if (memData.success && memData.memories && memData.memories.length > 0) {
+                        // Pick a random memory to mention
+                        const mem = memData.memories[Math.floor(Math.random() * memData.memories.length)];
+                        if (mem.key && mem.value) {
+                            personalNote = ` I remember that your ${mem.key} is ${mem.value}.`;
                         }
                     }
-
-                    alert('âœ… Account created! You can now login.');
-                    document.getElementById('register-modal').style.display = 'none';
-                    document.getElementById('login-modal').style.display = 'flex';
-                } else {
-                    alert(data.error || 'Registration failed');
+                } catch (e) {
+                    console.log('Memory API not available');
                 }
-            } catch (e) {
-                alert('Network error');
+
+                // Time-based greeting
+                const hour = new Date().getHours();
+                let timeGreeting = 'Hello';
+                if (hour >= 5 && hour < 12) timeGreeting = 'Good morning';
+                else if (hour >= 12 && hour < 18) timeGreeting = 'Good afternoon';
+                else if (hour >= 18 && hour < 22) timeGreeting = 'Good evening';
+                else timeGreeting = 'Good night';
+
+                const welcomeMsg = `${timeGreeting}, ${username}!${personalNote} How can I help you today?`;
+
+                console.log("Greeting:", welcomeMsg);
+                write('bot', welcomeMsg);
+                speak(welcomeMsg);
             }
 
-            this.textContent = 'ðŸš€ CREATE ACCOUNT';
-            this.disabled = false;
-        });
+            // ðŸŒŸ KELIONAI WELCOME MESSAGE (Page Load)
+            function showKelionaiWelcome() {
+                const hour = new Date().getHours();
+                let greeting;
 
-        // ANTI-SCREENSHOT PROTECTION (Basic - can be bypassed but deters casual users)
-        // Disable right-click
-        document.addEventListener('contextmenu', function (e) {
-            const isAdmin = localStorage.getItem('role') === 'admin';
-            if (!isAdmin) {
+                if (hour >= 5 && hour < 12) greeting = "Good morning";
+                else if (hour >= 12 && hour < 18) greeting = "Good afternoon";
+                else greeting = "Good evening";
+
+                const welcomeText = `${greeting}, visitor! Welcome to KELIONAI - Your Intelligent Assistant. Please click LOGIN to continue.`;
+
+                write('bot', welcomeText);
+                speak(welcomeText);
+            }
+
+            // =====================================================================
+            // v143: NEW FEATURES - Password Reset, Register, Tracking, Security
+            // =====================================================================
+
+            // Track visitor on page load
+            (function trackVisit() {
+                fetch('/api/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ page: window.location.pathname, username: localStorage.getItem('username') || null })
+                }).catch(() => { });
+            })();
+
+            // FORGOT PASSWORD MODAL
+            document.getElementById('forgot-pass-link')?.addEventListener('click', function (e) {
                 e.preventDefault();
-                return false;
-            }
-        });
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('forgot-modal').style.display = 'flex';
+                document.getElementById('forgot-step1').style.display = 'block';
+                document.getElementById('forgot-step2').style.display = 'none';
+            });
 
-        // Disable Print Screen (limited effectiveness)
-        document.addEventListener('keyup', function (e) {
-            const isAdmin = localStorage.getItem('role') === 'admin';
-            if (!isAdmin && e.key === 'PrintScreen') {
-                navigator.clipboard.writeText('');
-                alert('Screenshots are disabled for security.');
-            }
-        });
+            document.getElementById('forgot-back-link')?.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.getElementById('forgot-modal').style.display = 'none';
+                document.getElementById('login-modal').style.display = 'flex';
+            });
 
-        // Disable keyboard shortcuts for screenshots
-        document.addEventListener('keydown', function (e) {
-            const isAdmin = localStorage.getItem('role') === 'admin';
-            if (!isAdmin) {
-                // Ctrl+P (print), Ctrl+S (save), Ctrl+Shift+S
-                if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'P' || e.key === 'S')) {
+            document.getElementById('forgot-send-btn')?.addEventListener('click', async function () {
+                const email = document.getElementById('forgot-email').value.trim();
+                if (!email) return alert('Please enter your email');
+
+                this.textContent = 'â³ Sending...';
+                this.disabled = true;
+
+                try {
+                    const res = await fetch('/api/forgot-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        document.getElementById('forgot-step1').style.display = 'none';
+                        document.getElementById('forgot-step2').style.display = 'block';
+                    } else {
+                        alert(data.error || 'Failed to send code');
+                    }
+                } catch (e) {
+                    alert('Network error');
+                }
+
+                this.textContent = 'ðŸ“§ SEND CODE';
+                this.disabled = false;
+            });
+
+            document.getElementById('forgot-reset-btn')?.addEventListener('click', async function () {
+                const email = document.getElementById('forgot-email').value.trim();
+                const code = document.getElementById('forgot-code').value.trim();
+                const newPass = document.getElementById('forgot-newpass').value;
+
+                if (!code || code.length !== 6) return alert('Please enter the 6-digit code');
+                if (!newPass || newPass.length < 8) return alert('Password must be at least 8 characters');
+
+                this.textContent = 'â³ Resetting...';
+                this.disabled = true;
+
+                try {
+                    const res = await fetch('/api/reset-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, code, new_password: newPass })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        alert('âœ… Password reset! You can now login.');
+                        document.getElementById('forgot-modal').style.display = 'none';
+                        document.getElementById('login-modal').style.display = 'flex';
+                    } else {
+                        alert(data.error || 'Reset failed');
+                    }
+                } catch (e) {
+                    alert('Network error');
+                }
+
+                this.textContent = 'ðŸ”“ RESET PASSWORD';
+                this.disabled = false;
+            });
+
+            // REGISTER MODAL
+            document.getElementById('register-link')?.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('register-modal').style.display = 'flex';
+            });
+
+            document.getElementById('register-back-link')?.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.getElementById('register-modal').style.display = 'none';
+                document.getElementById('login-modal').style.display = 'flex';
+            });
+
+            document.getElementById('do-register')?.addEventListener('click', async function () {
+                const firstName = document.getElementById('reg-firstname').value.trim();
+                const lastName = document.getElementById('reg-lastname').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
+                const password = document.getElementById('reg-password').value;
+                const country = document.getElementById('reg-country').value;
+                const phone = document.getElementById('reg-phone').value.trim();
+                const address = document.getElementById('reg-address').value.trim();
+                const city = document.getElementById('reg-city').value.trim();
+                const postal = document.getElementById('reg-postal').value.trim();
+                const voucher = document.getElementById('reg-voucher').value.trim().toUpperCase();
+
+                if (!firstName || !lastName) return alert('First and Last name required');
+                if (!email) return alert('Email is required');
+                if (!password || password.length < 8) return alert('Password must be at least 8 characters');
+
+                this.textContent = 'â³ Creating...';
+                this.disabled = true;
+
+                try {
+                    const res = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email, password, first_name: firstName, last_name: lastName,
+                            country, phone, address_line1: address, city, postal_code: postal,
+                            subscription: voucher ? 'voucher' : 'demo'
+                        })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        // If voucher was provided, try to redeem it
+                        if (voucher) {
+                            // Login first to get token
+                            const loginRes = await fetch('/api/login', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ username: data.username, password })
+                            });
+                            const loginData = await loginRes.json();
+
+                            if (loginData.success && loginData.token) {
+                                // Redeem voucher
+                                await fetch('/api/voucher/redeem', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': 'Bearer ' + loginData.token
+                                    },
+                                    body: JSON.stringify({ code: voucher })
+                                });
+                            }
+                        }
+
+                        alert('âœ… Account created! You can now login.');
+                        document.getElementById('register-modal').style.display = 'none';
+                        document.getElementById('login-modal').style.display = 'flex';
+                    } else {
+                        alert(data.error || 'Registration failed');
+                    }
+                } catch (e) {
+                    alert('Network error');
+                }
+
+                this.textContent = 'ðŸš€ CREATE ACCOUNT';
+                this.disabled = false;
+            });
+
+            // ANTI-SCREENSHOT PROTECTION (Basic - can be bypassed but deters casual users)
+            // Disable right-click
+            document.addEventListener('contextmenu', function (e) {
+                const isAdmin = localStorage.getItem('role') === 'admin';
+                if (!isAdmin) {
                     e.preventDefault();
                     return false;
                 }
-            }
-        });
+            });
 
-        // =====================================================================
-        // AUTO-VERSIONING: Preia versiunea de la backend și actualizează peste tot
-        // =====================================================================
-        (async function loadVersion() {
-            try {
-                const res = await fetch('/api/version');
-                const data = await res.json();
-                const version = data.version || 'v143.0';
-
-                // Actualizează toate elementele cu versiunea
-                document.querySelectorAll('.version-tag, #version-tag').forEach(el => {
-                    el.textContent = version;
-                });
-
-                // Actualizează titlul paginii
-                document.title = `KELION ${version} - ${data.codename || 'GLOBAL_EYE'} OS`;
-
-                // Actualizează NEURAL INTERFACE header
-                const chatHeader = document.querySelector('#chat-header span');
-                if (chatHeader && chatHeader.textContent.includes('NEURAL INTERFACE')) {
-                    chatHeader.textContent = `NEURAL INTERFACE ${version}`;
+            // Disable Print Screen (limited effectiveness)
+            document.addEventListener('keyup', function (e) {
+                const isAdmin = localStorage.getItem('role') === 'admin';
+                if (!isAdmin && e.key === 'PrintScreen') {
+                    navigator.clipboard.writeText('');
+                    alert('Screenshots are disabled for security.');
                 }
+            });
 
-                console.log(`✅ Version loaded: ${version} (${data.codename})`);
-            } catch (e) {
-                console.log('Version API unavailable, using fallback');
-            }
-        })();
-
-        // =====================================================================
-        // 3D HOLOGRAM SYSTEM - KELION AI AVATAR
-        // =====================================================================
-        const HologramSystem = {
-            scene: null,
-            camera: null,
-            renderer: null,
-            model: null,
-            mixer: null,
-            animations: {},
-            morphTargets: {},
-            clock: new THREE.Clock(),
-            isSpeaking: false,
-
-            // Mouse tracking for eye following
-            mouseX: 0,
-            mouseY: 0,
-            targetLookX: 0,
-            targetLookY: 0,
-
-            init: function () {
-                const container = document.getElementById('hologram-container');
-                if (!container) return;
-
-                // Setup mouse tracking
-                document.addEventListener('mousemove', (e) => {
-                    // Normalize mouse position to -1 to 1
-                    this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-                    this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-                });
-
-                // Scene setup with transparent background
-                this.scene = new THREE.Scene();
-
-                // Camera
-                this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-                this.camera.position.set(0, 0, 2.5);
-
-                // Renderer with transparency
-                this.renderer = new THREE.WebGLRenderer({
-                    antialias: true,
-                    alpha: true,
-                    powerPreference: "high-performance"
-                });
-                this.renderer.setSize(600, 600);
-                this.renderer.setPixelRatio(window.devicePixelRatio);
-                this.renderer.setClearColor(0x000000, 0);
-                this.renderer.outputEncoding = THREE.sRGBEncoding;
-                container.appendChild(this.renderer.domElement);
-
-                // Holographic lighting
-                const ambientLight = new THREE.AmbientLight(0x00f3ff, 0.5);
-                this.scene.add(ambientLight);
-
-                const frontLight = new THREE.DirectionalLight(0x00f3ff, 1);
-                frontLight.position.set(0, 1, 2);
-                this.scene.add(frontLight);
-
-                const backLight = new THREE.DirectionalLight(0xff00ff, 0.5);
-                backLight.position.set(0, 0, -2);
-                this.scene.add(backLight);
-
-                const rimLight = new THREE.PointLight(0x00f3ff, 0.8, 10);
-                rimLight.position.set(2, 1, 0);
-                this.scene.add(rimLight);
-
-                // Load 3D model
-                this.loadModel();
-
-                // Create particle system
-                this.createParticles();
-
-                // Start animation loop
-                this.animate();
-
-                console.log('✅ Hologram System initialized');
-            },
-
-            // Particle system for processing effect
-            particles: null,
-            particleActive: false,
-
-            createParticles: function () {
-                const particleCount = 100;
-                const geometry = new THREE.BufferGeometry();
-                const positions = new Float32Array(particleCount * 3);
-
-                for (let i = 0; i < particleCount; i++) {
-                    // Sphere distribution around head
-                    const theta = Math.random() * Math.PI * 2;
-                    const phi = Math.random() * Math.PI;
-                    const radius = 0.8 + Math.random() * 0.4;
-
-                    positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-                    positions[i * 3 + 1] = radius * Math.cos(phi);
-                    positions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
-                }
-
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-                const material = new THREE.PointsMaterial({
-                    color: 0x00f3ff,
-                    size: 0.02,
-                    transparent: true,
-                    opacity: 0,
-                    blending: THREE.AdditiveBlending
-                });
-
-                this.particles = new THREE.Points(geometry, material);
-                this.scene.add(this.particles);
-            },
-
-            // Start particles when processing
-            startProcessing: function () {
-                this.particleActive = true;
-                if (this.particles) {
-                    this.particles.material.opacity = 0.8;
-                }
-                this.setColor('processing');
-            },
-
-            // Stop particles
-            stopProcessing: function () {
-                this.particleActive = false;
-                if (this.particles) {
-                    this.particles.material.opacity = 0;
-                }
-                this.setColor('default');
-            },
-
-            // Color states for hologram
-            colorStates: {
-                default: { color: 0x00f3ff, emissive: 0x003344 },
-                processing: { color: 0xff00ff, emissive: 0x440044 },
-                happy: { color: 0x00ff88, emissive: 0x004422 },
-                sad: { color: 0x4488ff, emissive: 0x112244 },
-                angry: { color: 0xff4444, emissive: 0x441111 },
-                speaking: { color: 0x00ffff, emissive: 0x004444 }
-            },
-
-            setColor: function (state) {
-                if (!this.model) return;
-                const colors = this.colorStates[state] || this.colorStates.default;
-
-                this.model.traverse((child) => {
-                    if (child.isMesh && child.material) {
-                        child.material.color.setHex(colors.color);
-                        child.material.emissive.setHex(colors.emissive);
+            // Disable keyboard shortcuts for screenshots
+            document.addEventListener('keydown', function (e) {
+                const isAdmin = localStorage.getItem('role') === 'admin';
+                if (!isAdmin) {
+                    // Ctrl+P (print), Ctrl+S (save), Ctrl+Shift+S
+                    if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'P' || e.key === 'S')) {
+                        e.preventDefault();
+                        return false;
                     }
-                });
-            },
+                }
+            });
 
-            loadModel: function () {
-                const loader = new THREE.GLTFLoader();
-                const modelPath = '/assets/kelion_holo/uploads_files_4723651_HologramMaleHead3DModelAnimatedWithFacialExpressions.glb';
+            // =====================================================================
+            // AUTO-VERSIONING: Preia versiunea de la backend și actualizează peste tot
+            // =====================================================================
+            (async function loadVersion() {
+                try {
+                    const res = await fetch('/api/version');
+                    const data = await res.json();
+                    const version = data.version || 'v143.0';
 
-                loader.load(
-                    modelPath,
-                    (gltf) => {
-                        this.model = gltf.scene;
+                    // Actualizează toate elementele cu versiunea
+                    document.querySelectorAll('.version-tag, #version-tag').forEach(el => {
+                        el.textContent = version;
+                    });
 
-                        // Apply holographic material
-                        this.model.traverse((child) => {
-                            if (child.isMesh) {
-                                child.material = new THREE.MeshPhongMaterial({
-                                    color: 0x00f3ff,
-                                    emissive: 0x003344,
-                                    transparent: true,
-                                    opacity: 0.85,
-                                    wireframe: false,
-                                    side: THREE.DoubleSide
-                                });
+                    // Actualizează titlul paginii
+                    document.title = `KELION ${version} - ${data.codename || 'GLOBAL_EYE'} OS`;
 
-                                // Store morph targets for facial animations
-                                if (child.morphTargetInfluences) {
-                                    this.morphTargets[child.name] = child;
-                                    console.log('Morph targets found:', child.morphTargetDictionary);
+                    // Actualizează NEURAL INTERFACE header
+                    const chatHeader = document.querySelector('#chat-header span');
+                    if (chatHeader && chatHeader.textContent.includes('NEURAL INTERFACE')) {
+                        chatHeader.textContent = `NEURAL INTERFACE ${version}`;
+                    }
+
+                    console.log(`✅ Version loaded: ${version} (${data.codename})`);
+                } catch (e) {
+                    console.log('Version API unavailable, using fallback');
+                }
+            })();
+
+            // =====================================================================
+            // 3D HOLOGRAM SYSTEM - KELION AI AVATAR
+            // =====================================================================
+            const HologramSystem = {
+                scene: null,
+                camera: null,
+                renderer: null,
+                model: null,
+                mixer: null,
+                animations: {},
+                morphTargets: {},
+                clock: new THREE.Clock(),
+                isSpeaking: false,
+
+                // Mouse tracking for eye following
+                mouseX: 0,
+                mouseY: 0,
+                targetLookX: 0,
+                targetLookY: 0,
+
+                init: function () {
+                    const container = document.getElementById('hologram-container');
+                    if (!container) return;
+
+                    // Setup mouse tracking
+                    document.addEventListener('mousemove', (e) => {
+                        // Normalize mouse position to -1 to 1
+                        this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                        this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+                    });
+
+                    // Scene setup with transparent background
+                    this.scene = new THREE.Scene();
+
+                    // Camera
+                    this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+                    this.camera.position.set(0, 0, 2.5);
+
+                    // Renderer with transparency
+                    this.renderer = new THREE.WebGLRenderer({
+                        antialias: true,
+                        alpha: true,
+                        powerPreference: "high-performance"
+                    });
+                    this.renderer.setSize(600, 600);
+                    this.renderer.setPixelRatio(window.devicePixelRatio);
+                    this.renderer.setClearColor(0x000000, 0);
+                    this.renderer.outputEncoding = THREE.sRGBEncoding;
+                    container.appendChild(this.renderer.domElement);
+
+                    // Holographic lighting
+                    const ambientLight = new THREE.AmbientLight(0x00f3ff, 0.5);
+                    this.scene.add(ambientLight);
+
+                    const frontLight = new THREE.DirectionalLight(0x00f3ff, 1);
+                    frontLight.position.set(0, 1, 2);
+                    this.scene.add(frontLight);
+
+                    const backLight = new THREE.DirectionalLight(0xff00ff, 0.5);
+                    backLight.position.set(0, 0, -2);
+                    this.scene.add(backLight);
+
+                    const rimLight = new THREE.PointLight(0x00f3ff, 0.8, 10);
+                    rimLight.position.set(2, 1, 0);
+                    this.scene.add(rimLight);
+
+                    // Load 3D model
+                    this.loadModel();
+
+                    // Create particle system
+                    this.createParticles();
+
+                    // Start animation loop
+                    this.animate();
+
+                    console.log('✅ Hologram System initialized');
+                },
+
+                // Particle system for processing effect
+                particles: null,
+                particleActive: false,
+
+                createParticles: function () {
+                    const particleCount = 100;
+                    const geometry = new THREE.BufferGeometry();
+                    const positions = new Float32Array(particleCount * 3);
+
+                    for (let i = 0; i < particleCount; i++) {
+                        // Sphere distribution around head
+                        const theta = Math.random() * Math.PI * 2;
+                        const phi = Math.random() * Math.PI;
+                        const radius = 0.8 + Math.random() * 0.4;
+
+                        positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+                        positions[i * 3 + 1] = radius * Math.cos(phi);
+                        positions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+                    }
+
+                    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                    const material = new THREE.PointsMaterial({
+                        color: 0x00f3ff,
+                        size: 0.02,
+                        transparent: true,
+                        opacity: 0,
+                        blending: THREE.AdditiveBlending
+                    });
+
+                    this.particles = new THREE.Points(geometry, material);
+                    this.scene.add(this.particles);
+                },
+
+                // Start particles when processing
+                startProcessing: function () {
+                    this.particleActive = true;
+                    if (this.particles) {
+                        this.particles.material.opacity = 0.8;
+                    }
+                    this.setColor('processing');
+                },
+
+                // Stop particles
+                stopProcessing: function () {
+                    this.particleActive = false;
+                    if (this.particles) {
+                        this.particles.material.opacity = 0;
+                    }
+                    this.setColor('default');
+                },
+
+                // Color states for hologram
+                colorStates: {
+                    default: { color: 0x00f3ff, emissive: 0x003344 },
+                    processing: { color: 0xff00ff, emissive: 0x440044 },
+                    happy: { color: 0x00ff88, emissive: 0x004422 },
+                    sad: { color: 0x4488ff, emissive: 0x112244 },
+                    angry: { color: 0xff4444, emissive: 0x441111 },
+                    speaking: { color: 0x00ffff, emissive: 0x004444 }
+                },
+
+                setColor: function (state) {
+                    if (!this.model) return;
+                    const colors = this.colorStates[state] || this.colorStates.default;
+
+                    this.model.traverse((child) => {
+                        if (child.isMesh && child.material) {
+                            child.material.color.setHex(colors.color);
+                            child.material.emissive.setHex(colors.emissive);
+                        }
+                    });
+                },
+
+                loadModel: function () {
+                    const loader = new THREE.GLTFLoader();
+                    const modelPath = '/assets/kelion_holo/uploads_files_4723651_HologramMaleHead3DModelAnimatedWithFacialExpressions.glb';
+
+                    loader.load(
+                        modelPath,
+                        (gltf) => {
+                            this.model = gltf.scene;
+
+                            // Apply holographic material
+                            this.model.traverse((child) => {
+                                if (child.isMesh) {
+                                    child.material = new THREE.MeshPhongMaterial({
+                                        color: 0x00f3ff,
+                                        emissive: 0x003344,
+                                        transparent: true,
+                                        opacity: 0.85,
+                                        wireframe: false,
+                                        side: THREE.DoubleSide
+                                    });
+
+                                    // Store morph targets for facial animations
+                                    if (child.morphTargetInfluences) {
+                                        this.morphTargets[child.name] = child;
+                                        console.log('Morph targets found:', child.morphTargetDictionary);
+                                    }
                                 }
-                            }
-                        });
-
-                        // Position and scale
-                        this.model.position.set(0, -0.3, 0);
-                        this.model.scale.set(1.5, 1.5, 1.5);
-
-                        this.scene.add(this.model);
-
-                        // Setup animations
-                        if (gltf.animations && gltf.animations.length > 0) {
-                            this.mixer = new THREE.AnimationMixer(this.model);
-                            gltf.animations.forEach((clip) => {
-                                this.animations[clip.name] = this.mixer.clipAction(clip);
-                                console.log('Animation loaded:', clip.name);
                             });
 
-                            // Play idle animation if exists
-                            if (this.animations['idle']) {
-                                this.animations['idle'].play();
-                            } else {
-                                // Play first animation
-                                const firstAnim = Object.values(this.animations)[0];
-                                if (firstAnim) firstAnim.play();
+                            // Position and scale
+                            this.model.position.set(0, -0.3, 0);
+                            this.model.scale.set(1.5, 1.5, 1.5);
+
+                            this.scene.add(this.model);
+
+                            // Setup animations
+                            if (gltf.animations && gltf.animations.length > 0) {
+                                this.mixer = new THREE.AnimationMixer(this.model);
+                                gltf.animations.forEach((clip) => {
+                                    this.animations[clip.name] = this.mixer.clipAction(clip);
+                                    console.log('Animation loaded:', clip.name);
+                                });
+
+                                // Play idle animation if exists
+                                if (this.animations['idle']) {
+                                    this.animations['idle'].play();
+                                } else {
+                                    // Play first animation
+                                    const firstAnim = Object.values(this.animations)[0];
+                                    if (firstAnim) firstAnim.play();
+                                }
+                            }
+
+                            console.log('✅ 3D Model loaded successfully');
+                        },
+                        (progress) => {
+                            const percent = (progress.loaded / progress.total * 100).toFixed(1);
+                            console.log(`Loading model: ${percent}%`);
+                        },
+                        (error) => {
+                            console.warn('Model loading error:', error);
+                        }
+                    );
+                },
+
+                animate: function () {
+                    requestAnimationFrame(() => this.animate());
+
+                    const delta = this.clock.getDelta();
+                    const time = Date.now();
+
+                    // Update animations
+                    if (this.mixer) {
+                        this.mixer.update(delta);
+                    }
+
+                    // ===== HUMAN-LIKE BEHAVIORS =====
+                    if (this.model) {
+                        // Gentle floating/breathing animation
+                        this.model.position.y = -0.3 + Math.sin(time * 0.001) * 0.015;
+
+                        // ===== EYE/HEAD TRACKING - Follow cursor =====
+                        // Smooth interpolation towards mouse position
+                        this.targetLookX += (this.mouseX * 0.15 - this.targetLookX) * 0.05;
+                        this.targetLookY += (this.mouseY * 0.1 - this.targetLookY) * 0.05;
+
+                        // Apply to head rotation (combine with subtle idle movement)
+                        this.model.rotation.y = this.targetLookX + Math.sin(time * 0.0003) * 0.03;
+                        this.model.rotation.x = -this.targetLookY + Math.sin(time * 0.0005) * 0.02;
+
+                        // Natural blinking (every 3-5 seconds)
+                        this.handleBlinking(time);
+
+                        // Micro-expressions when idle
+                        if (!this.isSpeaking) {
+                            this.handleIdleExpressions(time);
+                        }
+                    }
+
+                    // Lip sync simulation when speaking
+                    if (this.isSpeaking && this.model) {
+                        this.simulateLipSync();
+                    }
+
+                    this.renderer.render(this.scene, this.camera);
+                },
+
+                // Natural blinking behavior
+                lastBlinkTime: 0,
+                nextBlinkIn: 3000,
+
+                handleBlinking: function (time) {
+                    if (time - this.lastBlinkTime > this.nextBlinkIn) {
+                        this.blink();
+                        this.lastBlinkTime = time;
+                        this.nextBlinkIn = 2500 + Math.random() * 3000; // 2.5-5.5 seconds
+                    }
+                },
+
+                blink: function () {
+                    this.model.traverse((child) => {
+                        if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
+                            const leftEye = child.morphTargetDictionary['eyeBlinkLeft'] || child.morphTargetDictionary['eyesClosed'];
+                            const rightEye = child.morphTargetDictionary['eyeBlinkRight'] || child.morphTargetDictionary['eyesClosed'];
+
+                            if (leftEye !== undefined) {
+                                // Quick blink animation
+                                child.morphTargetInfluences[leftEye] = 1;
+                                setTimeout(() => { if (child.morphTargetInfluences) child.morphTargetInfluences[leftEye] = 0; }, 150);
+                            }
+                            if (rightEye !== undefined && rightEye !== leftEye) {
+                                child.morphTargetInfluences[rightEye] = 1;
+                                setTimeout(() => { if (child.morphTargetInfluences) child.morphTargetInfluences[rightEye] = 0; }, 150);
                             }
                         }
+                    });
+                },
 
-                        console.log('✅ 3D Model loaded successfully');
-                    },
-                    (progress) => {
-                        const percent = (progress.loaded / progress.total * 100).toFixed(1);
-                        console.log(`Loading model: ${percent}%`);
-                    },
-                    (error) => {
-                        console.warn('Model loading error:', error);
-                    }
-                );
-            },
-
-            animate: function () {
-                requestAnimationFrame(() => this.animate());
-
-                const delta = this.clock.getDelta();
-                const time = Date.now();
-
-                // Update animations
-                if (this.mixer) {
-                    this.mixer.update(delta);
-                }
-
-                // ===== HUMAN-LIKE BEHAVIORS =====
-                if (this.model) {
-                    // Gentle floating/breathing animation
-                    this.model.position.y = -0.3 + Math.sin(time * 0.001) * 0.015;
-
-                    // ===== EYE/HEAD TRACKING - Follow cursor =====
-                    // Smooth interpolation towards mouse position
-                    this.targetLookX += (this.mouseX * 0.15 - this.targetLookX) * 0.05;
-                    this.targetLookY += (this.mouseY * 0.1 - this.targetLookY) * 0.05;
-
-                    // Apply to head rotation (combine with subtle idle movement)
-                    this.model.rotation.y = this.targetLookX + Math.sin(time * 0.0003) * 0.03;
-                    this.model.rotation.x = -this.targetLookY + Math.sin(time * 0.0005) * 0.02;
-
-                    // Natural blinking (every 3-5 seconds)
-                    this.handleBlinking(time);
-
-                    // Micro-expressions when idle
-                    if (!this.isSpeaking) {
-                        this.handleIdleExpressions(time);
-                    }
-                }
-
-                // Lip sync simulation when speaking
-                if (this.isSpeaking && this.model) {
-                    this.simulateLipSync();
-                }
-
-                this.renderer.render(this.scene, this.camera);
-            },
-
-            // Natural blinking behavior
-            lastBlinkTime: 0,
-            nextBlinkIn: 3000,
-
-            handleBlinking: function (time) {
-                if (time - this.lastBlinkTime > this.nextBlinkIn) {
-                    this.blink();
-                    this.lastBlinkTime = time;
-                    this.nextBlinkIn = 2500 + Math.random() * 3000; // 2.5-5.5 seconds
-                }
-            },
-
-            blink: function () {
-                this.model.traverse((child) => {
-                    if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
-                        const leftEye = child.morphTargetDictionary['eyeBlinkLeft'] || child.morphTargetDictionary['eyesClosed'];
-                        const rightEye = child.morphTargetDictionary['eyeBlinkRight'] || child.morphTargetDictionary['eyesClosed'];
-
-                        if (leftEye !== undefined) {
-                            // Quick blink animation
-                            child.morphTargetInfluences[leftEye] = 1;
-                            setTimeout(() => { if (child.morphTargetInfluences) child.morphTargetInfluences[leftEye] = 0; }, 150);
-                        }
-                        if (rightEye !== undefined && rightEye !== leftEye) {
-                            child.morphTargetInfluences[rightEye] = 1;
-                            setTimeout(() => { if (child.morphTargetInfluences) child.morphTargetInfluences[rightEye] = 0; }, 150);
-                        }
-                    }
-                });
-            },
-
-            // Subtle idle expressions - polite, attentive look
-            handleIdleExpressions: function (time) {
-                this.model.traverse((child) => {
-                    if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
-                        // Subtle friendly smile
-                        const smile = child.morphTargetDictionary['mouthSmile'] || child.morphTargetDictionary['smile'];
-                        if (smile !== undefined) {
-                            child.morphTargetInfluences[smile] = 0.15 + Math.sin(time * 0.0002) * 0.05;
-                        }
-
-                        // Slight brow movement (attentive)
-                        const browUp = child.morphTargetDictionary['browUpCenter'] || child.morphTargetDictionary['browInnerUp'];
-                        if (browUp !== undefined) {
-                            child.morphTargetInfluences[browUp] = Math.sin(time * 0.0003) * 0.1;
-                        }
-                    }
-                });
-            },
-
-            simulateLipSync: function () {
-                // Simulate mouth movement based on audio
-                Object.values(this.morphTargets).forEach(mesh => {
-                    if (mesh.morphTargetInfluences && mesh.morphTargetInfluences.length > 0) {
-                        const mouthIndex = mesh.morphTargetDictionary?.['mouthOpen'] ||
-                            mesh.morphTargetDictionary?.['jawOpen'] || 0;
-                        mesh.morphTargetInfluences[mouthIndex] =
-                            Math.abs(Math.sin(Date.now() * 0.015)) * 0.5;
-                    }
-                });
-            },
-
-            startSpeaking: function () {
-                this.isSpeaking = true;
-                document.body.classList.add('speaking');
-            },
-
-            stopSpeaking: function () {
-                this.isSpeaking = false;
-                document.body.classList.remove('speaking');
-
-                // Reset mouth
-                Object.values(this.morphTargets).forEach(mesh => {
-                    if (mesh.morphTargetInfluences) {
-                        mesh.morphTargetInfluences.fill(0);
-                    }
-                });
-            },
-
-            setEmotion: function (emotion) {
-                if (!this.model) return;
-
-                // Emotion morph target mappings
-                const emotionMorphs = {
-                    happy: ['smile', 'mouthSmile', 'eyeWideLeft', 'eyeWideRight', 'cheekPuff'],
-                    sad: ['mouthFrown', 'frownLeft', 'frownRight', 'eyeSquintLeft', 'eyeSquintRight', 'browDownLeft', 'browDownRight'],
-                    angry: ['browDownLeft', 'browDownRight', 'eyeSquintLeft', 'eyeSquintRight', 'mouthFrown', 'jawForward'],
-                    surprised: ['eyeWideLeft', 'eyeWideRight', 'browUpLeft', 'browUpRight', 'jawOpen', 'mouthOpen'],
-                    thinking: ['eyeSquintLeft', 'browUpRight', 'mouthPucker'],
-                    neutral: []
-                };
-
-                const targetMorphs = emotionMorphs[emotion] || emotionMorphs.neutral;
-
-                // Apply morph targets to model
-                this.model.traverse((child) => {
-                    if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
-                        // Reset all morphs first
-                        child.morphTargetInfluences.fill(0);
-
-                        // Apply emotion morphs
-                        targetMorphs.forEach(morphName => {
-                            const index = child.morphTargetDictionary[morphName];
-                            if (index !== undefined) {
-                                child.morphTargetInfluences[index] = 0.7;
+                // Subtle idle expressions - polite, attentive look
+                handleIdleExpressions: function (time) {
+                    this.model.traverse((child) => {
+                        if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
+                            // Subtle friendly smile
+                            const smile = child.morphTargetDictionary['mouthSmile'] || child.morphTargetDictionary['smile'];
+                            if (smile !== undefined) {
+                                child.morphTargetInfluences[smile] = 0.15 + Math.sin(time * 0.0002) * 0.05;
                             }
-                        });
-                    }
-                });
 
-                console.log(`🎭 Hologram emotion set: ${emotion}`);
-            }
-        };
+                            // Slight brow movement (attentive)
+                            const browUp = child.morphTargetDictionary['browUpCenter'] || child.morphTargetDictionary['browInnerUp'];
+                            if (browUp !== undefined) {
+                                child.morphTargetInfluences[browUp] = Math.sin(time * 0.0003) * 0.1;
+                            }
+                        }
+                    });
+                },
 
-        // =====================================================================
-        // EMOTION DETECTOR - Analyze text and detect emotion
-        // =====================================================================
-        const EmotionDetector = {
-            // Keywords for emotion detection
-            patterns: {
-                happy: ['bun', 'excelent', 'perfect', 'frumos', 'super', 'minunat', 'fantastic', 'bucuros', 'fericit',
-                    'good', 'great', 'excellent', 'wonderful', 'amazing', 'happy', 'glad', 'pleased', '😊', '😄', '🎉', '👍'],
-                sad: ['trist', 'rău', 'păcat', 'din păcate', 'regret', 'scuze', 'îmi pare rău',
-                    'sad', 'sorry', 'unfortunately', 'regret', 'apologize', '😢', '😔', '💔'],
-                angry: ['greșit', 'incorect', 'eroare', 'nu se poate', 'blocat', 'interzis',
-                    'error', 'wrong', 'invalid', 'blocked', 'forbidden', 'cannot', '😠', '❌'],
-                surprised: ['wow', 'uimitor', 'incredibil', 'serios', 'nu-mi vine să cred', 'impresionant',
-                    'amazing', 'incredible', 'unbelievable', 'seriously', 'wow', '😮', '🤯', '!'],
-                thinking: ['hmm', 'interesant', 'lasă-mă să gândesc', 'procesez', 'analizez', 'caut',
-                    'thinking', 'processing', 'analyzing', 'searching', 'let me', 'consider', '🤔']
-            },
+                simulateLipSync: function () {
+                    // Simulate mouth movement based on audio
+                    Object.values(this.morphTargets).forEach(mesh => {
+                        if (mesh.morphTargetInfluences && mesh.morphTargetInfluences.length > 0) {
+                            const mouthIndex = mesh.morphTargetDictionary?.['mouthOpen'] ||
+                                mesh.morphTargetDictionary?.['jawOpen'] || 0;
+                            mesh.morphTargetInfluences[mouthIndex] =
+                                Math.abs(Math.sin(Date.now() * 0.015)) * 0.5;
+                        }
+                    });
+                },
 
-            detect: function (text) {
-                const lowerText = (text || '').toLowerCase();
+                startSpeaking: function () {
+                    this.isSpeaking = true;
+                    document.body.classList.add('speaking');
+                },
 
-                // Check each emotion pattern
-                for (const [emotion, keywords] of Object.entries(this.patterns)) {
-                    for (const keyword of keywords) {
-                        if (lowerText.includes(keyword.toLowerCase())) {
-                            return emotion;
+                stopSpeaking: function () {
+                    this.isSpeaking = false;
+                    document.body.classList.remove('speaking');
+
+                    // Reset mouth
+                    Object.values(this.morphTargets).forEach(mesh => {
+                        if (mesh.morphTargetInfluences) {
+                            mesh.morphTargetInfluences.fill(0);
+                        }
+                    });
+                },
+
+                setEmotion: function (emotion) {
+                    if (!this.model) return;
+
+                    // Emotion morph target mappings
+                    const emotionMorphs = {
+                        happy: ['smile', 'mouthSmile', 'eyeWideLeft', 'eyeWideRight', 'cheekPuff'],
+                        sad: ['mouthFrown', 'frownLeft', 'frownRight', 'eyeSquintLeft', 'eyeSquintRight', 'browDownLeft', 'browDownRight'],
+                        angry: ['browDownLeft', 'browDownRight', 'eyeSquintLeft', 'eyeSquintRight', 'mouthFrown', 'jawForward'],
+                        surprised: ['eyeWideLeft', 'eyeWideRight', 'browUpLeft', 'browUpRight', 'jawOpen', 'mouthOpen'],
+                        thinking: ['eyeSquintLeft', 'browUpRight', 'mouthPucker'],
+                        neutral: []
+                    };
+
+                    const targetMorphs = emotionMorphs[emotion] || emotionMorphs.neutral;
+
+                    // Apply morph targets to model
+                    this.model.traverse((child) => {
+                        if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
+                            // Reset all morphs first
+                            child.morphTargetInfluences.fill(0);
+
+                            // Apply emotion morphs
+                            targetMorphs.forEach(morphName => {
+                                const index = child.morphTargetDictionary[morphName];
+                                if (index !== undefined) {
+                                    child.morphTargetInfluences[index] = 0.7;
+                                }
+                            });
+                        }
+                    });
+
+                    console.log(`🎭 Hologram emotion set: ${emotion}`);
+                }
+            };
+
+            // =====================================================================
+            // EMOTION DETECTOR - Analyze text and detect emotion
+            // =====================================================================
+            const EmotionDetector = {
+                // Keywords for emotion detection
+                patterns: {
+                    happy: ['bun', 'excelent', 'perfect', 'frumos', 'super', 'minunat', 'fantastic', 'bucuros', 'fericit',
+                        'good', 'great', 'excellent', 'wonderful', 'amazing', 'happy', 'glad', 'pleased', '😊', '😄', '🎉', '👍'],
+                    sad: ['trist', 'rău', 'păcat', 'din păcate', 'regret', 'scuze', 'îmi pare rău',
+                        'sad', 'sorry', 'unfortunately', 'regret', 'apologize', '😢', '😔', '💔'],
+                    angry: ['greșit', 'incorect', 'eroare', 'nu se poate', 'blocat', 'interzis',
+                        'error', 'wrong', 'invalid', 'blocked', 'forbidden', 'cannot', '😠', '❌'],
+                    surprised: ['wow', 'uimitor', 'incredibil', 'serios', 'nu-mi vine să cred', 'impresionant',
+                        'amazing', 'incredible', 'unbelievable', 'seriously', 'wow', '😮', '🤯', '!'],
+                    thinking: ['hmm', 'interesant', 'lasă-mă să gândesc', 'procesez', 'analizez', 'caut',
+                        'thinking', 'processing', 'analyzing', 'searching', 'let me', 'consider', '🤔']
+                },
+
+                detect: function (text) {
+                    const lowerText = (text || '').toLowerCase();
+
+                    // Check each emotion pattern
+                    for (const [emotion, keywords] of Object.entries(this.patterns)) {
+                        for (const keyword of keywords) {
+                            if (lowerText.includes(keyword.toLowerCase())) {
+                                return emotion;
+                            }
                         }
                     }
+
+                    // Default to neutral
+                    return 'neutral';
+                },
+
+                // Apply detected emotion to hologram
+                applyToHologram: function (text) {
+                    const emotion = this.detect(text);
+                    if (window.HologramSystem) {
+                        window.HologramSystem.setEmotion(emotion);
+                    }
+                    return emotion;
                 }
+            };
 
-                // Default to neutral
-                return 'neutral';
-            },
+            // Expose EmotionDetector globally
+            window.EmotionDetector = EmotionDetector;
 
-            // Apply detected emotion to hologram
-            applyToHologram: function (text) {
-                const emotion = this.detect(text);
-                if (window.HologramSystem) {
-                    window.HologramSystem.setEmotion(emotion);
-                }
-                return emotion;
-            }
-        };
+            // Initialize hologram when page ready
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    HologramSystem.init();
+                }, 2000); // Wait for loading screen
+            });
 
-        // Expose EmotionDetector globally
-        window.EmotionDetector = EmotionDetector;
+            // Expose to global for voice integration
+            window.HologramSystem = HologramSystem;
 
-        // Initialize hologram when page ready
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                HologramSystem.init();
-            }, 2000); // Wait for loading screen
-        });
+            // =====================================================================
+            // ACCESSIBILITY: Subtitle System for Hearing Impaired
+            // =====================================================================
+            const SubtitleSystem = {
+                isOpen: false,
+                currentLang: 'EN',
 
-        // Expose to global for voice integration
-        window.HologramSystem = HologramSystem;
+                init: function () {
+                    const btn = document.getElementById('accessibility-btn');
+                    const box = document.getElementById('subtitle-box');
 
-        // =====================================================================
-        // ACCESSIBILITY: Subtitle System for Hearing Impaired
-        // =====================================================================
-        const SubtitleSystem = {
-            isOpen: false,
-            currentLang: 'EN',
+                    if (!btn || !box) return;
 
-            init: function () {
-                const btn = document.getElementById('accessibility-btn');
-                const box = document.getElementById('subtitle-box');
+                    btn.addEventListener('click', () => this.toggle());
 
-                if (!btn || !box) return;
+                    // Load saved preference
+                    const saved = localStorage.getItem('subtitles_enabled');
+                    if (saved === 'true') {
+                        this.open();
+                    }
 
-                btn.addEventListener('click', () => this.toggle());
+                    console.log('✅ Subtitle System initialized');
+                },
 
-                // Load saved preference
-                const saved = localStorage.getItem('subtitles_enabled');
-                if (saved === 'true') {
-                    this.open();
-                }
+                toggle: function () {
+                    if (this.isOpen) {
+                        this.close();
+                    } else {
+                        this.open();
+                    }
+                },
 
-                console.log('✅ Subtitle System initialized');
-            },
+                open: function () {
+                    this.isOpen = true;
+                    document.getElementById('accessibility-btn')?.classList.add('active');
+                    document.getElementById('subtitle-box')?.classList.add('active');
+                    localStorage.setItem('subtitles_enabled', 'true');
+                },
 
-            toggle: function () {
-                if (this.isOpen) {
-                    this.close();
-                } else {
-                    this.open();
-                }
-            },
+                close: function () {
+                    this.isOpen = false;
+                    document.getElementById('accessibility-btn')?.classList.remove('active');
+                    document.getElementById('subtitle-box')?.classList.remove('active');
+                    localStorage.setItem('subtitles_enabled', 'false');
+                },
 
-            open: function () {
-                this.isOpen = true;
-                document.getElementById('accessibility-btn')?.classList.add('active');
-                document.getElementById('subtitle-box')?.classList.add('active');
-                localStorage.setItem('subtitles_enabled', 'true');
-            },
+                // Main method to show subtitles - call this when AI speaks
+                showText: function (text, lang = 'EN') {
+                    const subtitleText = document.getElementById('subtitle-text');
+                    const subtitleLang = document.getElementById('subtitle-lang');
 
-            close: function () {
-                this.isOpen = false;
-                document.getElementById('accessibility-btn')?.classList.remove('active');
-                document.getElementById('subtitle-box')?.classList.remove('active');
-                localStorage.setItem('subtitles_enabled', 'false');
-            },
+                    if (!subtitleText) return;
 
-            // Main method to show subtitles - call this when AI speaks
-            showText: function (text, lang = 'EN') {
-                const subtitleText = document.getElementById('subtitle-text');
-                const subtitleLang = document.getElementById('subtitle-lang');
+                    this.currentLang = lang.toUpperCase();
+                    if (subtitleLang) {
+                        subtitleLang.textContent = this.currentLang;
+                    }
 
-                if (!subtitleText) return;
+                    // Animate text appearance
+                    subtitleText.classList.add('speaking');
+                    subtitleText.textContent = text;
 
-                this.currentLang = lang.toUpperCase();
-                if (subtitleLang) {
-                    subtitleLang.textContent = this.currentLang;
-                }
-
-                // Animate text appearance
-                subtitleText.classList.add('speaking');
-                subtitleText.textContent = text;
-
-                // Auto-scroll to bottom
-                subtitleText.scrollTop = subtitleText.scrollHeight;
-            },
-
-            // Clear subtitles when speech ends
-            clear: function () {
-                const subtitleText = document.getElementById('subtitle-text');
-                if (subtitleText) {
-                    subtitleText.classList.remove('speaking');
-                }
-            },
-
-            // Append text (for streaming responses)
-            appendText: function (text) {
-                const subtitleText = document.getElementById('subtitle-text');
-                if (subtitleText) {
-                    subtitleText.textContent += text;
+                    // Auto-scroll to bottom
                     subtitleText.scrollTop = subtitleText.scrollHeight;
+                },
+
+                // Clear subtitles when speech ends
+                clear: function () {
+                    const subtitleText = document.getElementById('subtitle-text');
+                    if (subtitleText) {
+                        subtitleText.classList.remove('speaking');
+                    }
+                },
+
+                // Append text (for streaming responses)
+                appendText: function (text) {
+                    const subtitleText = document.getElementById('subtitle-text');
+                    if (subtitleText) {
+                        subtitleText.textContent += text;
+                        subtitleText.scrollTop = subtitleText.scrollHeight;
+                    }
                 }
+            };
+
+            // Initialize subtitle system
+            document.addEventListener('DOMContentLoaded', () => {
+                SubtitleSystem.init();
+            });
+
+            // Expose to global for integration
+            window.SubtitleSystem = SubtitleSystem;
+
+            // =====================================================================
+            // v143.0: NEW INTERFACE LOGIC
+            // =====================================================================
+
+            // 1. USAGE TIMER & TRIAL TRACKING
+            async function updateUsage() {
+                try {
+                    const response = await fetch(`/api/usage?username=${encodeURIComponent(state.user)}`);
+                    if (!response.ok) return;
+                    const data = await response.json();
+
+                    const timerEl = $('remaining-time');
+                    if (timerEl) {
+                        if (data.type === 'paid') {
+                            timerEl.textContent = "Unlimited Access";
+                            $('usage-timer').classList.remove('low-time');
+                        } else {
+                            const minutes = Math.floor(data.remaining_seconds / 60);
+                            const seconds = data.remaining_seconds % 60;
+                            timerEl.textContent = `${minutes}m ${seconds}s left`;
+
+                            if (minutes < 5) {
+                                $('usage-timer').classList.add('low-time');
+                            } else {
+                                $('usage-timer').classList.remove('low-time');
+                            }
+                        }
+                    }
+                } catch (err) { console.warn("Usage check failed"); }
             }
-        };
 
-        // Initialize subtitle system
-        document.addEventListener('DOMContentLoaded', () => {
-            SubtitleSystem.init();
-        });
+            // 2. THEME TOGGLE
+            function toggleTheme() {
+                document.body.classList.toggle('light-theme');
+                const isLight = document.body.classList.contains('light-theme');
+                const icon = $('theme-toggle').querySelector('i');
+                if (icon) {
+                    icon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+                }
+                localStorage.setItem('kelion-theme', isLight ? 'light' : 'dark');
+            }
 
-        // Expose to global for integration
-        window.SubtitleSystem = SubtitleSystem;
+            // 3. EXPORT CONVERSATION
+            function exportChat() {
+                const messages = Array.from(document.querySelectorAll('.message')).map(m => {
+                    const who = m.classList.contains('user') ? 'USER' : 'KELION';
+                    return `[${who}] ${m.textContent}`;
+                }).join('\n\n');
 
-    </script>
+                const blob = new Blob([`KELION AI v143.0 - CONVERSATION LOG\nDate: ${new Date().toLocaleString()}\n\n${messages}`], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `kelion_log_${new Date().toISOString().slice(0, 10)}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
 
-    <!-- 
+            // 5. SOUND EFFECTS
+            function playNotificationSound() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.1);
+                } catch (e) { /* Audio fallback */ }
+            }
+
+            // 6. PERSONALIZED WELCOME
+            async function personalizedWelcome() {
+                const welcomeMsg = state.user !== "N/A"
+                    ? `Welcome back, ${state.user}. Neural link stable. How can I assist you today?`
+                    : `Neural link initiated. I am KELION v143.0. Awaiting your command.`;
+
+                setTimeout(() => {
+                    write('bot', welcomeMsg);
+                    speak(welcomeMsg);
+                }, 1000);
+            }
+
+            // 7. INITIALIZATION & LISTENERS
+            document.addEventListener('DOMContentLoaded', () => {
+                SubtitleSystem.init();
+
+                // Check saved theme
+                if (localStorage.getItem('kelion-theme') === 'light') {
+                    toggleTheme();
+                }
+
+                // Keyboard Shortcuts
+                $('chat-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') execute();
+                });
+
+                // ESC to close modals
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        const modals = ['login-modal', 'forgot-modal', 'traffic-modal', 'admin-modal'];
+                        modals.forEach(m => { if ($(m)) $(m).style.display = 'none'; });
+                    }
+                });
+
+                // Control Listeners
+                $('theme-toggle').addEventListener('click', toggleTheme);
+                if ($('export-btn')) $('export-btn').addEventListener('click', exportChat);
+
+                // Start Usage Polling
+                updateUsage();
+                setInterval(updateUsage, 30000);
+
+                // Trigger Welcome
+                personalizedWelcome();
+            });
+
+        </script>
+
+        <!-- 
     ðŸ›‘ NEXUS AI VERIFICATION SEAL ðŸ›‘
     ================================
     DATE: 2025-12-25

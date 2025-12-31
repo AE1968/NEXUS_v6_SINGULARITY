@@ -17,6 +17,14 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+# Configure professional logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger('KELION')
+
 # Add current folder to path to ensure configuration import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -662,6 +670,79 @@ def update_user_usage(username, seconds_used):
         db.session.commit()
 
 
+@app.route('/api/usage', methods=['GET'])
+def get_usage_status():
+    """Returns remaining trial time for the current user/guest"""
+    username = request.args.get('username')
+    ip_address = request.remote_addr or request.headers.get('X-Forwarded-For', '0.0.0.0')
+    
+    if username and username not in ['User', 'Guest', '']:
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+            
+        # If paid, unlimited
+        if user.subscription and user.subscription not in ['trial', 'free', 'demo']:
+            return jsonify({
+                "type": "paid",
+                "remaining_seconds": 86400,
+                "remaining_days": 365,
+                "status": "Unlimited"
+            })
+            
+        trial = TrialUser.query.filter_by(username=username).first()
+        if not trial:
+            return jsonify({"type": "trial", "remaining_seconds": 1200, "remaining_days": 30})
+            
+        rem_sec = max(0, TrialUser.DAILY_LIMIT_SECONDS - trial.daily_seconds_used)
+        rem_days = max(0, (trial.trial_end - datetime.datetime.utcnow()).days)
+        return jsonify({
+            "type": "trial_user",
+            "remaining_seconds": rem_sec,
+            "remaining_days": rem_days
+        })
+    else:
+        tracker = DemoTracking.query.filter_by(ip_address=ip_address).first()
+        if not tracker:
+            return jsonify({"type": "guest", "remaining_seconds": 1200, "remaining_days": 30})
+            
+        rem_sec = max(0, DemoTracking.DAILY_LIMIT_SECONDS - tracker.daily_seconds_used)
+        rem_days = max(0, DemoTracking.TRIAL_DAYS - (datetime.datetime.utcnow() - tracker.first_access).days)
+        return jsonify({
+            "type": "guest",
+            "remaining_seconds": rem_sec,
+            "remaining_days": rem_days
+        })
+
+
+@app.route('/api/memories', methods=['POST'])
+def get_memories_endpoint():
+    """Returns user memories for personalized greetings"""
+    data = request.json
+    username = data.get('username', '').strip()
+    
+    if not username or username in ['User', 'Guest', '']:
+        return jsonify({"success": False, "memories": []})
+    
+    try:
+        memories = get_user_memories(username, limit=5)
+        memory_list = []
+        for mem in memories:
+            memory_list.append({
+                "key": mem.memory_key,
+                "value": mem.memory_value,
+                "type": mem.memory_type
+            })
+        
+        return jsonify({
+            "success": True,
+            "memories": memory_list
+        })
+    except Exception as e:
+        print(f"Memory fetch error: {e}")
+        return jsonify({"success": False, "memories": []})
+
+
 def get_subscription_offers():
     """Get available subscription packages"""
     return {
@@ -1086,6 +1167,31 @@ def send_confirmation_email(to_email, username, first_name, subscription, expiry
         print(f"âŒ Email error: {e}")
         return False
 
+def send_auto_response_email(to_email, name, auto_response_text, ticket_id):
+    """Send automated protocol response to contact form submitter"""
+    if not SMTP_EMAIL or not SMTP_PASSWORD:
+        print("⚠️ SMTP not configured - auto-response not sent")
+        return False
+    
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = f"KELION AI - Your Request #{ticket_id}"
+        msg['From'] = f"KELION AI <{SMTP_EMAIL}>"
+        msg['To'] = to_email
+        
+        text_part = MIMEText(auto_response_text, 'plain', 'utf-8')
+        msg.attach(text_part)
+        
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            server.sendmail(SMTP_EMAIL, to_email, msg.as_string())
+        
+        print(f"✅ Auto-response sent to {to_email} (#{ticket_id})")
+        return True
+    except Exception as e:
+        print(f"❌ Auto-response error: {e}")
+        return False
+
 def send_admin_notification(user_email, user_name, topic, topic_label, message):
     """Send email notification to admin when new contact message arrives"""
     try:
@@ -1263,6 +1369,16 @@ def get_config():
 # v143: AI SAFETY - check_ai_safety defined at end of file with AI_SAFETY_KEYWORDS
 # ==============================================================================
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for uptime monitoring"""
+    return jsonify({
+        "status": "healthy",
+        "version": VERSION,
+        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "service": "KELION AI"
+    }), 200
+
 @app.route('/api/chat', methods=['POST'])
 @token_required
 def api_chat(current_user):
@@ -1293,17 +1409,30 @@ def api_chat(current_user):
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
-    email = data.get('email')
-    password = data.get('password')
-    first_name = data.get('first_name', '')
-    last_name = data.get('last_name', '')
-    phone = data.get('phone', '')
-    country = data.get('country', '')
+    email = data.get('email', '').strip()
+    password = data.get('password', '')
+    first_name = data.get('first_name', '').strip()
+    last_name = data.get('last_name', '').strip()
+    phone = data.get('phone', '').strip()
+    country = data.get('country', '').strip()
+    address = data.get('address', '').strip()
+    city = data.get('city', '').strip()
+    postal_code = data.get('postal_code', '').strip()
     subscription = data.get('subscription', 'basic')
     voucher_code = data.get('voucher_code')
     
+    # Validate ALL mandatory fields
     if not email or not password:
         return jsonify({"success": False, "error": "Email and password are required"}), 400
+    if not first_name or not last_name:
+        return jsonify({"success": False, "error": "First name and last name are required"}), 400
+    if not phone:
+        return jsonify({"success": False, "error": "Phone number is required"}), 400
+    if not country:
+        return jsonify({"success": False, "error": "Country is required"}), 400
+    if not address or not city or not postal_code:
+        return jsonify({"success": False, "error": "Full address (street, city, postal code) is required"}), 400
+        
         
     if User.query.filter_by(email=email).first():
         return jsonify({"success": False, "error": "Email already registered"}), 400
@@ -1742,7 +1871,7 @@ def get_chatgpt_response(message, username, conversation_id, gender='male'):
 
 IDENTITY: Your name is {ai_name}, but users can also call you "KEY" or "K" for short. Respond to all these names.
 PERSONALITY: Cultured, polite, intelligent, occasionally witty. Like a well-educated gentleman.
-LANGUAGE: Respond in the SAME LANGUAGE as the user's message. If they write in Romanian, respond in Romanian. If English, respond in English.
+LANGUAGE: ALWAYS respond in ENGLISH, regardless of the user's language. This is a strict protocol. Even if the user writes in another language, you MUST reply in English.
 CURRENT TIME: {now.strftime("%H:%M")} on {now.strftime("%d %B %Y")}. Use "{time_greeting}" when appropriate.
 
 {memory_context}
@@ -1756,7 +1885,7 @@ MEMORY PROTOCOL:
 AUTODIDACT PROTOCOL:
 - If you don't know something current (news, prices, facts about recent events, weather, etc.), you CAN search the internet.
 - Use [[SEARCH:query]] at the END of your response to trigger a web search. The system will fetch results and you'll get updated info.
-- Example: "Lasă-mă să caut informații actuale despre asta. [[SEARCH:Prețul Bitcoin azi]]"
+- Example: "Let me search for current information about that. [[SEARCH:Bitcoin price today]]"
 
 SMART UI CONTROL:
 - [[ACTION:OPEN_HISTORY]] - Open chat history
@@ -2112,8 +2241,13 @@ def contact():
             "error": "Email, topic, and message are required"
         }), 400
     
-    # Extract optional fields
-    name = data.get('name', 'Anonymous')
+    # Validate name as mandatory
+    name = data.get('name', '').strip()
+    if not name:
+        return jsonify({
+            "success": False,
+            "error": "Name is required"
+        }), 400
     topic_label = data.get('topicLabel', '')
     user_agent = data.get('userAgent', '')
     source = data.get('source', '')
@@ -2139,16 +2273,20 @@ def contact():
         db.session.commit()
         
         # Log for admin
-        print(f"ðŸ“§ NEW CONTACT from {name} ({email}) - Topic: {topic_label}")
-        print(f"   Message: {message[:100]}...")
+        logger.info(f"📧 NEW CONTACT [{email_result['category'].upper()}] from {name} ({email})")
         
         # Send email notification to admin
         send_admin_notification(email, name, topic, topic_label, message)
         
+        # Send auto-response email to user
+        send_auto_response_email(email, name, email_result['auto_response'], email_result['ticket_id'])
+        
         return jsonify({
             "success": True,
             "message": "Contact form submitted successfully",
-            "id": new_contact.id
+            "id": new_contact.id,
+            "ticket_id": email_result['ticket_id'],
+            "category": email_result['category']
         }), 200
         
     except Exception as e:
