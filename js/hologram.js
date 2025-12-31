@@ -61,6 +61,11 @@ const HologramSystem = {
         rimLight.position.set(2, 1, 0);
         this.scene.add(rimLight);
 
+        // Initialize Energy Sphere if available
+        if (window.EnergySphere) {
+            window.EnergySphere.init(this.scene);
+        }
+
         // Load 3D model
         this.loadModel();
 
@@ -114,6 +119,7 @@ const HologramSystem = {
             this.particles.material.opacity = 0.8;
         }
         this.setColor('processing');
+        if (window.EnergySphere) window.EnergySphere.intensify();
     },
 
     // Stop particles
@@ -123,6 +129,7 @@ const HologramSystem = {
             this.particles.material.opacity = 0;
         }
         this.setColor('default');
+        if (window.EnergySphere) window.EnergySphere.calm();
     },
 
     // Color states for hologram
@@ -221,6 +228,11 @@ const HologramSystem = {
         // Update animations
         if (this.mixer) {
             this.mixer.update(delta);
+        }
+
+        // Update Energy Sphere
+        if (window.EnergySphere) {
+            window.EnergySphere.update();
         }
 
         // ===== HUMAN-LIKE BEHAVIORS =====
