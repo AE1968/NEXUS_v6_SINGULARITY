@@ -2853,7 +2853,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Trigger Welcome
-
     personalizedWelcome();
+
+    // ==============================================================================
+    // v143.0 INITIALIZATION PROTOCOL
+    // ==============================================================================
+    console.log("\u1f6a2 Initializing KELION v143.0 Neural Core...");
+
+    // Initialize 3D Hologram
+    if (window.HologramSystem) {
+        window.HologramSystem.init();
+        window.HologramSystem.animate();
+        console.log("\u2705 Hologram System: ACTIVE");
+
+        // Initialize Energy Sphere inside Hologram scene
+        if (window.EnergySphere && window.HologramSystem.scene) {
+            window.EnergySphere.init(window.HologramSystem.scene);
+            console.log("\u2705 Energy Sphere: ACTIVE");
+        }
+    }
+
+    // Initialize 3D Globe system if container exists
+    if (window.GlobeSystem && document.getElementById('globe-container')) {
+        window.GlobeSystem.init('globe-container');
+        window.GlobeSystem.animate();
+        console.log("\u2705 Globe System: ACTIVE");
+    }
+
+    // Accessibility: Initialize LipSync
+    if (window.LipSyncSystem) {
+        window.LipSyncSystem.init();
+    }
 
 });
