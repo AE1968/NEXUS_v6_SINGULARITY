@@ -1910,6 +1910,295 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // ==========================================================================
+    // 📝 REGISTRATION SYSTEM - Multi-Step Flow with Email Verification
+    // ==========================================================================
+
+    // Registration state
+    const regState = {
+        emailVerified: false,
+        verifiedEmail: '',
+        currentStep: 1,
+        paymentMethod: 'voucher' // 'voucher' or 'payment'
+    };
+
+    // Step navigation helper
+    function gotoRegStep(stepNum) {
+        $('reg-step-1').style.display = stepNum === 1 ? 'block' : 'none';
+        $('reg-step-2').style.display = stepNum === 2 ? 'block' : 'none';
+        $('reg-step-3').style.display = stepNum === 3 ? 'block' : 'none';
+
+        // Update progress dots
+        $('step-1-dot').style.background = stepNum >= 1 ? 'var(--pink)' : 'rgba(255,255,255,0.2)';
+        $('step-2-dot').style.background = stepNum >= 2 ? 'var(--pink)' : 'rgba(255,255,255,0.2)';
+        $('step-3-dot').style.background = stepNum >= 3 ? 'var(--pink)' : 'rgba(255,255,255,0.2)';
+
+        regState.currentStep = stepNum;
+    }
+
+    // Open register modal from login
+    const openRegisterLink = document.getElementById('register-link');
+    if (openRegisterLink) {
+        openRegisterLink.onclick = (e) => {
+            e.preventDefault();
+            $('login-modal').style.display = 'none';
+            $('register-modal').style.display = 'flex';
+            gotoRegStep(1); // Reset to step 1
+            regState.emailVerified = false;
+        };
+    }
+
+    // Back to login
+    const registerBackLink = $('register-back-link');
+    if (registerBackLink) {
+        registerBackLink.onclick = (e) => {
+            e.preventDefault();
+            $('register-modal').style.display = 'none';
+            $('login-modal').style.display = 'flex';
+        };
+    }
+
+    // STEP 1: Send verification code
+    const sendVerifyBtn = $('send-verify-code');
+    if (sendVerifyBtn) {
+        sendVerifyBtn.onclick = async () => {
+            const email = $('reg-email').value.trim();
+
+            if (!email || !email.includes('@')) {
+                alert('⚠️ Please enter a valid email address.');
+                return;
+            }
+
+            sendVerifyBtn.textContent = 'SENDING...';
+            sendVerifyBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/send-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, type: 'registration' })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    $('verify-code-section').style.display = 'block';
+                    sendVerifyBtn.textContent = 'CODE SENT ✓';
+                    sendVerifyBtn.style.background = '#00ff00';
+                    sendVerifyBtn.style.color = '#000';
+                    regState.verifiedEmail = email;
+                } else {
+                    alert('⚠️ ' + (data.error || 'Failed to send code'));
+                    sendVerifyBtn.textContent = 'SEND VERIFICATION CODE';
+                    sendVerifyBtn.disabled = false;
+                }
+            } catch (err) {
+                console.error('Send code error:', err);
+                alert('⚠️ Connection error. Please try again.');
+                sendVerifyBtn.textContent = 'SEND VERIFICATION CODE';
+                sendVerifyBtn.disabled = false;
+            }
+        };
+    }
+
+    // STEP 1: Verify code
+    const verifyEmailBtn = $('verify-email-btn');
+    if (verifyEmailBtn) {
+        verifyEmailBtn.onclick = async () => {
+            const code = $('reg-verify-code').value.trim();
+            const email = regState.verifiedEmail;
+
+            if (!code || code.length !== 6) {
+                alert('⚠️ Please enter the 6-digit code.');
+                return;
+            }
+
+            verifyEmailBtn.textContent = 'VERIFYING...';
+            verifyEmailBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/verify-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, code: code })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    regState.emailVerified = true;
+                    gotoRegStep(2); // Proceed to step 2
+                } else {
+                    alert('⚠️ ' + (data.error || 'Invalid code'));
+                    verifyEmailBtn.textContent = 'VERIFY EMAIL';
+                    verifyEmailBtn.disabled = false;
+                }
+            } catch (err) {
+                console.error('Verify code error:', err);
+                alert('⚠️ Connection error. Please try again.');
+                verifyEmailBtn.textContent = 'VERIFY EMAIL';
+                verifyEmailBtn.disabled = false;
+            }
+        };
+    }
+
+    // STEP 2: Continue to payment
+    const gotoStep3Btn = $('goto-step-3');
+    if (gotoStep3Btn) {
+        gotoStep3Btn.onclick = () => {
+            // Validate required fields
+            const firstname = $('reg-firstname').value.trim();
+            const lastname = $('reg-lastname').value.trim();
+            const password = $('reg-password').value;
+            const phone = $('reg-phone').value.trim();
+            const country = $('reg-country').value;
+            const address = $('reg-address').value.trim();
+            const city = $('reg-city').value.trim();
+            const postal = $('reg-postal').value.trim();
+
+            if (!firstname || !lastname) {
+                alert('⚠️ First name and last name are required.');
+                return;
+            }
+            if (!password || password.length < 8) {
+                alert('⚠️ Password must be at least 8 characters.');
+                return;
+            }
+            if (!phone) {
+                alert('⚠️ Phone number is required.');
+                return;
+            }
+            if (!address || !city || !postal) {
+                alert('⚠️ Full address (street, city, postal code) is required.');
+                return;
+            }
+
+            gotoRegStep(3);
+        };
+    }
+
+    // STEP 3: Toggle between voucher and payment
+    const toggleVoucherBtn = $('toggle-voucher');
+    const togglePaymentBtn = $('toggle-payment');
+    const voucherSection = $('voucher-section');
+    const paymentSection = $('payment-section');
+
+    if (toggleVoucherBtn) {
+        toggleVoucherBtn.onclick = () => {
+            regState.paymentMethod = 'voucher';
+            voucherSection.style.display = 'block';
+            paymentSection.style.display = 'none';
+            toggleVoucherBtn.style.background = 'rgba(0,255,0,0.4)';
+            togglePaymentBtn.style.background = 'rgba(255,0,255,0.2)';
+        };
+    }
+
+    if (togglePaymentBtn) {
+        togglePaymentBtn.onclick = () => {
+            regState.paymentMethod = 'payment';
+            voucherSection.style.display = 'none';
+            paymentSection.style.display = 'block';
+            toggleVoucherBtn.style.background = 'rgba(0,255,0,0.2)';
+            togglePaymentBtn.style.background = 'rgba(255,0,255,0.4)';
+
+            // Note: PayPal SDK should be loaded here if needed
+            // For now, registration will proceed without pay
+        };
+    }
+
+    // STEP 3: Final registration
+    const doRegisterBtn = $('do-register');
+    if (doRegisterBtn) {
+        doRegisterBtn.onclick = async () => {
+            const regStatus = $('reg-status');
+
+            // Verify email was completed
+            if (!regState.emailVerified) {
+                alert('⚠️ Please verify your email first (Step 1).');
+                gotoRegStep(1);
+                return;
+            }
+
+            // Collect all data
+            const regData = {
+                email: regState.verifiedEmail,
+                password: $('reg-password').value,
+                first_name: $('reg-firstname').value.trim(),
+                last_name: $('reg-lastname').value.trim(),
+                phone: $('reg-phone').value.trim(),
+                country: $('reg-country').value,
+                address: $('reg-address').value.trim(),
+                city: $('reg-city').value.trim(),
+                postal_code: $('reg-postal').value.trim(),
+                subscription: 'basic'
+            };
+
+            // Check payment method
+            if (regState.paymentMethod === 'voucher') {
+                const voucherCode = $('reg-voucher').value.trim().toUpperCase();
+                if (!voucherCode) {
+                    alert('⚠️ Please enter a voucher code or switch to payment.');
+                    return;
+                }
+                regData.voucher_code = voucherCode;
+            } else {
+                // Payment selected - get selected plan
+                const selectedPlan = document.querySelector('input[name="plan"]:checked');
+                if (selectedPlan) {
+                    regData.subscription = selectedPlan.value;
+                }
+                // Note: PayPal integration would add paypal_order_id here
+            }
+
+            doRegisterBtn.textContent = 'CREATING ACCOUNT...';
+            doRegisterBtn.disabled = true;
+            if (regStatus) regStatus.textContent = '';
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(regData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (regStatus) {
+                        regStatus.style.color = '#00ff00';
+                        regStatus.textContent = '✅ Account created! You can now login.';
+                    }
+
+                    // Auto-fill login form
+                    $('u-input').value = data.username || regData.email.split('@')[0];
+                    $('p-input').value = regData.password;
+
+                    // Switch to login after 2 seconds
+                    setTimeout(() => {
+                        $('register-modal').style.display = 'none';
+                        $('login-modal').style.display = 'flex';
+                        alert('🎉 Welcome to KELION AI! Please login with your new account.');
+                    }, 2000);
+                } else {
+                    if (regStatus) {
+                        regStatus.style.color = '#ff4444';
+                        regStatus.textContent = '❌ ' + (data.error || 'Registration failed');
+                    }
+                    doRegisterBtn.textContent = 'CREATE ACCOUNT';
+                    doRegisterBtn.disabled = false;
+                }
+            } catch (err) {
+                console.error('Registration error:', err);
+                if (regStatus) {
+                    regStatus.style.color = '#ff4444';
+                    regStatus.textContent = '❌ Connection error. Please try again.';
+                }
+                doRegisterBtn.textContent = 'CREATE ACCOUNT';
+                doRegisterBtn.disabled = false;
+            }
+        };
+    }
+
 
     // initThreeJS(); // DISABLED - shows robot background instead
 

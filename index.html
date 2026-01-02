@@ -47,7 +47,7 @@
     <!-- KELION 3D Systems: Globe, Energy Sphere, Lip Sync, AI_key Plasma -->
     <script src="js/3d-systems.js?v=143.AUDIT.FINAL" defer></script>
     <script src="js/AI_key.js?v=143.AUDIT.FINAL" defer></script>
-    
+
     <link rel="stylesheet" href="css/style.css?v=143.AUDIT.FINAL">
 </head>
 
@@ -433,153 +433,199 @@
 
 
 
-        <!-- REGISTER MODAL -->
+        <!-- REGISTER MODAL - Multi-Step Flow -->
 
         <div id="register-modal"
             style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter:blur(5px); overflow-y:auto;">
 
-            <div class="modal-box" style="max-width:550px; margin:30px auto;">
+            <div class="modal-box" style="max-width:600px; margin:30px auto; max-height:90vh; overflow-y:auto;">
 
                 <h2 style="color:var(--pink);"><i class="fas fa-user-plus"></i> CREATE ACCOUNT</h2>
 
+                <!-- Progress Steps -->
+                <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px;">
+                    <div id="step-1-dot" style="width:12px; height:12px; border-radius:50%; background:var(--pink);">
+                    </div>
+                    <div id="step-2-dot"
+                        style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.2);"></div>
+                    <div id="step-3-dot"
+                        style="width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.2);"></div>
+                </div>
 
-
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <!-- ========== STEP 1: Email Verification ========== -->
+                <div id="reg-step-1">
+                    <p style="color:#888; font-size:0.9rem; margin-bottom:20px;">Step 1: Verify your email address</p>
 
                     <div class="input-grp">
+                        <label>Email *</label>
+                        <input type="email" id="reg-email" placeholder="john@example.com" required>
+                    </div>
 
-                        <label>First Name *</label>
+                    <button id="send-verify-code" class="modal-btn" style="background:var(--cyan);">
+                        <i class="fas fa-paper-plane"></i> SEND VERIFICATION CODE
+                    </button>
 
-                        <input type="text" id="reg-firstname" placeholder="John" required>
+                    <!-- Code Input (hidden initially) -->
+                    <div id="verify-code-section" style="display:none; margin-top:20px;">
+                        <p style="color:#00ff00; font-size:0.85rem;"><i class="fas fa-check-circle"></i> Code sent!
+                            Check your email.</p>
+                        <div class="input-grp">
+                            <label>6-Digit Code</label>
+                            <input type="text" id="reg-verify-code" placeholder="123456" maxlength="6"
+                                style="letter-spacing:5px; text-align:center; font-size:1.4rem;">
+                        </div>
+                        <button id="verify-email-btn" class="modal-btn" style="background:#00ff00; color:#000;">
+                            <i class="fas fa-check"></i> VERIFY EMAIL
+                        </button>
+                    </div>
+                </div>
 
+                <!-- ========== STEP 2: Personal Information ========== -->
+                <div id="reg-step-2" style="display:none;">
+                    <p style="color:#888; font-size:0.9rem; margin-bottom:20px;">Step 2: Your details</p>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                        <div class="input-grp">
+                            <label>First Name *</label>
+                            <input type="text" id="reg-firstname" placeholder="John" required>
+                        </div>
+                        <div class="input-grp">
+                            <label>Last Name *</label>
+                            <input type="text" id="reg-lastname" placeholder="Doe" required>
+                        </div>
                     </div>
 
                     <div class="input-grp">
-
-                        <label>Last Name *</label>
-
-                        <input type="text" id="reg-lastname" placeholder="Doe" required>
-
+                        <label>Password * (min 8 chars)</label>
+                        <input type="password" id="reg-password" placeholder="••••••••" required>
                     </div>
 
-                </div>
-
-
-
-                <div class="input-grp">
-
-                    <label>Email *</label>
-
-                    <input type="email" id="reg-email" placeholder="john@example.com" required>
-
-                </div>
-
-
-
-                <div class="input-grp">
-
-                    <label>Password * (min 8 chars)</label>
-
-                    <input type="password" id="reg-password" placeholder="********" required>
-
-                </div>
-
-
-
-                <div style="display:grid; grid-template-columns:100px 1fr; gap:10px;">
-
-                    <div class="input-grp">
-
-                        <label>Country *</label>
-
-                        <select id="reg-country" required
-                            style="width:100%; padding:15px; background:rgba(0,0,0,0.6); border:1px solid var(--border); border-radius:8px; color:#fff;">
-
-                            <option value="UK">UK</option>
-
-                            <option value="RO">RO</option>
-
-                            <option value="US">US</option>
-
-                            <option value="DE">DE</option>
-
-                            <option value="FR">FR</option>
-
-                        </select>
-
+                    <div style="display:grid; grid-template-columns:100px 1fr; gap:10px;">
+                        <div class="input-grp">
+                            <label>Country *</label>
+                            <select id="reg-country" required
+                                style="width:100%; padding:15px; background:rgba(0,0,0,0.6); border:1px solid var(--border); border-radius:8px; color:#fff;">
+                                <option value="UK">UK</option>
+                                <option value="RO">RO</option>
+                                <option value="US">US</option>
+                                <option value="DE">DE</option>
+                                <option value="FR">FR</option>
+                                <option value="IT">IT</option>
+                                <option value="ES">ES</option>
+                            </select>
+                        </div>
+                        <div class="input-grp">
+                            <label>Phone *</label>
+                            <input type="tel" id="reg-phone" placeholder="7123456789" required>
+                        </div>
                     </div>
 
                     <div class="input-grp">
-
-                        <label>Phone *</label>
-
-                        <input type="tel" id="reg-phone" placeholder="7123456789" required>
-
+                        <label>Address *</label>
+                        <input type="text" id="reg-address" placeholder="123 Main Street" required>
                     </div>
 
-                </div>
-
-
-
-                <div class="input-grp">
-
-                    <label>Address *</label>
-
-                    <input type="text" id="reg-address" placeholder="123 Main Street" required>
-
-                </div>
-
-
-
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-
-                    <div class="input-grp">
-
-                        <label>City *</label>
-
-                        <input type="text" id="reg-city" placeholder="London" required>
-
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                        <div class="input-grp">
+                            <label>City *</label>
+                            <input type="text" id="reg-city" placeholder="London" required>
+                        </div>
+                        <div class="input-grp">
+                            <label>Postal Code *</label>
+                            <input type="text" id="reg-postal" placeholder="SW1A 1AA" required>
+                        </div>
                     </div>
 
-                    <div class="input-grp">
+                    <button id="goto-step-3" class="modal-btn" style="background:var(--cyan);">
+                        CONTINUE TO PAYMENT <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
 
-                        <label>Postal Code *</label>
+                <!-- ========== STEP 3: Payment / Voucher ========== -->
+                <div id="reg-step-3" style="display:none;">
+                    <p style="color:#888; font-size:0.9rem; margin-bottom:20px;">Step 3: Choose your access method</p>
 
-                        <input type="text" id="reg-postal" placeholder="SW1A 1AA" required>
-
+                    <!-- Payment Method Toggle -->
+                    <div style="display:flex; gap:10px; margin-bottom:20px;">
+                        <button id="toggle-voucher" class="modal-btn"
+                            style="flex:1; background:rgba(0,255,0,0.2); border:2px solid #00ff00; color:#00ff00;">
+                            <i class="fas fa-ticket-alt"></i> HAVE A VOUCHER
+                        </button>
+                        <button id="toggle-payment" class="modal-btn"
+                            style="flex:1; background:rgba(255,0,255,0.2); border:2px solid var(--pink); color:var(--pink);">
+                            <i class="fas fa-credit-card"></i> PAY NOW
+                        </button>
                     </div>
 
+                    <!-- Voucher Section -->
+                    <div id="voucher-section">
+                        <div class="input-grp"
+                            style="background:rgba(0,255,0,0.05); padding:15px; border-radius:10px; border:1px dashed rgba(0,255,0,0.3);">
+                            <label style="color:#00ff00;"><i class="fas fa-ticket-alt"></i> Voucher Code</label>
+                            <input type="text" id="reg-voucher" placeholder="KEL-XXXXXXXX"
+                                style="text-transform:uppercase;">
+                            <small style="color:#888; font-size:0.7rem;">Enter your promotional code for 1 month free
+                                access.</small>
+                        </div>
+                    </div>
+
+                    <!-- Payment Plans Section (hidden initially) -->
+                    <div id="payment-section" style="display:none;">
+                        <p style="color:var(--cyan); font-size:0.85rem; margin-bottom:15px;">Choose your subscription:
+                        </p>
+
+                        <div style="display:grid; gap:10px;">
+                            <!-- 1 Month -->
+                            <label
+                                style="display:flex; align-items:center; gap:15px; padding:15px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; cursor:pointer;">
+                                <input type="radio" name="plan" value="1_month" style="width:20px; height:20px;">
+                                <div style="flex:1;">
+                                    <strong style="color:var(--cyan);">1 Month</strong>
+                                    <p style="margin:0; font-size:0.8rem; color:#888;">Full access - €10/month</p>
+                                </div>
+                                <span style="color:var(--pink); font-weight:bold;">€10</span>
+                            </label>
+
+                            <!-- 6 Months - POPULAR -->
+                            <label
+                                style="display:flex; align-items:center; gap:15px; padding:15px; background:rgba(255,0,255,0.1); border:2px solid var(--pink); border-radius:10px; cursor:pointer; position:relative;">
+                                <span
+                                    style="position:absolute; top:-10px; right:15px; background:var(--pink); color:#000; padding:2px 10px; border-radius:10px; font-size:0.7rem; font-weight:bold;">POPULAR</span>
+                                <input type="radio" name="plan" value="6_months" checked
+                                    style="width:20px; height:20px;">
+                                <div style="flex:1;">
+                                    <strong style="color:var(--cyan);">6 Months</strong>
+                                    <p style="margin:0; font-size:0.8rem; color:#888;">Save 30% - €7/month</p>
+                                </div>
+                                <span style="color:var(--pink); font-weight:bold;">€42</span>
+                            </label>
+
+                            <!-- 12 Months -->
+                            <label
+                                style="display:flex; align-items:center; gap:15px; padding:15px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; cursor:pointer;">
+                                <input type="radio" name="plan" value="12_months" style="width:20px; height:20px;">
+                                <div style="flex:1;">
+                                    <strong style="color:var(--cyan);">12 Months</strong>
+                                    <p style="margin:0; font-size:0.8rem; color:#888;">Best value - €5/month</p>
+                                </div>
+                                <span style="color:var(--pink); font-weight:bold;">€60</span>
+                            </label>
+                        </div>
+
+                        <!-- PayPal Button Placeholder -->
+                        <div id="paypal-button-container" style="margin-top:20px;"></div>
+                    </div>
+
+                    <button id="do-register" class="modal-btn"
+                        style="background:linear-gradient(135deg, var(--pink), var(--cyan)); margin-top:20px;">
+                        <i class="fas fa-rocket"></i> CREATE ACCOUNT
+                    </button>
+
+                    <p id="reg-status" style="margin-top:10px; font-size:0.85rem; text-align:center;"></p>
                 </div>
-
-
-
-                <!-- Voucher Code Field -->
-
-                <div class="input-grp"
-                    style="background:rgba(0,255,0,0.05); padding:15px; border-radius:10px; border:1px dashed rgba(0,255,0,0.3);">
-
-                    <label style="color:#00ff00;"><i class="fas fa-ticket-alt"></i> Voucher Code *</label>
-
-                    <input type="text" id="reg-voucher" placeholder="KEL-XXXXXXXX" style="text-transform:uppercase;"
-                        required>
-
-                    <small style="color:#888; font-size:0.7rem;">Enter your promotional code for access.</small>
-
-                </div>
-
-
-
-                <button id="do-register" class="modal-btn"
-                    style="background:linear-gradient(135deg, var(--pink), var(--cyan));"><i class="fas fa-rocket"></i>
-
-                    CREATE ACCOUNT</button>
-
-
 
                 <p style="margin-top:15px;">
-
                     <a href="#" id="register-back-link" style="color:#888; font-size:0.8rem;">&#8592; Back to Login</a>
-
                 </p>
 
             </div>
