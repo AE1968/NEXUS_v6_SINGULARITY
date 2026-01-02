@@ -620,6 +620,112 @@ async function execute() {
 
 
 
+// =============================================================================
+// 🎤 GREETING SYSTEM - Synchronized with Hologram Appearance
+// =============================================================================
+
+/**
+ * Wait for AI_key (hologram) to be fully loaded
+ * @returns {Promise} Resolves when AI_key is ready
+ */
+function waitForHologram(maxWaitMs = 5000) {
+    return new Promise((resolve) => {
+        const startTime = Date.now();
+        const checkInterval = setInterval(() => {
+            if (window.aiKeyEntity || (Date.now() - startTime > maxWaitMs)) {
+                clearInterval(checkInterval);
+                resolve(!!window.aiKeyEntity);
+            }
+        }, 100);
+    });
+}
+
+/**
+ * Show welcome message for visitors (before login)
+ * Synchronized with hologram appearance
+ */
+async function showKelionaiWelcome() {
+    console.log('🎤 Showing KELIONAI welcome message...');
+
+    // Wait for hologram to be ready
+    const hologramReady = await waitForHologram();
+
+    if (hologramReady && window.aiKeyEntity) {
+        // Start hologram speaking animation
+        window.aiKeyEntity.speak("Welcome to KELION AI.", 4000);
+    }
+
+    const welcomeMsg = "Welcome to KELION AI. Please login to access the neural interface.";
+
+    // Write to chat
+    write('bot', welcomeMsg);
+
+    // Speak the message
+    speak(welcomeMsg);
+}
+
+/**
+ * Greet user after successful login
+ * Synchronized with hologram + shows last conversation or personalized greeting
+ * @param {string} username - The logged in username
+ */
+async function greetUser(username) {
+    console.log(`🎤 Greeting user: ${username}`);
+
+    // Wait for hologram to be ready
+    const hologramReady = await waitForHologram();
+
+    // Determine time-based greeting
+    const hour = new Date().getHours();
+    let timeGreeting = "Hello";
+    if (hour >= 5 && hour < 12) {
+        timeGreeting = "Good morning";
+    } else if (hour >= 12 && hour < 18) {
+        timeGreeting = "Good afternoon";
+    } else {
+        timeGreeting = "Good evening";
+    }
+
+    // Try to fetch last conversation from backend
+    let greetingText = `${timeGreeting}, ${username}! I'm KELION, your AI assistant. How can I help you today?`;
+
+    try {
+        const response = await fetch('/api/last-conversation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.last_message) {
+                // Personalized greeting with context
+                greetingText = `${timeGreeting}, ${username}! Welcome back. Last time we talked about: "${data.last_message.substring(0, 50)}..." How can I continue to assist you?`;
+            }
+        }
+    } catch (err) {
+        console.log('Could not fetch last conversation, using default greeting');
+    }
+
+    // Activate hologram speaking mode
+    if (hologramReady && window.aiKeyEntity) {
+        // Calculate speech duration based on text length (approx 100 chars per 3 seconds)
+        const duration = Math.max(3000, Math.min(8000, greetingText.length * 30));
+        window.aiKeyEntity.speak(greetingText, duration);
+    }
+
+    // Write to chat
+    write('bot', greetingText);
+
+    // Speak the message
+    speak(greetingText);
+
+    // Focus on input for immediate typing
+    setTimeout(() => {
+        const chatInput = $('chat-input');
+        if (chatInput) chatInput.focus();
+    }, 500);
+}
 
 
 // \u1f30c BACKGROUND PARTICLES
@@ -952,7 +1058,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     $('u-input').value = "demo";
 
-    $('p-input').value = "demo2024";
+    $('p-input').value = "demo123";
 
 
 
@@ -1096,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             $('u-input').value = 'demo';
 
-            $('p-input').value = 'demo2024';
+            $('p-input').value = 'demo123';
 
 
 

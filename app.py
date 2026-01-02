@@ -865,6 +865,36 @@ def get_memories_endpoint():
         return jsonify({"success": False, "memories": []})
 
 
+@app.route('/api/last-conversation', methods=['POST'])
+def get_last_conversation():
+    """Returns last conversation message for personalized greeting after login"""
+    data = request.json or {}
+    username = data.get('username', '').strip()
+    
+    if not username or username in ['User', 'Guest', '']:
+        return jsonify({"success": False, "last_message": None})
+    
+    try:
+        # Get the last user message from chat history
+        last_chat = ChatHistory.query.filter_by(username=username)\
+            .order_by(ChatHistory.timestamp.desc())\
+            .first()
+        
+        if last_chat:
+            return jsonify({
+                "success": True,
+                "last_message": last_chat.user_message,
+                "last_response": last_chat.ai_response[:100] if last_chat.ai_response else None,
+                "timestamp": last_chat.timestamp.isoformat() if last_chat.timestamp else None
+            })
+        else:
+            return jsonify({"success": False, "last_message": None})
+            
+    except Exception as e:
+        logger.error(f"Last conversation fetch error: {e}")
+        return jsonify({"success": False, "last_message": None})
+
+
 def get_subscription_offers():
     """Get available subscription packages"""
     return {
