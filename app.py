@@ -450,6 +450,34 @@ class VisitorLog(db.Model):
     username = db.Column(db.String(80), nullable=True)
 
 
+class UserMemory(db.Model):
+    """Persistent memory for personalized interactions"""
+    __tablename__ = 'user_memories'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    memory_key = db.Column(db.String(100), nullable=False)
+    memory_value = db.Column(db.Text, nullable=False)
+    memory_type = db.Column(db.String(30), default='fact')  # fact, preference, event, personal
+    importance = db.Column(db.Integer, default=5)  # 1-10
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    last_accessed = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+
+class AdminBroadcast(db.Model):
+    """Admin broadcast messages to all users"""
+    __tablename__ = 'admin_broadcasts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.Text, nullable=False)
+    message_type = db.Column(db.String(20), default='info')  # info, warning, alert, promotion
+    created_by = db.Column(db.String(80), default='admin')
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=True)
+    is_active = db.Column(db.Boolean, default=True)
+    target_users = db.Column(db.Text, default='all')  # 'all' or comma-separated usernames
+
+
 class ExpiryNotification(db.Model):
     """Tracking notificări expirare"""
     __tablename__ = 'expiry_notifications'
@@ -2242,6 +2270,163 @@ def admin_delete_user(user_id):
     except Exception as e:
         logger.error(f"Delete user error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ==============================================================================
+# MEMORY SYSTEM - Helper Functions
+# ==============================================================================
+
+def add_user_memory(username, key, value, memory_type='fact', importance=5):
+    """Add or update a memory for a user"""
+    try:
+        existing = UserMemory.query.filter_by(username=username, memory_key=key).first()
+        if existing:
+            existing.memory_value = value
+            existing.last_accessed = datetime.datetime.utcnow()
+        else:
+            memory = UserMemory(
+                username=username,
+                memory_key=key,
+                memory_value=value,
+                memory_type=memory_type,
+                importance=importance
+            )
+            db.session.add(memory)
+        db.session.commit()
+        return True
+    except Exception as e:
+        logger.error(f"Add memory error: {e}")
+        return False
+
+
+def get_user_memories(username, limit=20):
+    """Get all memories for a user, ordered by importance"""
+    return UserMemory.query.filter_by(username=username)\
+        .order_by(UserMemory.importance.desc())\
+        .limit(limit).all()
+
+
+def build_memory_context(username):
+    """Build memory context string for AI prompts"""
+    memories = get_user_memories(username)
+    if not memories:
+        return ""
+    
+    context = "\n\n[USER MEMORIES - Use this for personalization]:\n"
+    for mem in memories:
+        context += f"- {mem.memory_key}: {mem.memory_value}\n"
+    return context
+
+
+def extract_memories_from_message(username, message, response):
+    """Extract and save important information from conversations"""
+    # Simple keyword-based extraction
+    patterns = [
+        (r"my name is (\w+)", "name", "personal"),
+        (r"i am (\d+) years old", "age", "personal"),
+        (r"i live in ([A-Za-z\s]+)", "location", "personal"),
+        (r"i work (?:at|for|as) ([^.]+)", "job", "personal"),
+        (r"my birthday is ([^.]+)", "birthday", "event"),
+        (r"i like ([^.]+)", "likes", "preference"),
+        (r"i don'?t like ([^.]+)", "dislikes", "preference"),
+    ]
+    
+    import re
+    message_lower = message.lower()
+    for pattern, key, mem_type in patterns:
+        match = re.search(pattern, message_lower)
+        if match:
+            add_user_memory(username, key, match.group(1).strip(), mem_type, 7)
+
+
+@app.route('/api/memories', methods=['POST'])
+def get_memories_api():
+    """API endpoint to get user memories"""
+    data = request.json or {}
+    username = data.get('username', '').strip()
+    
+    if not username or username in ['Guest', 'demo', '']:
+        return jsonify({"success": False, "memories": []})
+    
+    memories = get_user_memories(username)
+    return jsonify({
+        "success": True,
+        "memories": [{
+            "key": m.memory_key,
+            "value": m.memory_value,
+            "type": m.memory_type
+        } for m in memories]
+    })
+
+
+@app.route('/api/memories/add', methods=['POST'])
+def add_memory_api():
+    """API endpoint to add a memory"""
+    data = request.json or {}
+    username = data.get('username', '').strip()
+    key = data.get('key', '').strip()
+    value = data.get('value', '').strip()
+    
+    if not username or not key or not value:
+        return jsonify({"success": False, "error": "Missing fields"}), 400
+    
+    success = add_user_memory(username, key, value, data.get('type', 'fact'))
+    return jsonify({"success": success})
+
+
+# ==============================================================================
+# ADMIN BROADCAST SYSTEM
+# ==============================================================================
+
+@app.route('/api/admin/broadcast', methods=['POST'])
+def admin_send_broadcast():
+    """Send a broadcast message to all users (admin only)"""
+    try:
+        data = request.json or {}
+        message = data.get('message', '').strip()
+        msg_type = data.get('type', 'info')
+        
+        if not message:
+            return jsonify({"success": False, "error": "Message required"}), 400
+        
+        broadcast = AdminBroadcast(
+            message=message,
+            message_type=msg_type,
+            created_by='admin',
+            is_active=True
+        )
+        db.session.add(broadcast)
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "message": "Broadcast sent successfully",
+            "broadcast_id": broadcast.id
+        })
+    except Exception as e:
+        logger.error(f"Broadcast error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/broadcasts', methods=['GET'])
+def get_active_broadcasts():
+    """Get active broadcast messages for display"""
+    try:
+        broadcasts = AdminBroadcast.query.filter_by(is_active=True)\
+            .order_by(AdminBroadcast.created_at.desc())\
+            .limit(5).all()
+        
+        return jsonify({
+            "success": True,
+            "broadcasts": [{
+                "id": b.id,
+                "message": b.message,
+                "type": b.message_type,
+                "created_at": b.created_at.isoformat() if b.created_at else None
+            } for b in broadcasts]
+        })
+    except Exception as e:
+        return jsonify({"success": False, "broadcasts": []})
 
 
 #

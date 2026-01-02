@@ -850,6 +850,29 @@
                     <h3 style="color:var(--cyan);"><i class="fas fa-cog"></i> System Settings</h3>
 
                     <div style="display:grid; gap:20px;">
+                        <!-- Send Broadcast Message -->
+                        <div
+                            style="background:rgba(255,0,255,0.1); padding:20px; border-radius:10px; border:1px solid var(--pink);">
+                            <h4 style="color:var(--pink); margin:0 0 15px 0;"><i class="fas fa-bullhorn"></i> Broadcast
+                                Message</h4>
+                            <p style="color:#888; font-size:0.85rem; margin:0 0 10px 0;">Send a message to all users
+                                (will appear on their interface).</p>
+                            <textarea id="broadcast-message" rows="3" placeholder="Enter your message to all users..."
+                                style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:5px; color:#fff; resize:vertical; margin-bottom:10px;"></textarea>
+                            <select id="broadcast-type"
+                                style="padding:10px; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:5px; color:#fff; margin-right:10px;">
+                                <option value="info">📢 Info</option>
+                                <option value="warning">⚠️ Warning</option>
+                                <option value="alert">🚨 Alert</option>
+                                <option value="promotion">🎁 Promotion</option>
+                            </select>
+                            <button id="send-broadcast"
+                                style="padding:10px 25px; background:var(--pink); color:#000; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
+                                <i class="fas fa-paper-plane"></i> SEND BROADCAST
+                            </button>
+                            <p id="broadcast-status" style="margin-top:10px; font-size:0.85rem;"></p>
+                        </div>
+
                         <!-- Maintenance Mode -->
                         <div
                             style="background:rgba(255,0,0,0.1); padding:20px; border-radius:10px; border:1px solid rgba(255,0,0,0.3);">

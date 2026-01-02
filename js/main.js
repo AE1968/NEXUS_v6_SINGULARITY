@@ -27,6 +27,126 @@ const state = {
 };
 
 
+// =============================================================================
+// 🌍 LANGUAGE SYSTEM - Native voice for each language
+// =============================================================================
+
+const LANGUAGE_VOICES = {
+    'en': { name: 'English', codes: ['en-US', 'en-GB', 'en'], voiceNames: ['Google UK English Male', 'Microsoft Mark', 'Microsoft David'] },
+    'ro': { name: 'Romanian', codes: ['ro-RO', 'ro'], voiceNames: ['Microsoft Andrei', 'Google română'] },
+    'de': { name: 'German', codes: ['de-DE', 'de'], voiceNames: ['Google Deutsch', 'Microsoft Stefan'] },
+    'fr': { name: 'French', codes: ['fr-FR', 'fr'], voiceNames: ['Google français', 'Microsoft Paul'] },
+    'es': { name: 'Spanish', codes: ['es-ES', 'es'], voiceNames: ['Google español', 'Microsoft Pablo'] },
+    'it': { name: 'Italian', codes: ['it-IT', 'it'], voiceNames: ['Google italiano', 'Microsoft Cosimo'] },
+    'pt': { name: 'Portuguese', codes: ['pt-PT', 'pt-BR', 'pt'], voiceNames: ['Google português'] },
+    'ru': { name: 'Russian', codes: ['ru-RU', 'ru'], voiceNames: ['Google русский'] },
+    'zh': { name: 'Chinese', codes: ['zh-CN', 'zh'], voiceNames: ['Google 中文'] },
+    'ja': { name: 'Japanese', codes: ['ja-JP', 'ja'], voiceNames: ['Google 日本語'] },
+    'ar': { name: 'Arabic', codes: ['ar-SA', 'ar'], voiceNames: ['Google العربية'] },
+    'hi': { name: 'Hindi', codes: ['hi-IN', 'hi'], voiceNames: ['Google हिन्दी'] }
+};
+
+/**
+ * Detect language from text
+ */
+function detectLanguage(text) {
+    const text_lower = text.toLowerCase();
+
+    // Romanian indicators
+    if (/[ăîâșț]|bună|salut|mulțumesc|sunt|cum|este|aceasta/.test(text_lower)) return 'ro';
+
+    // German indicators
+    if (/[äöüß]|guten|danke|bitte|ist|das|wie|und/.test(text_lower)) return 'de';
+
+    // French indicators
+    if (/[àâçéèêëîïôûùüÿœæ]|bonjour|merci|c'est|je suis|qu'est/.test(text_lower)) return 'fr';
+
+    // Spanish indicators
+    if (/[ñ¿¡]|hola|gracias|qué|está|buenos|cómo/.test(text_lower)) return 'es';
+
+    // Italian indicators
+    if (/buon|grazie|come|sono|questo|quella/.test(text_lower)) return 'it';
+
+    // Russian indicators (cyrillic)
+    if (/[а-яё]/.test(text_lower)) return 'ru';
+
+    // Chinese indicators
+    if (/[\u4e00-\u9fa5]/.test(text)) return 'zh';
+
+    // Japanese indicators
+    if (/[\u3040-\u30ff]/.test(text)) return 'ja';
+
+    // Arabic indicators
+    if (/[\u0600-\u06FF]/.test(text)) return 'ar';
+
+    // Hindi indicators
+    if (/[\u0900-\u097F]/.test(text)) return 'hi';
+
+    // Default to English
+    return 'en';
+}
+
+/**
+ * Get the best voice for a language
+ */
+function getVoiceForLanguage(lang) {
+    const voices = window.speechSynthesis.getVoices();
+    const langConfig = LANGUAGE_VOICES[lang] || LANGUAGE_VOICES['en'];
+
+    // First try to find a preferred voice name
+    for (const preferred of langConfig.voiceNames) {
+        const found = voices.find(v => v.name.includes(preferred));
+        if (found) return found;
+    }
+
+    // Then try to match by language code
+    for (const code of langConfig.codes) {
+        const found = voices.find(v => v.lang.startsWith(code));
+        if (found) return found;
+    }
+
+    // Fallback to any voice with matching lang
+    const fallback = voices.find(v => v.lang.startsWith(lang));
+    if (fallback) return fallback;
+
+    // Ultimate fallback
+    return voices[0];
+}
+
+/**
+ * Change language and update voice
+ */
+function setLanguage(lang) {
+    state.language = lang;
+    localStorage.setItem('kelion_language', lang);
+    console.log(`🌍 Language set to: ${LANGUAGE_VOICES[lang]?.name || lang}`);
+}
+
+/**
+ * Check for admin broadcast messages
+ */
+async function checkBroadcasts() {
+    try {
+        const res = await fetch('/api/broadcasts');
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.broadcasts && data.broadcasts.length > 0) {
+                data.broadcasts.forEach(b => {
+                    // Show broadcast as system message
+                    const existingCheck = localStorage.getItem(`broadcast_${b.id}`);
+                    if (!existingCheck) {
+                        write('bot', `📢 ${b.message}`);
+                        localStorage.setItem(`broadcast_${b.id}`, 'seen');
+                    }
+                });
+            }
+        }
+    } catch (e) {
+        console.log('Could not check broadcasts');
+    }
+}
+
+
 
 const $ = id => document.getElementById(id);
 
@@ -396,11 +516,14 @@ async function speak(text) {
 
         const utterance = new SpeechSynthesisUtterance(text);
 
-        const voices = window.speechSynthesis.getVoices();
+        // Detect language from text and get appropriate voice
+        const detectedLang = detectLanguage(text);
+        state.language = detectedLang; // Update state
 
-        // Try to find a male/romanian voice
+        utterance.voice = getVoiceForLanguage(detectedLang);
+        utterance.lang = LANGUAGE_VOICES[detectedLang]?.codes[0] || 'en-US';
 
-        utterance.voice = voices.find(v => v.lang.includes('ro') || v.name.includes('Male')) || voices[0];
+        console.log(`🔊 Speaking in ${LANGUAGE_VOICES[detectedLang]?.name || 'English'}`);
 
         utterance.onstart = () => {
 
@@ -2348,6 +2471,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const refreshUsersBtn = $('admin-refresh-users');
     if (refreshUsersBtn) {
         refreshUsersBtn.onclick = loadAdminData;
+    }
+
+    // Send broadcast message (admin only)
+    const sendBroadcastBtn = $('send-broadcast');
+    if (sendBroadcastBtn) {
+        sendBroadcastBtn.onclick = async () => {
+            const message = $('broadcast-message').value.trim();
+            const type = $('broadcast-type').value;
+            const status = $('broadcast-status');
+
+            if (!message) {
+                alert('⚠️ Please enter a message.');
+                return;
+            }
+
+            sendBroadcastBtn.textContent = 'SENDING...';
+            sendBroadcastBtn.disabled = true;
+
+            try {
+                const res = await fetch('/api/admin/broadcast', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, type })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    status.style.color = '#00ff00';
+                    status.textContent = '✅ Broadcast sent successfully!';
+                    $('broadcast-message').value = '';
+                } else {
+                    status.style.color = '#ff4444';
+                    status.textContent = '❌ ' + (data.error || 'Failed to send');
+                }
+            } catch (e) {
+                status.style.color = '#ff4444';
+                status.textContent = '❌ Connection error';
+            }
+
+            sendBroadcastBtn.innerHTML = '<i class="fas fa-paper-plane"></i> SEND BROADCAST';
+            sendBroadcastBtn.disabled = false;
+        };
     }
 
 
