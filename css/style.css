@@ -910,65 +910,123 @@ body.ready #footer-ticker {
 
 /* ================================================================
            HOLOGRAM CONTAINER - Sfera Plasma AI_key
+           RESPONSIVE pentru toate tipurile de ecrane
            ================================================================ */
 
 #hologram-container {
-
     position: fixed;
-
     top: 50%;
-
     left: 50%;
-
     transform: translate(-50%, -50%);
-
     width: 600px;
-
     height: 600px;
-
     z-index: 10;
-
     pointer-events: none;
     /* Click-through */
-
+    display: block !important;
+    /* ÎNTOTDEAUNA VIZIBIL */
+    opacity: 1 !important;
+    visibility: visible !important;
 }
-
-
 
 #hologram-container canvas {
-
     pointer-events: none;
-
+    width: 100% !important;
+    height: 100% !important;
 }
 
-
-
-/* Responsive pentru ecrane mai mici */
-
-@media (max-width: 768px) {
-
+/* Extra Large Screens (4K, Ultra-wide) */
+@media (min-width: 2560px) {
     #hologram-container {
+        width: 800px;
+        height: 800px;
+    }
+}
 
+/* Large Desktop (1920px+) */
+@media (min-width: 1920px) and (max-width: 2559px) {
+    #hologram-container {
+        width: 700px;
+        height: 700px;
+    }
+}
+
+/* Standard Desktop (1200px - 1919px) */
+@media (min-width: 1200px) and (max-width: 1919px) {
+    #hologram-container {
+        width: 600px;
+        height: 600px;
+    }
+}
+
+/* Small Desktop / Laptop (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    #hologram-container {
+        width: 500px;
+        height: 500px;
+    }
+}
+
+/* Tablet Landscape (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    #hologram-container {
+        width: 400px;
+        height: 400px;
+        top: 45%;
+    }
+}
+
+/* Tablet Portrait (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    #hologram-container {
         width: 350px;
-
         height: 350px;
-
+        top: 40%;
     }
-
 }
 
-
-
-@media (max-width: 480px) {
-
+/* Mobile Landscape (480px - 575px) */
+@media (min-width: 480px) and (max-width: 575px) {
     #hologram-container {
-
-        width: 280px;
-
-        height: 280px;
-
+        width: 300px;
+        height: 300px;
+        top: 35%;
     }
+}
 
+/* Mobile Portrait (320px - 479px) */
+@media (min-width: 320px) and (max-width: 479px) {
+    #hologram-container {
+        width: 260px;
+        height: 260px;
+        top: 30%;
+    }
+}
+
+/* Extra Small Mobile (< 320px) */
+@media (max-width: 319px) {
+    #hologram-container {
+        width: 200px;
+        height: 200px;
+        top: 28%;
+    }
+}
+
+/* Landscape orientation adjustment for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    #hologram-container {
+        width: 250px;
+        height: 250px;
+        top: 50%;
+    }
+}
+
+/* High DPI / Retina displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    #hologram-container canvas {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
 }
 
 

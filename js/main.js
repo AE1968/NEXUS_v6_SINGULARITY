@@ -480,13 +480,8 @@ async function execute() {
 
     try {
 
-        // START VISUAL PROCESSING
-
-        if (window.HologramSystem) {
-
-            window.HologramSystem.startProcessing();
-
-        }
+        // 🎭 START HOLOGRAM PROCESSING MODE
+        activateHologramResponse('Processing your request...', 'processing');
 
 
 
@@ -522,13 +517,7 @@ async function execute() {
 
 
 
-        // STOP VISUAL PROCESSING
-
-        if (window.HologramSystem) {
-
-            window.HologramSystem.stopProcessing();
-
-        }
+        // 🎭 HOLOGRAM WILL SWITCH TO SPEAKING MODE WHEN RESPONSE IS READY
 
 
 
@@ -585,6 +574,9 @@ async function execute() {
             thinking.remove();
 
             write('bot', reply);
+
+            // 🎭 ACTIVATE FULL HOLOGRAM RESPONSE - ALL FUNCTIONS
+            activateHologramResponse(reply, 'speaking');
 
             speak(reply);
 
@@ -648,14 +640,12 @@ async function showKelionaiWelcome() {
     console.log('🎤 Showing KELIONAI welcome message...');
 
     // Wait for hologram to be ready
-    const hologramReady = await waitForHologram();
-
-    if (hologramReady && window.aiKeyEntity) {
-        // Start hologram speaking animation
-        window.aiKeyEntity.speak("Welcome to KELION AI.", 4000);
-    }
+    await waitForHologram();
 
     const welcomeMsg = "Welcome to KELION AI. Please login to access the neural interface.";
+
+    // 🎭 ACTIVATE FULL HOLOGRAM FOR WELCOME
+    activateHologramResponse(welcomeMsg, 'speaking');
 
     // Write to chat
     write('bot', welcomeMsg);
@@ -707,12 +697,8 @@ async function greetUser(username) {
         console.log('Could not fetch last conversation, using default greeting');
     }
 
-    // Activate hologram speaking mode
-    if (hologramReady && window.aiKeyEntity) {
-        // Calculate speech duration based on text length (approx 100 chars per 3 seconds)
-        const duration = Math.max(3000, Math.min(8000, greetingText.length * 30));
-        window.aiKeyEntity.speak(greetingText, duration);
-    }
+    // 🎭 ACTIVATE FULL HOLOGRAM FOR GREETING
+    activateHologramResponse(greetingText, 'speaking');
 
     // Write to chat
     write('bot', greetingText);
@@ -727,6 +713,149 @@ async function greetUser(username) {
     }, 500);
 }
 
+
+// =============================================================================
+// 🎭 HOLOGRAM FULL ACTIVATION - APLICĂ TOATE FUNCȚIILE LA FIECARE RĂSPUNS
+// =============================================================================
+
+/**
+ * Activates ALL hologram functions for a response
+ * This should be called EVERY time the AI responds
+ * @param {string} text - The response text
+ * @param {string} mode - 'speaking' | 'processing' | 'listening' | 'calm'
+ */
+function activateHologramResponse(text, mode = 'speaking') {
+    // Ensure hologram-container is always visible
+    const container = document.getElementById('hologram-container');
+    if (container) {
+        container.style.display = 'block';
+        container.style.opacity = '1';
+        container.style.visibility = 'visible';
+    }
+
+    // Use AI_key if available (plasma sphere)
+    if (window.aiKeyEntity) {
+        const hologram = window.aiKeyEntity;
+
+        switch (mode) {
+            case 'processing':
+                // AI is thinking - show processing animation
+                hologram.process();
+                hologram.intensify();
+                break;
+
+            case 'listening':
+                // Microphone is active
+                hologram.listen();
+                break;
+
+            case 'speaking':
+                // AI is responding
+                // 1. Stop any processing animation
+                if (hologram.stopProcessing) hologram.stopProcessing();
+
+                // 2. Detect emotion from text and apply it
+                if (window.EmotionDetector) {
+                    const emotion = window.EmotionDetector.detect(text);
+                    hologram.setEmotion(emotion);
+                }
+
+                // 3. Calculate speech duration based on text length
+                const wordsPerSecond = 2.5; // Average speaking speed
+                const wordCount = text.split(/\s+/).length;
+                const duration = Math.max(3000, Math.min(15000, (wordCount / wordsPerSecond) * 1000));
+
+                // 4. Activate speaking animation
+                hologram.speak(text, duration);
+                break;
+
+            case 'calm':
+            default:
+                // Return to idle state
+                hologram.calm();
+                break;
+        }
+
+        console.log(`🎭 Hologram activated: mode=${mode}, text=${text.substring(0, 30)}...`);
+        return true;
+    }
+
+    // Fallback to HologramSystem if AI_key not available
+    if (window.HologramSystem) {
+        const hologram = window.HologramSystem;
+
+        switch (mode) {
+            case 'processing':
+                hologram.startProcessing();
+                hologram.setColor('processing');
+                break;
+
+            case 'speaking':
+                hologram.stopProcessing();
+                hologram.startSpeaking();
+                hologram.setColor('speaking');
+
+                // Apply emotion
+                if (window.EmotionDetector) {
+                    window.EmotionDetector.applyToHologram(text);
+                }
+                break;
+
+            case 'calm':
+            default:
+                hologram.stopSpeaking();
+                hologram.stopProcessing();
+                hologram.setColor('default');
+                break;
+        }
+
+        console.log(`🎭 HologramSystem activated: mode=${mode}`);
+        return true;
+    }
+
+    console.warn('⚠️ No hologram system available');
+    return false;
+}
+
+/**
+ * Stop all hologram animations and return to calm state
+ */
+function deactivateHologram() {
+    if (window.aiKeyEntity) {
+        window.aiKeyEntity.calm();
+        if (window.aiKeyEntity.stopProcessing) {
+            window.aiKeyEntity.stopProcessing();
+        }
+    }
+
+    if (window.HologramSystem) {
+        window.HologramSystem.stopSpeaking();
+        window.HologramSystem.stopProcessing();
+        window.HologramSystem.setColor('default');
+    }
+}
+
+/**
+ * Ensure hologram is visible on page resize
+ */
+function ensureHologramVisible() {
+    const container = document.getElementById('hologram-container');
+    if (container) {
+        container.style.display = 'block';
+        container.style.opacity = '1';
+        container.style.visibility = 'visible';
+    }
+}
+
+// Add resize listener to ensure hologram visibility
+window.addEventListener('resize', ensureHologramVisible);
+window.addEventListener('orientationchange', ensureHologramVisible);
+
+// Ensure hologram is visible on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(ensureHologramVisible, 100);
+    setTimeout(ensureHologramVisible, 2000); // Also after hologram loads
+});
 
 // \u1f30c BACKGROUND PARTICLES
 
