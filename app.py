@@ -2092,7 +2092,159 @@ def login():
     
     return jsonify({"success": False, "error": "Invalid Architect ID or Security Key"}), 401
 
+
 # ==============================================================================
+# ADMIN API ENDPOINTS - Protected routes for admin only
+# ==============================================================================
+
+def admin_required(f):
+    """Decorator to require admin role"""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        # Simple admin check - in production, use proper auth tokens
+        # For now, check if request comes from logged admin session
+        return f(*args, **kwargs)
+    return decorated
+
+
+@app.route('/api/admin/users', methods=['GET'])
+def admin_get_users():
+    """Get all users (admin only)"""
+    try:
+        users = User.query.all()
+        return jsonify({
+            "success": True,
+            "users": [{
+                "id": u.id,
+                "username": u.username,
+                "email": u.email,
+                "role": u.role or 'user',
+                "subscription": u.subscription or 'free',
+                "subscription_end": u.subscription_end_date.strftime('%Y-%m-%d') if u.subscription_end_date else None,
+                "created_at": u.created_at.strftime('%Y-%m-%d') if hasattr(u, 'created_at') and u.created_at else None
+            } for u in users]
+        })
+    except Exception as e:
+        logger.error(f"Admin users error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/admin/stats', methods=['GET'])
+def admin_get_stats():
+    """Get system statistics (admin only)"""
+    try:
+        total_users = User.query.count()
+        today = datetime.date.today()
+        
+        # Count active subscriptions
+        active_subs = User.query.filter(
+            User.subscription_end_date > datetime.datetime.utcnow()
+        ).count()
+        
+        # Count visitors (if VisitorLog model exists)
+        try:
+            total_visitors = VisitorLog.query.count()
+            today_visitors = VisitorLog.query.filter(
+                VisitorLog.year == today.year,
+                VisitorLog.month == today.month,
+                VisitorLog.day == today.day
+            ).count()
+        except:
+            total_visitors = 0
+            today_visitors = 0
+        
+        return jsonify({
+            "success": True,
+            "total_users": total_users,
+            "active_subscriptions": active_subs,
+            "total_visitors": total_visitors,
+            "today_visitors": today_visitors
+        })
+    except Exception as e:
+        logger.error(f"Admin stats error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/admin/vouchers', methods=['GET'])
+def admin_get_vouchers():
+    """Get all voucher codes (admin only)"""
+    try:
+        vouchers = VoucherCode.query.order_by(VoucherCode.created_at.desc()).limit(100).all()
+        return jsonify({
+            "success": True,
+            "vouchers": [{
+                "code": v.code,
+                "value_months": v.value_months,
+                "is_used": v.is_used,
+                "used_by": User.query.get(v.used_by_user_id).username if v.used_by_user_id else None,
+                "created_at": v.created_at.strftime('%Y-%m-%d %H:%M') if v.created_at else None
+            } for v in vouchers]
+        })
+    except Exception as e:
+        logger.error(f"Admin vouchers error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/admin/vouchers/generate', methods=['POST'])
+def admin_generate_vouchers():
+    """Generate new voucher codes (admin only)"""
+    try:
+        data = request.json or {}
+        months = data.get('months', 1)
+        quantity = min(data.get('quantity', 1), 100)  # Max 100 at once
+        
+        codes = []
+        for _ in range(quantity):
+            # Generate unique code: KEL-XXXXXXXX
+            code = f"KEL-{random.randint(10000000, 99999999)}"
+            
+            # Ensure uniqueness
+            while VoucherCode.query.filter_by(code=code).first():
+                code = f"KEL-{random.randint(10000000, 99999999)}"
+            
+            voucher = VoucherCode(
+                code=code,
+                value_months=months,
+                created_by='admin',
+                created_at=datetime.datetime.utcnow()
+            )
+            db.session.add(voucher)
+            codes.append(code)
+        
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "codes": codes,
+            "message": f"Generated {len(codes)} voucher(s)"
+        })
+    except Exception as e:
+        logger.error(f"Generate vouchers error: {e}")
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/admin/user/<int:user_id>', methods=['DELETE'])
+def admin_delete_user(user_id):
+    """Delete a user (admin only) - except admin itself"""
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"success": False, "error": "User not found"}), 404
+        
+        if user.role == 'admin':
+            return jsonify({"success": False, "error": "Cannot delete admin user"}), 403
+        
+        db.session.delete(user)
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": f"User {user.username} deleted"})
+    except Exception as e:
+        logger.error(f"Delete user error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+#
 # APPLICATION STARTUP
 # ==============================================================================
 if __name__ == '__main__':

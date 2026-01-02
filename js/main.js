@@ -2200,6 +2200,157 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // ==========================================================================
+    // 🛡️ ADMIN PANEL - Full Control (only for admin user)
+    // ==========================================================================
+
+    // Open admin panel (only if admin)
+    const trafficBtn = $('traffic-btn');
+    if (trafficBtn) {
+        trafficBtn.onclick = () => {
+            if (!state.isAdmin) {
+                alert('⛔ ACCESS DENIED: Admin privileges required.');
+                return;
+            }
+            $('admin-modal').style.display = 'flex';
+            loadAdminData();
+        };
+    }
+
+    // Close admin panel
+    const closeAdminBtn = $('close-admin');
+    if (closeAdminBtn) {
+        closeAdminBtn.onclick = () => {
+            $('admin-modal').style.display = 'none';
+        };
+    }
+
+    // Admin tab switching
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.onclick = () => {
+            const tabName = tab.getAttribute('data-tab');
+
+            // Update tab styles
+            document.querySelectorAll('.admin-tab').forEach(t => {
+                t.style.background = 'rgba(255,255,255,0.1)';
+                t.style.color = '#fff';
+                t.style.fontWeight = 'normal';
+            });
+            tab.style.background = 'var(--pink)';
+            tab.style.color = '#000';
+            tab.style.fontWeight = 'bold';
+
+            // Show selected content
+            document.querySelectorAll('.admin-content').forEach(c => c.style.display = 'none');
+            $('admin-' + tabName).style.display = 'block';
+        };
+    });
+
+    // Load admin data
+    async function loadAdminData() {
+        // Load users
+        try {
+            const usersRes = await fetch('/api/admin/users', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('kelion_token') || ''}` }
+            });
+            if (usersRes.ok) {
+                const data = await usersRes.json();
+                if (data.users) {
+                    const tbody = $('users-list');
+                    tbody.innerHTML = data.users.map(u => `
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+                            <td style="padding:12px;">${u.id}</td>
+                            <td style="padding:12px; color:var(--cyan);">${u.username}</td>
+                            <td style="padding:12px;">${u.email}</td>
+                            <td style="padding:12px;"><span style="background:${u.role === 'admin' ? 'var(--pink)' : 'rgba(255,255,255,0.2)'}; padding:3px 10px; border-radius:10px; color:${u.role === 'admin' ? '#000' : '#fff'};">${u.role}</span></td>
+                            <td style="padding:12px;">${u.subscription || 'free'}</td>
+                            <td style="padding:12px;">${u.subscription_end || '-'}</td>
+                            <td style="padding:12px;">
+                                <button onclick="deleteUser(${u.id})" style="background:#ff4444; color:#fff; border:none; padding:5px 10px; border-radius:3px; cursor:pointer; font-size:0.8rem;">DELETE</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            }
+        } catch (e) { console.log('Could not load users'); }
+
+        // Load stats
+        try {
+            const statsRes = await fetch('/api/admin/stats');
+            if (statsRes.ok) {
+                const stats = await statsRes.json();
+                $('stat-today').textContent = stats.today_visitors || 0;
+                $('stat-total').textContent = stats.total_visitors || 0;
+                $('stat-users').textContent = stats.total_users || 0;
+                $('stat-active').textContent = stats.active_subscriptions || 0;
+            }
+        } catch (e) { console.log('Could not load stats'); }
+
+        // Load vouchers
+        try {
+            const vouchersRes = await fetch('/api/admin/vouchers');
+            if (vouchersRes.ok) {
+                const data = await vouchersRes.json();
+                if (data.vouchers) {
+                    const tbody = $('vouchers-list');
+                    tbody.innerHTML = data.vouchers.map(v => `
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+                            <td style="padding:12px; font-family:monospace; color:var(--cyan);">${v.code}</td>
+                            <td style="padding:12px;">${v.value_months} month(s)</td>
+                            <td style="padding:12px;"><span style="background:${v.is_used ? '#ff4444' : '#00ff00'}; padding:3px 10px; border-radius:10px; color:#000;">${v.is_used ? 'USED' : 'AVAILABLE'}</span></td>
+                            <td style="padding:12px;">${v.used_by || '-'}</td>
+                            <td style="padding:12px;">${v.created_at || '-'}</td>
+                        </tr>
+                    `).join('');
+                }
+            }
+        } catch (e) { console.log('Could not load vouchers'); }
+    }
+
+    // Generate vouchers
+    const generateVouchersBtn = $('generate-vouchers');
+    if (generateVouchersBtn) {
+        generateVouchersBtn.onclick = async () => {
+            const months = parseInt($('voucher-months').value);
+            const quantity = parseInt($('voucher-quantity').value);
+
+            generateVouchersBtn.textContent = 'GENERATING...';
+            generateVouchersBtn.disabled = true;
+
+            try {
+                const res = await fetch('/api/admin/vouchers/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ months, quantity })
+                });
+
+                const data = await res.json();
+                if (data.success && data.codes) {
+                    $('generated-vouchers').style.display = 'block';
+                    $('voucher-codes').innerHTML = data.codes.map(c =>
+                        `<div style="padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.1);">${c}</div>`
+                    ).join('');
+                    loadAdminData(); // Refresh voucher list
+                } else {
+                    alert('Failed to generate vouchers: ' + (data.error || 'Unknown error'));
+                }
+            } catch (e) {
+                alert('Error generating vouchers');
+            }
+
+            generateVouchersBtn.textContent = 'GENERATE';
+            generateVouchersBtn.disabled = false;
+        };
+    }
+
+    // Refresh users
+    const refreshUsersBtn = $('admin-refresh-users');
+    if (refreshUsersBtn) {
+        refreshUsersBtn.onclick = loadAdminData;
+    }
+
+
     // initThreeJS(); // DISABLED - shows robot background instead
 
 });

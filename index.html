@@ -634,6 +634,273 @@
 
 
 
+        <!-- ========== ADMIN PANEL MODAL ========== -->
+        <!-- Only visible for user with role='admin' -->
+        <div id="admin-modal"
+            style="position:fixed; inset:0; background:rgba(0,0,0,0.98); display:none; align-items:flex-start; justify-content:center; z-index:4000; backdrop-filter:blur(8px); overflow-y:auto; padding:30px;">
+
+            <div
+                style="width:100%; max-width:1200px; background:#080818; border:2px solid var(--pink); border-radius:15px; padding:30px;">
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                    <h2 style="color:var(--pink); margin:0;"><i class="fas fa-shield-alt"></i> ADMIN CONTROL PANEL</h2>
+                    <button id="close-admin"
+                        style="background:transparent; border:1px solid #ff4444; color:#ff4444; padding:10px 20px; border-radius:5px; cursor:pointer;">
+                        <i class="fas fa-times"></i> CLOSE
+                    </button>
+                </div>
+
+                <!-- Admin Tabs -->
+                <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+                    <button class="admin-tab active" data-tab="users"
+                        style="padding:12px 25px; background:var(--pink); color:#000; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
+                        <i class="fas fa-users"></i> USERS
+                    </button>
+                    <button class="admin-tab" data-tab="vouchers"
+                        style="padding:12px 25px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid var(--border); border-radius:5px; cursor:pointer;">
+                        <i class="fas fa-ticket-alt"></i> VOUCHERS
+                    </button>
+                    <button class="admin-tab" data-tab="traffic"
+                        style="padding:12px 25px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid var(--border); border-radius:5px; cursor:pointer;">
+                        <i class="fas fa-chart-line"></i> TRAFFIC
+                    </button>
+                    <button class="admin-tab" data-tab="payments"
+                        style="padding:12px 25px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid var(--border); border-radius:5px; cursor:pointer;">
+                        <i class="fas fa-credit-card"></i> PAYMENTS
+                    </button>
+                    <button class="admin-tab" data-tab="settings"
+                        style="padding:12px 25px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid var(--border); border-radius:5px; cursor:pointer;">
+                        <i class="fas fa-cog"></i> SETTINGS
+                    </button>
+                </div>
+
+                <!-- ===== USERS TAB ===== -->
+                <div id="admin-users" class="admin-content" style="display:block;">
+                    <h3 style="color:var(--cyan);"><i class="fas fa-users"></i> User Management</h3>
+                    <div style="display:flex; gap:15px; margin-bottom:20px; flex-wrap:wrap;">
+                        <input type="text" id="admin-search-user" placeholder="Search by username or email..."
+                            style="flex:1; min-width:200px; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:5px; color:#fff;">
+                        <button id="admin-refresh-users"
+                            style="padding:12px 25px; background:var(--cyan); color:#000; border:none; border-radius:5px; cursor:pointer;">
+                            <i class="fas fa-sync"></i> REFRESH
+                        </button>
+                    </div>
+                    <div id="admin-users-table"
+                        style="background:rgba(0,0,0,0.3); border-radius:10px; overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                            <thead>
+                                <tr style="background:rgba(0,243,255,0.1);">
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">ID
+                                    </th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Username</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Email</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Role</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Subscription</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Expires</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-list">
+                                <tr>
+                                    <td colspan="7" style="padding:20px; text-align:center; color:#888;">Loading
+                                        users...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ===== VOUCHERS TAB ===== -->
+                <div id="admin-vouchers" class="admin-content" style="display:none;">
+                    <h3 style="color:var(--cyan);"><i class="fas fa-ticket-alt"></i> Voucher Management</h3>
+
+                    <!-- Generate New Voucher -->
+                    <div
+                        style="background:rgba(0,255,0,0.05); padding:20px; border-radius:10px; margin-bottom:20px; border:1px dashed rgba(0,255,0,0.3);">
+                        <h4 style="color:#00ff00; margin-top:0;"><i class="fas fa-plus-circle"></i> Generate New Voucher
+                        </h4>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; align-items:flex-end;">
+                            <div>
+                                <label style="display:block; color:#888; font-size:0.8rem; margin-bottom:5px;">Duration
+                                    (months)</label>
+                                <select id="voucher-months"
+                                    style="padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:5px; color:#fff;">
+                                    <option value="1">1 Month</option>
+                                    <option value="3">3 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="12">12 Months</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    style="display:block; color:#888; font-size:0.8rem; margin-bottom:5px;">Quantity</label>
+                                <input type="number" id="voucher-quantity" value="1" min="1" max="100"
+                                    style="width:80px; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:5px; color:#fff;">
+                            </div>
+                            <button id="generate-vouchers"
+                                style="padding:12px 30px; background:#00ff00; color:#000; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
+                                <i class="fas fa-magic"></i> GENERATE
+                            </button>
+                        </div>
+                        <div id="generated-vouchers"
+                            style="margin-top:15px; padding:15px; background:rgba(0,0,0,0.5); border-radius:5px; display:none;">
+                            <p style="color:#00ff00; margin:0 0 10px 0;">Generated Codes:</p>
+                            <div id="voucher-codes" style="font-family:monospace; color:var(--cyan);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Existing Vouchers -->
+                    <div id="admin-vouchers-table"
+                        style="background:rgba(0,0,0,0.3); border-radius:10px; overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                            <thead>
+                                <tr style="background:rgba(255,0,255,0.1);">
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Code</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Months</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Status</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Used By</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Created</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vouchers-list">
+                                <tr>
+                                    <td colspan="5" style="padding:20px; text-align:center; color:#888;">Loading
+                                        vouchers...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ===== TRAFFIC TAB ===== -->
+                <div id="admin-traffic" class="admin-content" style="display:none;">
+                    <h3 style="color:var(--cyan);"><i class="fas fa-chart-line"></i> Traffic Analytics</h3>
+                    <div
+                        style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:30px;">
+                        <div
+                            style="background:rgba(0,243,255,0.1); padding:20px; border-radius:10px; text-align:center; border:1px solid var(--cyan);">
+                            <div style="font-size:2rem; color:var(--cyan); font-weight:bold;" id="stat-today">--</div>
+                            <div style="color:#888;">Today's Visitors</div>
+                        </div>
+                        <div
+                            style="background:rgba(255,0,255,0.1); padding:20px; border-radius:10px; text-align:center; border:1px solid var(--pink);">
+                            <div style="font-size:2rem; color:var(--pink); font-weight:bold;" id="stat-total">--</div>
+                            <div style="color:#888;">Total Visitors</div>
+                        </div>
+                        <div
+                            style="background:rgba(0,255,0,0.1); padding:20px; border-radius:10px; text-align:center; border:1px solid #00ff00;">
+                            <div style="font-size:2rem; color:#00ff00; font-weight:bold;" id="stat-users">--</div>
+                            <div style="color:#888;">Registered Users</div>
+                        </div>
+                        <div
+                            style="background:rgba(255,165,0,0.1); padding:20px; border-radius:10px; text-align:center; border:1px solid orange;">
+                            <div style="font-size:2rem; color:orange; font-weight:bold;" id="stat-active">--</div>
+                            <div style="color:#888;">Active Subscriptions</div>
+                        </div>
+                    </div>
+                    <canvas id="traffic-canvas" width="800" height="300"
+                        style="width:100%; background:rgba(0,0,0,0.3); border-radius:10px;"></canvas>
+                </div>
+
+                <!-- ===== PAYMENTS TAB ===== -->
+                <div id="admin-payments" class="admin-content" style="display:none;">
+                    <h3 style="color:var(--cyan);"><i class="fas fa-credit-card"></i> Payment History</h3>
+                    <div id="admin-payments-table"
+                        style="background:rgba(0,0,0,0.3); border-radius:10px; overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                            <thead>
+                                <tr style="background:rgba(255,165,0,0.1);">
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Date</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        User</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Plan</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Amount</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Method</th>
+                                    <th style="padding:12px; text-align:left; border-bottom:1px solid var(--border);">
+                                        Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-list">
+                                <tr>
+                                    <td colspan="6" style="padding:20px; text-align:center; color:#888;">Loading
+                                        payments...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ===== SETTINGS TAB ===== -->
+                <div id="admin-settings" class="admin-content" style="display:none;">
+                    <h3 style="color:var(--cyan);"><i class="fas fa-cog"></i> System Settings</h3>
+
+                    <div style="display:grid; gap:20px;">
+                        <!-- Maintenance Mode -->
+                        <div
+                            style="background:rgba(255,0,0,0.1); padding:20px; border-radius:10px; border:1px solid rgba(255,0,0,0.3);">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h4 style="color:#ff4444; margin:0;"><i class="fas fa-tools"></i> Maintenance Mode
+                                    </h4>
+                                    <p style="color:#888; font-size:0.85rem; margin:5px 0 0 0;">Disable access for all
+                                        users except admin.</p>
+                                </div>
+                                <label style="position:relative; display:inline-block; width:60px; height:34px;">
+                                    <input type="checkbox" id="maintenance-toggle"
+                                        style="opacity:0; width:0; height:0;">
+                                    <span
+                                        style="position:absolute; cursor:pointer; inset:0; background:#555; border-radius:34px; transition:0.4s;"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Reset Demo User -->
+                        <div
+                            style="background:rgba(0,243,255,0.1); padding:20px; border-radius:10px; border:1px solid var(--cyan);">
+                            <h4 style="color:var(--cyan); margin:0 0 10px 0;"><i class="fas fa-redo"></i> Reset Demo
+                                User</h4>
+                            <p style="color:#888; font-size:0.85rem; margin:0 0 15px 0;">Reset demo user's usage limits
+                                and conversation history.</p>
+                            <button id="reset-demo"
+                                style="padding:10px 20px; background:var(--cyan); color:#000; border:none; border-radius:5px; cursor:pointer;">
+                                RESET DEMO
+                            </button>
+                        </div>
+
+                        <!-- Database Backup -->
+                        <div
+                            style="background:rgba(0,255,0,0.1); padding:20px; border-radius:10px; border:1px solid #00ff00;">
+                            <h4 style="color:#00ff00; margin:0 0 10px 0;"><i class="fas fa-database"></i> Database
+                                Backup</h4>
+                            <p style="color:#888; font-size:0.85rem; margin:0 0 15px 0;">Download a backup of the
+                                database.</p>
+                            <button id="download-backup"
+                                style="padding:10px 20px; background:#00ff00; color:#000; border:none; border-radius:5px; cursor:pointer;">
+                                DOWNLOAD BACKUP
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
         <!-- AE CONTACT SYSTEM (Integrated) -->
 
         <div id="ae-contact-modal">
