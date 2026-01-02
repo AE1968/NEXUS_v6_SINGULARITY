@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KELION - Plasma Globe Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: url('assets/kelion_holo/force_field_bg.png') no-repeat center center;
+            background-size: cover;
+            background-color: #050510;
+            min-height: 100vh;
+            font-family: 'Orbitron', sans-serif;
+            color: #00f3ff;
+            overflow: hidden;
+        }
+
+        #globe-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+        }
+
+        /* Control Panel */
+        #controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .ctrl-btn {
+            background: rgba(0, 20, 40, 0.9);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .ctrl-btn.active {
+            background: linear-gradient(135deg, #00f3ff, #ff00ff);
+            color: #000;
+            border-color: #ff00ff;
+        }
+
+        /* Status Display */
+        #status {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 10, 20, 0.9);
+            border: 1px solid #00f3ff;
+            padding: 10px 30px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+        }
+
+        #status-text {
+            color: #00ff00;
+        }
+
+        /* Side indicators */
+        #side-panel {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .side-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 20, 40, 0.8);
+            border: 2px solid #00f3ff;
+            color: #00f3ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .side-btn:hover {
+            background: rgba(0, 243, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .side-btn.active {
+            background: #00f3ff;
+            color: #000;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px #00f3ff;
+            }
+
+            50% {
+                box-shadow: 0 0 30px #00f3ff, 0 0 50px #ff00ff;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+
+<body>
+    <div id="status">STATUS: <span id="status-text">IDLE</span></div>
+
+    <div id="side-panel">
+        <div class="side-btn" id="btn-voice" title="Voice">🔊</div>
+        <div class="side-btn" id="btn-vision" title="Vision">👁</div>
+        <div class="side-btn" id="btn-ai" title="AI Core">⚡</div>
+        <div class="side-btn" id="btn-data" title="Database">💾</div>
+    </div>
+
+    <div id="globe-container"></div>
+
+    <div id="controls">
+        <button class="ctrl-btn" id="btn-speak">SPEAK</button>
+        <button class="ctrl-btn" id="btn-listen">LISTEN</button>
+        <button class="ctrl-btn" id="btn-process">PROCESS</button>
+        <button class="ctrl-btn" id="btn-calm">CALM</button>
+        <button class="ctrl-btn" id="btn-intense">INTENSIFY</button>
+    </div>
+
+    <script>
+        // Plasma Globe with Animation
+        class PlasmaGlobe {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                this.camera.position.z = 5;
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(500, 500);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.container.appendChild(this.renderer.domElement);
+
+                this.clock = new THREE.Clock();
+                this.streamers = [];
+                this.state = 'idle';
+                this.streamerCount = 12;
+
+                this.colors = {
+                    idle: { primary: 0x00f3ff, secondary: 0x0066aa },
+                    speaking: { primary: 0x00ffaa, secondary: 0x00ff00 },
+                    listening: { primary: 0xff00ff, secondary: 0xaa00aa },
+                    processing: { primary: 0xffaa00, secondary: 0xff6600 },
+                    intense: { primary: 0xff0066, secondary: 0xff00ff }
+                };
+
+                this.createGlobe();
+                this.createStreamers();
+                this.animate();
+            }
+
+            createGlobe() {
+                // Glass sphere
+                const glassGeo = new THREE.SphereGeometry(1.8, 64, 64);
+                const glassMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xffffff,
+                    roughness: 0,
+                    metalness: 0.1,
+                    transmission: 0.92,
+                    transparent: true,
+                    opacity: 0.2,
+                    side: THREE.DoubleSide
+                });
+                this.glass = new THREE.Mesh(glassGeo, glassMat);
+                this.scene.add(this.glass);
+
+                // Inner glow
+                const glowGeo = new THREE.SphereGeometry(1.7, 32, 32);
+                const glowMat = new THREE.ShaderMaterial({
+                    uniforms: {
+                        glowColor: { value: new THREE.Color(0x00f3ff) },
+                        intensity: { value: 0.5 }
+                    },
+                    vertexShader: `
+                        varying vec3 vNormal;
+                        void main() {
+                            vNormal = normalize(normalMatrix * normal);
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform vec3 glowColor;
+                        uniform float intensity;
+                        varying vec3 vNormal;
+                        void main() {
+                            float rim = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 3.0);
+                            gl_FragColor = vec4(glowColor, rim * intensity);
+                        }
+                    `,
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    side: THREE.BackSide,
+                    depthWrite: false
+                });
+                this.glowMesh = new THREE.Mesh(glowGeo, glowMat);
+                this.scene.add(this.glowMesh);
+
+                // Core
+                const coreGeo = new THREE.SphereGeometry(0.12, 16, 16);
+                const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                this.core = new THREE.Mesh(coreGeo, coreMat);
+                this.scene.add(this.core);
+            }
+
+            createStreamers() {
+                for (let i = 0; i < this.streamerCount; i++) {
+                    this.addStreamer();
+                }
+            }
+
+            addStreamer() {
+                const segments = 30;
+                const points = [];
+                for (let i = 0; i <= segments; i++) {
+                    points.push(new THREE.Vector3(0, 0, 0));
+                }
+                const curve = new THREE.CatmullRomCurve3(points);
+                const geo = new THREE.TubeGeometry(curve, segments, 0.025, 6, false);
+                const mat = new THREE.MeshBasicMaterial({
+                    color: Math.random() > 0.5 ? 0x00f3ff : 0xff00ff,
+                    transparent: true,
+                    opacity: 0.85,
+                    blending: THREE.AdditiveBlending
+                });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.userData = {
+                    target: this.randomPoint(),
+                    phase: Math.random() * Math.PI * 2,
+                    speed: 1 + Math.random() * 2,
+                    wave: 0.08 + Math.random() * 0.1,
+                    segments: segments
+                };
+                this.streamers.push(mesh);
+                this.scene.add(mesh);
+            }
+
+            randomPoint() {
+                const r = 1.7;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                return new THREE.Vector3(
+                    r * Math.sin(phi) * Math.cos(theta),
+                    r * Math.sin(phi) * Math.sin(theta),
+                    r * Math.cos(phi)
+                );
+            }
+
+            updateStreamers(time) {
+                const colors = this.colors[this.state] || this.colors.idle;
+
+                this.streamers.forEach((s, idx) => {
+                    // Random target change
+                    if (Math.random() < 0.015) {
+                        s.userData.target.lerp(this.randomPoint(), 0.4).normalize().multiplyScalar(1.7);
+                    }
+
+                    const points = [];
+                    const start = new THREE.Vector3(0, 0, 0);
+                    const end = s.userData.target;
+
+                    for (let i = 0; i <= s.userData.segments; i++) {
+                        const t = i / s.userData.segments;
+                        const p = new THREE.Vector3().lerpVectors(start, end, t);
+                        const wave = Math.sin(t * Math.PI);
+
+                        // Wavy plasma effect
+                        p.x += Math.sin(t * 10 + time * s.userData.speed + s.userData.phase) * s.userData.wave * wave;
+                        p.y += Math.cos(t * 8 + time * s.userData.speed) * s.userData.wave * wave;
+                        p.z += Math.sin(t * 12 + time * 1.5) * s.userData.wave * 0.5 * wave;
+
+                        points.push(p);
+                    }
+
+                    const newCurve = new THREE.CatmullRomCurve3(points);
+                    s.geometry.dispose();
+                    s.geometry = new THREE.TubeGeometry(newCurve, s.userData.segments, 0.022, 6, false);
+
+                    // Pulsing opacity
+                    s.material.opacity = 0.6 + Math.sin(time * 8 + s.userData.phase) * 0.35;
+
+                    // Color based on state
+                    s.material.color.setHex(idx % 2 === 0 ? colors.primary : colors.secondary);
+                });
+
+                // Update glow color
+                if (this.glowMesh) {
+                    this.glowMesh.material.uniforms.glowColor.value.setHex(colors.primary);
+                }
+            }
+
+            setState(state) {
+                this.state = state;
+                document.getElementById('status-text').textContent = state.toUpperCase();
+
+                // Update button states
+                document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+                const btn = document.getElementById('btn-' + state);
+                if (btn) btn.classList.add('active');
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                const time = this.clock.getElapsedTime();
+
+                this.updateStreamers(time);
+
+                // Rotate glass slowly
+                if (this.glass) this.glass.rotation.y = time * 0.03;
+
+                // Pulse core
+                if (this.core) {
+                    this.core.scale.setScalar(1 + Math.sin(time * 6) * 0.15);
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // Initialize
+        let globe;
+        window.addEventListener('DOMContentLoaded', () => {
+            globe = new PlasmaGlobe('globe-container');
+
+            // Button handlers
+            document.getElementById('btn-speak').onclick = () => globe.setState('speaking');
+            document.getElementById('btn-listen').onclick = () => globe.setState('listening');
+            document.getElementById('btn-process').onclick = () => globe.setState('processing');
+            document.getElementById('btn-calm').onclick = () => globe.setState('idle');
+            document.getElementById('btn-intense').onclick = () => globe.setState('intense');
+
+            // Side buttons
+            document.querySelectorAll('.side-btn').forEach(btn => {
+                btn.onclick = () => {
+                    btn.classList.toggle('active');
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>

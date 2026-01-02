@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plasma Sphere Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: url('assets/kelion_holo/force_field_bg.png') no-repeat center center;
+            background-size: cover;
+            background-color: #050510;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #sphere-container {
+            width: 700px;
+            height: 700px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+    <div id="sphere-container"></div>
+    <script>
+        // DOAR SFERA PLASMA - fără cap
+        class PlasmaSphere {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                this.camera.position.z = 4.5;
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(700, 700);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.toneMapping = THREE.ReinhardToneMapping;
+                this.renderer.toneMappingExposure = 1.8;
+                this.container.appendChild(this.renderer.domElement);
+
+                this.colors = {
+                    cyan: new THREE.Color(0x00f3ff),
+                    magenta: new THREE.Color(0xff00ff)
+                };
+
+                this.streamers = [];
+                this.clock = new THREE.Clock();
+
+                this.createGlassSphere();
+                this.createStreamers();
+                this.animate();
+            }
+
+            createGlassSphere() {
+                // Sfera de sticlă exterioară
+                const glassGeo = new THREE.SphereGeometry(1.6, 64, 64);
+                const glassMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xffffff,
+                    roughness: 0,
+                    metalness: 0.1,
+                    transmission: 0.9,
+                    transparent: true,
+                    opacity: 0.25,
+                    side: THREE.FrontSide
+                });
+                this.glass = new THREE.Mesh(glassGeo, glassMat);
+                this.scene.add(this.glass);
+
+                // Glow interior
+                const glowGeo = new THREE.SphereGeometry(1.5, 32, 32);
+                const glowMat = new THREE.ShaderMaterial({
+                    uniforms: { viewVector: { value: this.camera.position } },
+                    vertexShader: `
+                        varying float intensity;
+                        void main() {
+                            vec3 vNormal = normalize(normalMatrix * normal);
+                            vec3 vView = normalize(normalMatrix * cameraPosition);
+                            intensity = pow(0.8 - dot(vNormal, vView), 3.0);
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        varying float intensity;
+                        void main() {
+                            vec3 glow = vec3(0.2, 0.0, 0.5);
+                            gl_FragColor = vec4(glow, intensity * 0.6);
+                        }
+                    `,
+                    side: THREE.BackSide,
+                    blending: THREE.AdditiveBlending,
+                    transparent: true,
+                    depthWrite: false
+                });
+                this.scene.add(new THREE.Mesh(glowGeo, glowMat));
+
+                // Nucleu central strălucitor
+                const coreGeo = new THREE.SphereGeometry(0.15, 32, 32);
+                const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                this.core = new THREE.Mesh(coreGeo, coreMat);
+                this.scene.add(this.core);
+            }
+
+            createStreamers() {
+                for (let i = 0; i < 12; i++) {
+                    this.addStreamer();
+                }
+            }
+
+            addStreamer() {
+                const segments = 25;
+                const curve = new THREE.CatmullRomCurve3(Array(segments).fill(new THREE.Vector3()));
+                const geo = new THREE.TubeGeometry(curve, segments, 0.02, 4, false);
+                const mat = new THREE.MeshBasicMaterial({
+                    color: Math.random() > 0.5 ? this.colors.cyan : this.colors.magenta,
+                    transparent: true,
+                    opacity: 0.9,
+                    blending: THREE.AdditiveBlending
+                });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.userData = {
+                    target: this.randomSurfacePoint(),
+                    phase: Math.random() * Math.PI * 2,
+                    speed: 1.5 + Math.random() * 2,
+                    amplitude: 0.1 + Math.random() * 0.15,
+                    segments: segments
+                };
+                this.streamers.push(mesh);
+                this.scene.add(mesh);
+            }
+
+            randomSurfacePoint() {
+                const r = 1.55;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                return new THREE.Vector3(
+                    r * Math.sin(phi) * Math.cos(theta),
+                    r * Math.sin(phi) * Math.sin(theta),
+                    r * Math.cos(phi)
+                );
+            }
+
+            updateStreamers(time) {
+                this.streamers.forEach(s => {
+                    if (Math.random() < 0.02) {
+                        s.userData.target.lerp(this.randomSurfacePoint(), 0.3).normalize().multiplyScalar(1.55);
+                    }
+
+                    const points = [];
+                    const start = new THREE.Vector3(0, 0, 0);
+                    const end = s.userData.target;
+
+                    for (let i = 0; i <= s.userData.segments; i++) {
+                        const t = i / s.userData.segments;
+                        const base = new THREE.Vector3().lerpVectors(start, end, t);
+                        const wave = Math.sin(t * Math.PI);
+                        base.x += Math.sin(t * 12 + time * s.userData.speed + s.userData.phase) * s.userData.amplitude * wave;
+                        base.y += Math.cos(t * 9 + time * s.userData.speed) * s.userData.amplitude * wave;
+                        base.z += Math.sin(t * 15 + time) * s.userData.amplitude * 0.5 * wave;
+                        points.push(base);
+                    }
+
+                    const newCurve = new THREE.CatmullRomCurve3(points);
+                    s.geometry.dispose();
+                    s.geometry = new THREE.TubeGeometry(newCurve, s.userData.segments, 0.018, 4, false);
+                    s.material.opacity = 0.7 + Math.sin(time * 10 + s.userData.phase) * 0.3;
+                });
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                const time = this.clock.getElapsedTime();
+
+                this.updateStreamers(time);
+
+                if (this.glass) this.glass.rotation.y = time * 0.05;
+                if (this.core) {
+                    this.core.scale.setScalar(1 + Math.sin(time * 8) * 0.1);
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            new PlasmaSphere('sphere-container');
+            console.log('✅ Plasma Sphere ONLY - no head');
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>KELION Hologram - Purchased Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #020208;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #hologram-container {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #status {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            color: #00f3ff;
+            font: 12px 'Segoe UI', sans-serif;
+            background: rgba(0, 10, 20, 0.85);
+            padding: 10px 15px;
+            border: 1px solid rgba(0, 243, 255, 0.5);
+            border-radius: 6px;
+            z-index: 100;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+
+<body>
+    <div id="hologram-container"></div>
+    <div id="status">Initializing...</div>
+
+    <script>
+        const status = document.getElementById('status');
+        const container = document.getElementById('hologram-container');
+
+        // Scene
+        const scene = new THREE.Scene();
+
+        // Camera - positioned for full head view
+        const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0.2, 5);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 0);
+        container.appendChild(renderer.domElement);
+
+        // Holographic Lighting - cyan/blue like in reference image
+        scene.add(new THREE.AmbientLight(0x00f3ff, 0.6));
+
+        const frontLight = new THREE.DirectionalLight(0x00f3ff, 2);
+        frontLight.position.set(0, 0, 5);
+        scene.add(frontLight);
+
+        const topLight = new THREE.PointLight(0x00aaff, 3, 15);
+        topLight.position.set(0, 4, 2);
+        scene.add(topLight);
+
+        const leftRim = new THREE.PointLight(0x00f3ff, 2, 10);
+        leftRim.position.set(-3, 1, 1);
+        scene.add(leftRim);
+
+        const rightRim = new THREE.PointLight(0x00f3ff, 2, 10);
+        rightRim.position.set(3, 1, 1);
+        scene.add(rightRim);
+
+        // Load textures from purchased software
+        const textureLoader = new THREE.TextureLoader();
+        const colorTexture = textureLoader.load('assets/kelion_holo/Textures/Textures/MaleHeadHolo_Color.png');
+        const opacityTexture = textureLoader.load('assets/kelion_holo/Textures/Textures/MaleHeadHolo_Opacity.png');
+
+        let mixer = null;
+        const clock = new THREE.Clock();
+
+        status.textContent = 'Loading model...';
+
+        // Load GLB model
+        const loader = new THREE.GLTFLoader();
+        loader.load('assets/hologram.glb',
+            (gltf) => {
+                const model = gltf.scene;
+
+                // Calculate bounds for proper framing
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+
+                // Center the model
+                model.position.x = -center.x;
+                model.position.y = -center.y;
+                model.position.z = -center.z;
+
+                // Scale smaller to fit entire head in viewport
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const targetScale = 1.5 / maxDim;
+                model.scale.setScalar(targetScale);
+
+                // Lower the model so head is centered
+                model.position.y -= 0.3;
+
+                // Apply holographic wireframe material using purchased textures
+                model.traverse((node) => {
+                    if (node.isMesh) {
+                        // Use the Color texture as the main visual with emissive glow
+                        node.material = new THREE.MeshBasicMaterial({
+                            map: colorTexture,
+                            alphaMap: opacityTexture,
+                            color: 0x00f3ff,
+                            transparent: true,
+                            opacity: 1.0,
+                            side: THREE.DoubleSide,
+                            blending: THREE.AdditiveBlending,
+                            depthWrite: false
+                        });
+                    }
+                });
+
+                scene.add(model);
+
+                // Setup animations
+                if (gltf.animations && gltf.animations.length > 0) {
+                    mixer = new THREE.AnimationMixer(model);
+                    gltf.animations.forEach((clip) => {
+                        const action = mixer.clipAction(clip);
+                        action.play();
+                    });
+                    status.textContent = '✓ Hologram Active (' + gltf.animations.length + ' animations)';
+                } else {
+                    status.textContent = '✓ Hologram Loaded';
+                }
+            },
+            (progress) => {
+                if (progress.total > 0) {
+                    const pct = Math.round((progress.loaded / progress.total) * 100);
+                    status.textContent = 'Loading: ' + pct + '%';
+                }
+            },
+            (error) => {
+                status.textContent = 'Error: ' + (error.message || 'Load failed');
+                console.error('GLB Load Error:', error);
+            }
+        );
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            if (mixer) mixer.update(delta);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+
+</html>

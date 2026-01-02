@@ -28,6 +28,30 @@ logger = logging.getLogger('KELION')
 # Add current folder to path to ensure configuration import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# DECORATOR: Token Required for Protected Routes
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            if " " in auth_header:
+                token = auth_header.split(" ")[1]
+        
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+        
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = User.query.filter_by(username=data['username']).first()
+            if not current_user:
+                 return jsonify({'message': 'User not found!'}), 401
+        except Exception as e:
+             return jsonify({'message': 'Token is invalid!', 'error': str(e)}), 401
+             
+        return f(current_user, *args, **kwargs)
+    return decorated
+
 # Import version from centralized file
 from version import VERSION, get_version_info
 
@@ -1998,6 +2022,45 @@ def login():
     data = request.json
     username_q = data.get('username')
     password_q = data.get('password')
+
+    if not username_q or not password_q:
+        return jsonify({"success": False, "error": "Missing credentials"}), 400
+
+    if username_q == 'demo' and password_q == 'demo':
+        return jsonify({
+            "success": True, 
+            "username": "demo", 
+            "role": "user",
+            "subscription": "demo",
+            "message": "Demo Access Granted"
+        })
+
+    user = User.query.filter((User.username == username_q) | (User.email == username_q)).first()
+    
+    if user and check_password_hash(user.password_hash, password_q):
+        if isinstance(user.billing_history, str):
+             try:
+                 history = json.loads(user.billing_history)
+             except:
+                 history = []
+        else:
+             history = user.billing_history or []
+             
+        token = jwt.encode({
+            'username': user.username,
+            'role': user.role,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        }, app.config['SECRET_KEY'], algorithm="HS256")
+        
+        return jsonify({
+            "success": True,
+            "username": user.username,
+            "role": user.role,
+            "subscription": user.subscription,
+            "token": token
+        })
+    
+    return jsonify({"success": False, "error": "Invalid Architect ID or Security Key"}), 401
 
 # ==============================================================================
 # APPLICATION STARTUP

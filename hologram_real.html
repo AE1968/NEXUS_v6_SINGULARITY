@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KELION - Real Hologram Plasma Globe</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(ellipse at center, #0a0a1a 0%, #000008 100%);
+            min-height: 100vh;
+            font-family: 'Orbitron', sans-serif;
+            color: #00f3ff;
+            overflow: hidden;
+        }
+
+        /* Cosmic background */
+        #bg-stars {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(0, 243, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(2px 2px at 160px 120px, rgba(255, 0, 255, 0.6), transparent);
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: twinkle 4s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        #hologram-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+        }
+
+        /* Status Bar */
+        #status-bar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 10, 20, 0.95);
+            border: 1px solid #00f3ff;
+            border-radius: 10px;
+            padding: 15px 40px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-label {
+            font-size: 0.65rem;
+            color: #666;
+            letter-spacing: 2px;
+        }
+
+        .status-value {
+            font-size: 0.9rem;
+            color: #00ff00;
+        }
+
+        #emotion-display {
+            color: #ff00ff;
+            font-weight: 700;
+        }
+
+        /* Control Panel */
+        #controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            background: rgba(0, 10, 20, 0.9);
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .ctrl-btn {
+            background: linear-gradient(180deg, rgba(0, 40, 60, 0.9) 0%, rgba(0, 20, 40, 0.9) 100%);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ctrl-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .ctrl-btn:hover::before {
+            left: 100%;
+        }
+
+        .ctrl-btn:hover {
+            background: linear-gradient(180deg, rgba(0, 80, 120, 0.9) 0%, rgba(0, 40, 80, 0.9) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 243, 255, 0.4);
+        }
+
+        .ctrl-btn.active {
+            background: linear-gradient(135deg, #00f3ff 0%, #ff00ff 100%);
+            color: #000;
+            border-color: #fff;
+            animation: glow-pulse 1s infinite;
+        }
+
+        @keyframes glow-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 25px rgba(255, 0, 255, 0.8);
+            }
+        }
+
+        /* Side Panel */
+        #side-panel {
+            position: fixed;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .side-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(0, 20, 40, 0.9);
+            border: 2px solid #00f3ff;
+            color: #00f3ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+        }
+
+        .side-btn:hover {
+            background: rgba(0, 243, 255, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+        }
+
+        .side-btn.active {
+            background: #00f3ff;
+            color: #000;
+            animation: pulse-ring 1.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 243, 255, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(0, 243, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 243, 255, 0);
+            }
+        }
+
+        /* Loading */
+        #loading {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+
+        #loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border: 3px solid transparent;
+            border-top-color: #00f3ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #load-text {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            color: #00f3ff;
+        }
+    </style>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+
+<body>
+    <div id="bg-stars"></div>
+
+    <div id="loading">
+        <div class="loader-ring"></div>
+        <div id="load-text">INITIALIZING NEURAL LINK...</div>
+    </div>
+
+    <div id="status-bar">
+        <div class="status-item">
+            <span class="status-label">STATUS</span>
+            <span class="status-value" id="status-text">IDLE</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">EMOTION</span>
+            <span class="status-value" id="emotion-display">NEUTRAL</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">NEURAL LINK</span>
+            <span class="status-value" style="color: #00ff00;">ACTIVE</span>
+        </div>
+    </div>
+
+    <!-- LOGIN Button Top Right -->
+    <button id="login-btn" onclick="openLogin()" title="System Access">
+        🔐 LOGIN
+    </button>
+
+    <style>
+        #login-btn {
+            position: fixed;
+            top: 20px;
+            right: 25px;
+            background: linear-gradient(135deg, rgba(0, 40, 60, 0.95) 0%, rgba(0, 20, 40, 0.95) 100%);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        #login-btn:hover {
+            background: linear-gradient(135deg, #00f3ff 0%, #ff00ff 100%);
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.6);
+        }
+    </style>
+
+    <div id="side-panel">
+        <div class="side-btn" id="btn-voice" title="Voice TTS">🔊</div>
+        <div class="side-btn" id="btn-vision" title="Vision Scan">👁</div>
+        <div class="side-btn" id="btn-ai" title="AI Core">⚡</div>
+        <div class="side-btn" id="btn-data" title="Database">💾</div>
+    </div>
+
+    <div id="hologram-container"></div>
+
+    <!-- Contact Button Only -->
+    <div id="contact-btn" onclick="openContact()" title="Contact Us">
+        📧 CONTACT
+    </div>
+
+    <style>
+        #contact-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, rgba(0, 40, 60, 0.95) 0%, rgba(0, 20, 40, 0.95) 100%);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        #contact-btn:hover {
+            background: linear-gradient(135deg, #00f3ff 0%, #ff00ff 100%);
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.5);
+        }
+    </style>
+
+    <script>
+        /**
+         * KELION Real Hologram in Plasma Globe
+         * Uses FBX model with facial animations
+         */
+        class KelionHologram {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                this.camera.position.z = 5;
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(600, 600);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.container.appendChild(this.renderer.domElement);
+
+                this.clock = new THREE.Clock();
+                this.mixer = null;
+                this.model = null;
+                this.morphTargets = {};
+                this.streamers = [];
+                this.state = 'idle';
+                this.isSpeaking = false;
+
+                this.colors = {
+                    idle: { primary: 0x00f3ff, secondary: 0x0088aa, glow: 0x003355 },
+                    speaking: { primary: 0x00ffaa, secondary: 0x00ff66, glow: 0x004422 },
+                    listening: { primary: 0xff00ff, secondary: 0xaa00ff, glow: 0x440044 },
+                    processing: { primary: 0xffaa00, secondary: 0xff6600, glow: 0x442200 },
+                    happy: { primary: 0x00ff88, secondary: 0x66ffaa, glow: 0x004422 },
+                    angry: { primary: 0xff3333, secondary: 0xff0000, glow: 0x440000 }
+                };
+
+                this.init();
+            }
+
+            async init() {
+                this.setupLights();
+                this.createPlasmaGlobe();
+                this.createStreamers(15);
+                await this.loadHologramHead();
+                this.animate();
+
+                // Hide loading
+                setTimeout(() => {
+                    document.getElementById('loading').classList.add('hidden');
+                }, 500);
+            }
+
+            setupLights() {
+                const ambient = new THREE.AmbientLight(0x00f3ff, 0.3);
+                this.scene.add(ambient);
+
+                const point1 = new THREE.PointLight(0x00f3ff, 1, 10);
+                point1.position.set(2, 2, 3);
+                this.scene.add(point1);
+
+                const point2 = new THREE.PointLight(0xff00ff, 0.8, 10);
+                point2.position.set(-2, -1, 2);
+                this.scene.add(point2);
+            }
+
+            createPlasmaGlobe() {
+                // Glass sphere
+                const glassGeo = new THREE.SphereGeometry(2, 64, 64);
+                const glassMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xffffff,
+                    roughness: 0,
+                    metalness: 0.1,
+                    transmission: 0.95,
+                    transparent: true,
+                    opacity: 0.15,
+                    side: THREE.DoubleSide
+                });
+                this.glass = new THREE.Mesh(glassGeo, glassMat);
+                this.scene.add(this.glass);
+
+                // Inner glow sphere
+                const glowGeo = new THREE.SphereGeometry(1.95, 32, 32);
+                const glowMat = new THREE.ShaderMaterial({
+                    uniforms: {
+                        glowColor: { value: new THREE.Color(0x00f3ff) },
+                        intensity: { value: 0.4 }
+                    },
+                    vertexShader: `
+                        varying vec3 vNormal;
+                        varying vec3 vPosition;
+                        void main() {
+                            vNormal = normalize(normalMatrix * normal);
+                            vPosition = position;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform vec3 glowColor;
+                        uniform float intensity;
+                        varying vec3 vNormal;
+                        void main() {
+                            float rim = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.5);
+                            gl_FragColor = vec4(glowColor, rim * intensity);
+                        }
+                    `,
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    side: THREE.BackSide,
+                    depthWrite: false
+                });
+                this.glowMesh = new THREE.Mesh(glowGeo, glowMat);
+                this.scene.add(this.glowMesh);
+            }
+
+            createStreamers(count) {
+                for (let i = 0; i < count; i++) {
+                    const segments = 25;
+                    const points = [];
+                    for (let j = 0; j <= segments; j++) {
+                        points.push(new THREE.Vector3(0, 0, 0));
+                    }
+
+                    const curve = new THREE.CatmullRomCurve3(points);
+                    const geo = new THREE.TubeGeometry(curve, segments, 0.02, 6, false);
+                    const mat = new THREE.MeshBasicMaterial({
+                        color: i % 2 === 0 ? 0x00f3ff : 0xff00ff,
+                        transparent: true,
+                        opacity: 0.8,
+                        blending: THREE.AdditiveBlending
+                    });
+
+                    const mesh = new THREE.Mesh(geo, mat);
+                    mesh.userData = {
+                        target: this.randomSurfacePoint(),
+                        phase: Math.random() * Math.PI * 2,
+                        speed: 1.5 + Math.random() * 2,
+                        wave: 0.06 + Math.random() * 0.08,
+                        segments: segments,
+                        startFromHead: Math.random() > 0.4 // Some start from head area
+                    };
+
+                    this.streamers.push(mesh);
+                    this.scene.add(mesh);
+                }
+            }
+
+            randomSurfacePoint() {
+                const r = 1.9;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                return new THREE.Vector3(
+                    r * Math.sin(phi) * Math.cos(theta),
+                    r * Math.sin(phi) * Math.sin(theta),
+                    r * Math.cos(phi)
+                );
+            }
+
+            async loadHologramHead() {
+                return new Promise((resolve) => {
+                    // Try loading GLTF first (smaller, web-optimized)
+                    const loader = new THREE.GLTFLoader();
+
+                    loader.load('assets/hologram.glb',
+                        (gltf) => {
+                            this.model = gltf.scene;
+                            this.model.scale.set(0.8, 0.8, 0.8);
+                            this.model.position.set(0, -0.3, 0);
+
+                            // Apply hologram material
+                            this.model.traverse((child) => {
+                                if (child.isMesh) {
+                                    child.material = new THREE.MeshPhongMaterial({
+                                        color: 0x00f3ff,
+                                        emissive: 0x003344,
+                                        transparent: true,
+                                        opacity: 0.85,
+                                        wireframe: false
+                                    });
+
+                                    // Store morph targets
+                                    if (child.morphTargetInfluences) {
+                                        this.morphTargets = child.morphTargetDictionary || {};
+                                        this.morphMesh = child;
+                                    }
+                                }
+                            });
+
+                            // Load animations
+                            if (gltf.animations && gltf.animations.length > 0) {
+                                this.mixer = new THREE.AnimationMixer(this.model);
+                                gltf.animations.forEach((clip) => {
+                                    const action = this.mixer.clipAction(clip);
+                                    action.play();
+                                });
+                            }
+
+                            this.scene.add(this.model);
+                            console.log('Hologram head loaded successfully');
+                            resolve();
+                        },
+                        (progress) => {
+                            const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                            document.getElementById('load-text').textContent = `LOADING MODEL... ${percent}%`;
+                        },
+                        (error) => {
+                            console.warn('GLB load failed, using procedural head:', error);
+                            this.createProceduralHead();
+                            resolve();
+                        }
+                    );
+                });
+            }
+
+            createProceduralHead() {
+                // Create a simple procedural head if model fails
+                const headGeo = new THREE.SphereGeometry(0.5, 32, 32);
+                const headMat = new THREE.MeshPhongMaterial({
+                    color: 0x00f3ff,
+                    emissive: 0x003344,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                this.model = new THREE.Mesh(headGeo, headMat);
+                this.model.position.y = 0.2;
+                this.scene.add(this.model);
+            }
+
+            updateStreamers(time) {
+                const colors = this.colors[this.state] || this.colors.idle;
+                const intensity = this.state === 'processing' || this.state === 'speaking' ? 1.5 : 1;
+
+                this.streamers.forEach((s, idx) => {
+                    // Occasionally change target
+                    if (Math.random() < 0.01 * intensity) {
+                        s.userData.target = this.randomSurfacePoint();
+                    }
+
+                    const points = [];
+                    // Start point - either center or near head
+                    const startY = s.userData.startFromHead ? 0.2 : 0;
+                    const start = new THREE.Vector3(0, startY, 0);
+                    const end = s.userData.target;
+
+                    for (let i = 0; i <= s.userData.segments; i++) {
+                        const t = i / s.userData.segments;
+                        const p = new THREE.Vector3().lerpVectors(start, end, t);
+                        const wave = Math.sin(t * Math.PI);
+
+                        // Sinuous plasma motion
+                        p.x += Math.sin(t * 12 + time * s.userData.speed + s.userData.phase) * s.userData.wave * wave;
+                        p.y += Math.cos(t * 10 + time * s.userData.speed * 0.8) * s.userData.wave * wave;
+                        p.z += Math.sin(t * 8 + time * 1.2) * s.userData.wave * 0.6 * wave;
+
+                        points.push(p);
+                    }
+
+                    const newCurve = new THREE.CatmullRomCurve3(points);
+                    s.geometry.dispose();
+                    s.geometry = new THREE.TubeGeometry(newCurve, s.userData.segments, 0.018, 6, false);
+
+                    // Pulsing opacity and color
+                    s.material.opacity = 0.5 + Math.sin(time * 6 + s.userData.phase) * 0.4;
+                    s.material.color.setHex(idx % 2 === 0 ? colors.primary : colors.secondary);
+                });
+
+                // Update glow
+                if (this.glowMesh) {
+                    this.glowMesh.material.uniforms.glowColor.value.setHex(colors.primary);
+                    this.glowMesh.material.uniforms.intensity.value = 0.3 + Math.sin(time * 3) * 0.15;
+                }
+            }
+
+            updateHead(time) {
+                if (!this.model) return;
+
+                // Subtle head movement
+                this.model.rotation.y = Math.sin(time * 0.3) * 0.1;
+                this.model.rotation.x = Math.sin(time * 0.2) * 0.05;
+
+                // Morph target animations (if available)
+                if (this.morphMesh && this.morphMesh.morphTargetInfluences) {
+                    // Lip sync when speaking
+                    if (this.isSpeaking) {
+                        const mouthIdx = this.morphTargets['mouthOpen'] || 0;
+                        this.morphMesh.morphTargetInfluences[mouthIdx] =
+                            0.3 + Math.sin(time * 15) * 0.3;
+                    }
+
+                    // Natural blinking
+                    const blinkIdx = this.morphTargets['eyeBlink'] || this.morphTargets['blink'] || 1;
+                    if (Math.floor(time * 10) % 40 === 0) {
+                        this.morphMesh.morphTargetInfluences[blinkIdx] = 1;
+                    } else {
+                        this.morphMesh.morphTargetInfluences[blinkIdx] *= 0.85;
+                    }
+                }
+
+                // Update material color based on state
+                const colors = this.colors[this.state] || this.colors.idle;
+                this.model.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        child.material.color.setHex(colors.primary);
+                        child.material.emissive.setHex(colors.glow);
+                    }
+                });
+            }
+
+            setState(state) {
+                this.state = state;
+                this.isSpeaking = state === 'speaking';
+
+                document.getElementById('status-text').textContent = state.toUpperCase();
+                document.getElementById('emotion-display').textContent =
+                    state === 'happy' ? 'HAPPY 😊' :
+                        state === 'angry' ? 'ANGRY 😠' :
+                            state === 'speaking' ? 'SPEAKING 🗣' :
+                                state === 'listening' ? 'LISTENING 🎤' :
+                                    state === 'processing' ? 'THINKING 🧠' : 'NEUTRAL';
+
+                // Update button states
+                document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+                const btn = document.getElementById('btn-' + state);
+                if (btn) btn.classList.add('active');
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                const time = this.clock.getElapsedTime();
+
+                // Update animation mixer
+                if (this.mixer) {
+                    this.mixer.update(this.clock.getDelta());
+                }
+
+                this.updateStreamers(time);
+                this.updateHead(time);
+
+                // Slow glass rotation
+                if (this.glass) {
+                    this.glass.rotation.y = time * 0.02;
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // Initialize
+        let hologram;
+        window.addEventListener('DOMContentLoaded', () => {
+            hologram = new KelionHologram('hologram-container');
+
+            // Expose hologram globally for programmatic control
+            window.kelion = hologram;
+
+            // Side buttons toggle
+            document.querySelectorAll('.side-btn').forEach(btn => {
+                btn.onclick = () => btn.classList.toggle('active');
+            });
+        });
+
+        // Global functions
+        function openLogin() {
+            alert('LOGIN modal - to be integrated with index.html');
+        }
+
+        function openContact() {
+            alert('CONTACT modal - to be integrated');
+        }
+
+        // Programmatic API:
+        // window.kelion.setState('speaking')
+        // window.kelion.setState('listening')
+        // window.kelion.setState('processing')
+        // window.kelion.setState('happy')
+        // window.kelion.setState('angry')
+        // window.kelion.setState('idle')
+    </script>
+</body>
+
+</html>

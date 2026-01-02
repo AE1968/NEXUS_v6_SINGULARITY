@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>KELION Hologram - Full Features</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #020208;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        #hologram-container {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #status {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            color: #00f3ff;
+            font-size: 12px;
+            background: rgba(0, 10, 20, 0.9);
+            padding: 12px 18px;
+            border: 1px solid rgba(0, 243, 255, 0.5);
+            border-radius: 8px;
+            z-index: 100;
+            max-width: 300px;
+        }
+
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+            max-width: 90vw;
+        }
+
+        .btn {
+            background: rgba(0, 50, 80, 0.8);
+            color: #00f3ff;
+            border: 1px solid #00f3ff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: rgba(0, 100, 150, 0.9);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+        }
+
+        .btn.active {
+            background: #00f3ff;
+            color: #000;
+        }
+
+        #expression-panel {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 10, 20, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 100;
+            min-width: 200px;
+        }
+
+        #expression-panel h3 {
+            color: #00f3ff;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .slider-group {
+            margin-bottom: 10px;
+        }
+
+        .slider-group label {
+            color: #00f3ff;
+            font-size: 11px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .slider-group input[type="range"] {
+            width: 100%;
+            accent-color: #00f3ff;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+
+<body>
+    <div id="hologram-container"></div>
+    <div id="status">Initializing...</div>
+
+    <div id="expression-panel">
+        <h3>🎭 Expressions (Blend Shapes)</h3>
+        <div class="slider-group">
+            <label>😊 Smile: <span id="smile-val">0%</span></label>
+            <input type="range" id="smile" min="0" max="100" value="0">
+        </div>
+        <div class="slider-group">
+            <label>😢 Sad: <span id="sad-val">0%</span></label>
+            <input type="range" id="sad" min="0" max="100" value="0">
+        </div>
+        <div class="slider-group">
+            <label>😟 Worried: <span id="worried-val">0%</span></label>
+            <input type="range" id="worried" min="0" max="100" value="0">
+        </div>
+        <div class="slider-group">
+            <label>😠 Angry: <span id="angry-val">0%</span></label>
+            <input type="range" id="angry" min="0" max="100" value="0">
+        </div>
+    </div>
+
+    <div id="controls">
+        <!-- Animation buttons will be added dynamically -->
+    </div>
+
+    <script>
+        const status = document.getElementById('status');
+        const container = document.getElementById('hologram-container');
+        const controlsDiv = document.getElementById('controls');
+
+        // Scene
+        const scene = new THREE.Scene();
+
+        // Camera
+        const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0.2, 4);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 0);
+        container.appendChild(renderer.domElement);
+
+        // Holographic Lighting
+        scene.add(new THREE.AmbientLight(0x00f3ff, 0.5));
+
+        const frontLight = new THREE.DirectionalLight(0x00f3ff, 2);
+        frontLight.position.set(0, 0, 5);
+        scene.add(frontLight);
+
+        const topLight = new THREE.PointLight(0x00aaff, 2, 15);
+        topLight.position.set(0, 4, 2);
+        scene.add(topLight);
+
+        const leftRim = new THREE.PointLight(0x00f3ff, 1.5, 10);
+        leftRim.position.set(-3, 1, 1);
+        scene.add(leftRim);
+
+        const rightRim = new THREE.PointLight(0x00f3ff, 1.5, 10);
+        rightRim.position.set(3, 1, 1);
+        scene.add(rightRim);
+
+        // Load textures
+        const textureLoader = new THREE.TextureLoader();
+        const colorTexture = textureLoader.load('assets/kelion_holo/Textures/Textures/MaleHeadHolo_Color.png');
+        const opacityTexture = textureLoader.load('assets/kelion_holo/Textures/Textures/MaleHeadHolo_Opacity.png');
+
+        let mixer = null;
+        let model = null;
+        let animations = {};
+        let morphMeshes = [];
+        let morphTargetNames = {};
+        const clock = new THREE.Clock();
+
+        status.textContent = 'Loading model...';
+
+        // Load GLB model with full features
+        const loader = new THREE.GLTFLoader();
+        loader.load('assets/hologram_full.glb',
+            (gltf) => {
+                model = gltf.scene;
+
+                // Calculate bounds
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+
+                // Center and scale
+                model.position.x = -center.x;
+                model.position.y = -center.y;
+                model.position.z = -center.z;
+
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const targetScale = 1.8 / maxDim;
+                model.scale.setScalar(targetScale);
+                model.position.y -= 0.2;
+
+                // Apply holographic look while keeping original textures from GLB
+                model.traverse((node) => {
+                    if (node.isMesh) {
+                        // Store meshes with morph targets
+                        if (node.morphTargetInfluences && node.morphTargetInfluences.length > 0) {
+                            morphMeshes.push(node);
+                            if (node.morphTargetDictionary) {
+                                Object.assign(morphTargetNames, node.morphTargetDictionary);
+                            }
+                        }
+
+                        // Keep original material but enhance for holographic effect
+                        const originalMat = node.material;
+                        if (originalMat) {
+                            // Clone to avoid modifying shared materials
+                            node.material = originalMat.clone();
+
+                            // Add holographic enhancements
+                            if (node.material.color) {
+                                node.material.color.setHex(0x00f3ff);
+                            }
+                            if (node.material.emissive) {
+                                node.material.emissive.setHex(0x0088ff);
+                                node.material.emissiveIntensity = 0.8;
+                            }
+                            node.material.transparent = true;
+                            node.material.opacity = 0.95;
+                            node.material.side = THREE.DoubleSide;
+                        }
+                    }
+                });
+
+                scene.add(model);
+
+                // Setup animations
+                if (gltf.animations && gltf.animations.length > 0) {
+                    mixer = new THREE.AnimationMixer(model);
+
+                    gltf.animations.forEach((clip, index) => {
+                        const action = mixer.clipAction(clip);
+                        animations[clip.name] = action;
+
+                        // Create button for each animation
+                        const btn = document.createElement('button');
+                        btn.className = 'btn';
+                        btn.textContent = clip.name;
+                        btn.onclick = () => playAnimation(clip.name);
+                        controlsDiv.appendChild(btn);
+                    });
+
+                    // Add "Stop All" button
+                    const stopBtn = document.createElement('button');
+                    stopBtn.className = 'btn';
+                    stopBtn.textContent = '⏹ Stop All';
+                    stopBtn.onclick = stopAllAnimations;
+                    controlsDiv.appendChild(stopBtn);
+
+                    // Add "Play All" button
+                    const playAllBtn = document.createElement('button');
+                    playAllBtn.className = 'btn';
+                    playAllBtn.textContent = '▶ Play All';
+                    playAllBtn.onclick = playAllAnimations;
+                    controlsDiv.appendChild(playAllBtn);
+
+                    status.innerHTML = `✓ Hologram Active<br>📽 ${gltf.animations.length} animations<br>🎭 ${Object.keys(morphTargetNames).length} blend shapes`;
+                } else {
+                    status.innerHTML = `✓ Hologram Loaded<br>🎭 ${Object.keys(morphTargetNames).length} blend shapes`;
+                }
+
+                // Log morph target names for debugging
+                console.log('Available morph targets:', morphTargetNames);
+                console.log('Available animations:', Object.keys(animations));
+            },
+            (progress) => {
+                if (progress.total > 0) {
+                    const pct = Math.round((progress.loaded / progress.total) * 100);
+                    status.textContent = 'Loading: ' + pct + '%';
+                }
+            },
+            (error) => {
+                status.textContent = 'Error: ' + (error.message || 'Load failed');
+                console.error('GLB Load Error:', error);
+            }
+        );
+
+        // Animation control functions
+        function playAnimation(name) {
+            if (animations[name]) {
+                animations[name].reset().play();
+                // Update button state
+                document.querySelectorAll('.btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.textContent === name);
+                });
+            }
+        }
+
+        function stopAllAnimations() {
+            Object.values(animations).forEach(action => action.stop());
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function playAllAnimations() {
+            Object.values(animations).forEach(action => action.reset().play());
+        }
+
+        // Expression sliders (blend shapes)
+        function setupExpressionSlider(id) {
+            const slider = document.getElementById(id);
+            const valSpan = document.getElementById(id + '-val');
+
+            slider.addEventListener('input', () => {
+                const value = slider.value / 100;
+                valSpan.textContent = slider.value + '%';
+
+                // Apply to all morph meshes
+                morphMeshes.forEach(mesh => {
+                    if (mesh.morphTargetDictionary) {
+                        // Try common naming conventions
+                        const possibleNames = [
+                            id,
+                            id.charAt(0).toUpperCase() + id.slice(1),
+                            id.toUpperCase(),
+                            'expression_' + id,
+                            'Expression_' + id
+                        ];
+
+                        for (const name of possibleNames) {
+                            if (mesh.morphTargetDictionary[name] !== undefined) {
+                                mesh.morphTargetInfluences[mesh.morphTargetDictionary[name]] = value;
+                                break;
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        setupExpressionSlider('smile');
+        setupExpressionSlider('sad');
+        setupExpressionSlider('worried');
+        setupExpressionSlider('angry');
+
+        // Speak function for lipsync integration
+        window.hologramSpeak = function (intensity = 1) {
+            morphMeshes.forEach(mesh => {
+                if (mesh.morphTargetDictionary) {
+                    // Try common lip sync morph target names
+                    const lipNames = ['talk', 'Talk', 'speak', 'Speak', 'mouthOpen', 'MouthOpen', 'jawOpen', 'JawOpen'];
+                    for (const name of lipNames) {
+                        if (mesh.morphTargetDictionary[name] !== undefined) {
+                            mesh.morphTargetInfluences[mesh.morphTargetDictionary[name]] = intensity;
+                            break;
+                        }
+                    }
+                }
+            });
+        };
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            if (mixer) mixer.update(delta);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+
+</html>

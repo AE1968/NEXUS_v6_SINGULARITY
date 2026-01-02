@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>KELION Hologram - Original Purchased Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050510;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            color: #00f3ff;
+        }
+
+        #hologram-container {
+            position: fixed;
+            inset: 0;
+        }
+
+        #status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 20, 40, 0.9);
+            padding: 15px 25px;
+            border: 1px solid #00f3ff;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+    </style>
+    <!-- Three.js + FBXLoader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/fflate.min.js"></script>
+</head>
+
+<body>
+    <div id="hologram-container"></div>
+    <div id="status">Loading...</div>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const log = (msg) => { console.log(msg); statusEl.innerHTML = msg; };
+
+        // Scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0, 5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.getElementById('hologram-container').appendChild(renderer.domElement);
+
+        // Lighting - Holographic style
+        scene.add(new THREE.AmbientLight(0x00f3ff, 0.6));
+
+        const light1 = new THREE.PointLight(0x00f3ff, 4, 20);
+        light1.position.set(-3, 3, 5);
+        scene.add(light1);
+
+        const light2 = new THREE.PointLight(0x00f3ff, 3, 20);
+        light2.position.set(3, 2, 4);
+        scene.add(light2);
+
+        const light3 = new THREE.PointLight(0x0088ff, 2, 15);
+        light3.position.set(0, -2, 3);
+        scene.add(light3);
+
+        // Load textures
+        const textureLoader = new THREE.TextureLoader();
+        const colorTexture = textureLoader.load('assets/kelion_holo/Textures/Textures/MaleHeadHolo_Color.png');
+        const opacityTexture = textureLoader.load('assets/kelion_holo/Textures/Textures/MaleHeadHolo_Opacity.png');
+
+        log("Loading FBX model with textures...");
+
+        // Load FBX
+        const loader = new THREE.FBXLoader();
+        let mixer = null;
+        const clock = new THREE.Clock();
+
+        loader.load('assets/kelion_holo/hologram.fbx',
+            (fbx) => {
+                log("FBX Loaded! Applying hologram materials...");
+
+                // Center and scale
+                const box = new THREE.Box3().setFromObject(fbx);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+
+                fbx.position.sub(center);
+                const scale = 4 / Math.max(size.x, size.y, size.z);
+                fbx.scale.setScalar(scale);
+                fbx.position.y = -0.5;
+
+                // Apply hologram material with textures
+                fbx.traverse((child) => {
+                    if (child.isMesh) {
+                        child.material = new THREE.MeshStandardMaterial({
+                            map: colorTexture,
+                            alphaMap: opacityTexture,
+                            color: 0x00f3ff,
+                            emissive: 0x00aaff,
+                            emissiveIntensity: 1.5,
+                            transparent: true,
+                            opacity: 0.95,
+                            roughness: 0.1,
+                            metalness: 0.5,
+                            side: THREE.DoubleSide
+                        });
+                    }
+                });
+
+                scene.add(fbx);
+
+                // Animations
+                if (fbx.animations && fbx.animations.length > 0) {
+                    mixer = new THREE.AnimationMixer(fbx);
+                    fbx.animations.forEach((clip) => {
+                        mixer.clipAction(clip).play();
+                    });
+                    log("✅ Hologram Active!<br>Playing " + fbx.animations.length + " animations<br>Model: FBX with original textures");
+                } else {
+                    log("✅ Hologram Loaded (no animations)");
+                }
+            },
+            (progress) => {
+                if (progress.total > 0) {
+                    const pct = Math.round(progress.loaded / progress.total * 100);
+                    log("Loading FBX: " + pct + "%");
+                }
+            },
+            (error) => {
+                log("Error: " + error.message);
+                console.error(error);
+            }
+        );
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animate
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            if (mixer) mixer.update(delta);
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+
+</html>

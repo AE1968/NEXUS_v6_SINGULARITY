@@ -17,6 +17,13 @@
         href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700&display=swap"
         rel="stylesheet">
 
+    <!-- THREE.JS & PLUGINS -->
+    <!-- CORE LIBRARIES (Three.js + GLTF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/fflate.min.js"></script>
+
     <style>
         :root {
             --cyan: #00f3ff;
@@ -92,6 +99,22 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity 2s ease-in-out;
+            display: none;
+            /* Hidden to show Hologram instead */
+        }
+
+        #hologram-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw;
+            height: 100vh;
+            z-index: 100;
+            pointer-events: none;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         #bg-image.active {
@@ -776,6 +799,7 @@
     </div>
 
     <canvas id="bg-canvas"></canvas>
+    <div id="hologram-container"></div>
     <div id="bg-image"></div>
     <div class="scan-line"></div>
 
@@ -1044,7 +1068,10 @@
         let currentAudio = null;
 
         async function speak(text) {
-            if (!state.voice) return;
+            if (!state.voice) {
+                if (window.hologram) window.hologram.calm();
+                return;
+            }
 
             // Stop previous audio if playing
             if (currentAudio) {
@@ -1080,7 +1107,10 @@
                 currentAudio = new Audio(url);
                 currentAudio.onended = () => {
                     document.body.classList.remove('speaking');
+                    if (window.hologram) window.hologram.calm();
                 };
+
+                if (window.hologram) window.hologram.speak();
                 currentAudio.play();
 
             } catch (err) {
@@ -1089,7 +1119,15 @@
                 const voices = window.speechSynthesis.getVoices();
                 // Try to find a male/romanian voice
                 utterance.voice = voices.find(v => v.lang.includes('ro') || v.name.includes('Male')) || voices[0];
-                utterance.onend = () => document.body.classList.remove('speaking');
+
+                utterance.onstart = () => {
+                    document.body.classList.add('speaking');
+                    if (window.hologram) window.hologram.speak();
+                };
+                utterance.onend = () => {
+                    document.body.classList.remove('speaking');
+                    if (window.hologram) window.hologram.calm();
+                };
                 window.speechSynthesis.speak(utterance);
             }
         }
@@ -1104,6 +1142,7 @@
             write('user', msg);
             input.value = "";
 
+            if (window.hologram) window.hologram.intensify();
             const thinking = write('bot', "Synapsing...");
 
             try {
@@ -1142,6 +1181,7 @@
             } catch (err) {
                 console.error("AI Processor Error:", err);
                 thinking.remove();
+                if (window.hologram) window.hologram.calm();
                 const errStatus = "Neural Link unstable. Please try again.";
                 write('bot', errStatus);
                 speak(errStatus);
@@ -1481,6 +1521,7 @@
 
                         mediaRecorder.onstart = () => {
                             isRecording = true;
+                            if (window.hologram) window.hologram.speak(); // Visual feedback for listening
                             micBtn.classList.add('recording');
                             micBtn.innerHTML = "🔴";
                             micBtn.style.color = "#f00";
@@ -1490,6 +1531,7 @@
 
                         mediaRecorder.onstop = async () => {
                             isRecording = false; // Reset state immediately
+                            if (window.hologram) window.hologram.intensify(); // Processing mode
 
                             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
 
@@ -1512,16 +1554,18 @@
                                 const data = await res.json();
                                 if (data.text) {
                                     $('chat-input').value = data.text;
-
-                                    // AUTO-SEND ON RELEASE
                                     const finalMsg = $('chat-input').value.trim();
                                     if (finalMsg !== "") {
-                                        console.log("Mic released. Auto-sending:", finalMsg);
                                         execute();
+                                    } else {
+                                        if (window.hologram) window.hologram.calm();
                                     }
+                                } else {
+                                    if (window.hologram) window.hologram.calm();
                                 }
                             } catch (e) {
                                 console.error("Whisper Error:", e);
+                                if (window.hologram) window.hologram.calm();
                                 $('chat-input').placeholder = "Error Transcribing";
                             }
 
@@ -1604,6 +1648,217 @@
             write('bot', welcomeText);
             speak(welcomeText);
         }
+
+        // ========================================
+        // KELION HOLOGRAM CORE (V6 - HOLOGRAPHIC HEAD ONLY)
+        // ========================================
+        class PlasmaHologram {
+            constructor(containerId) {
+                console.log("Hologram: Initializing Animated Head...");
+                this.container = document.getElementById(containerId);
+                if (!this.container) return;
+
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+                this.camera.position.set(0, 0, 4.5); // Reset camera Y to 0 for vertical center
+
+                this.rendererSize = Math.max(window.innerWidth, window.innerHeight);
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.container.innerHTML = '';
+                this.container.appendChild(this.renderer.domElement);
+
+                window.addEventListener('resize', () => {
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                });
+
+                this.clock = new THREE.Clock();
+                this.state = 'idle';
+                this.init();
+            }
+
+            init() {
+                // CREATE SCANLINE TEXTURE (Procedural)
+                const canvas = document.createElement('canvas');
+                canvas.width = 1; canvas.height = 64;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 1, 64);
+                ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 1, 32);
+                const scanlineTex = new THREE.CanvasTexture(canvas);
+                scanlineTex.wrapS = scanlineTex.wrapT = THREE.RepeatWrapping;
+                scanlineTex.repeat.set(1, 40);
+
+                // LIGHTING - HIGH DEFINITION
+                this.scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+                // Rim lights (Ultra Glow)
+                const rimL = new THREE.PointLight(0x00f3ff, 4, 15);
+                rimL.position.set(-5, 2, -2);
+                this.scene.add(rimL);
+
+                const rimR = new THREE.PointLight(0x00f3ff, 4, 15);
+                rimR.position.set(5, 2, -2);
+                this.scene.add(rimR);
+
+                // Face point light
+                this.glow = new THREE.PointLight(0x00f3ff, 3, 10);
+                this.glow.position.set(0, 0, 3);
+                this.scene.add(this.glow);
+
+                // LOAD MODEL
+                // LOAD MODEL - FBX (Clean & Simple)
+                const loader = new THREE.FBXLoader();
+                const fbxPath = 'assets/kelion_holo/hologram.fbx'; // Renamed for stability
+
+                loader.load(fbxPath, (fbx) => {
+                    console.log("Hologram: ACTIVATING FBX CORE...");
+
+                    // 1. Rig Group
+                    this.rig = new THREE.Group();
+                    this.scene.add(this.rig);
+
+                    // 2. Raw Model
+                    const rawModel = fbx;
+                    // 3. Auto-Center & Scale Rig
+                    const box = new THREE.Box3().setFromObject(rawModel);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+
+                    rawModel.position.sub(center); // Cancel out internal offsets
+                    this.rig.add(rawModel);
+
+                    // 4. Force Visual Size (Height 4.5 units)
+                    const targetHeight = 4.5;
+                    const scaleFactor = targetHeight / size.y;
+                    this.rig.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                    this.rig.position.set(0, -1.0, 0); // Center in lower viewport
+
+                    this.model = this.rig;
+
+                    /* AUTOMATIC CENTERING LOGIC REMOVED
+                    const box = new THREE.Box3().setFromObject(this.model);
+                    const center = new THREE.Vector3();
+                    box.getCenter(center);
+                    const size = new THREE.Vector3();
+                    box.getSize(size);
+
+                    // Offset to world center
+                    this.model.position.x += (this.model.position.x - center.x);
+                    this.model.position.y += (this.model.position.y - center.y);
+                    this.model.position.z += (this.model.position.z - center.z);
+
+                    // Controlled Scale (Normalize to height of ~3.8 units for perfect framing)
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const targetScale = 3.8 / maxDim;
+                    this.model.scale.set(targetScale, targetScale, targetScale);
+                    */
+
+                    // Setup Animations
+                    this.mixer = new THREE.AnimationMixer(rawModel);
+                    this.actions = {};
+                    console.log("--- FBX ANIMATIONS ---", fbx.animations.map(a => a.name));
+
+                    if (fbx.animations) {
+                        fbx.animations.forEach(clip => {
+                            // FBX names are often complex like "mixamorig:Blink"
+                            const cleanName = clip.name.toLowerCase();
+                            const action = this.mixer.clipAction(clip);
+                            this.actions[cleanName] = action;
+
+                            // Map standard keys
+                            if (cleanName.includes('blink')) this.actions['blink'] = action;
+                            if (cleanName.includes('speak') || cleanName.includes('talk')) this.actions['speak'] = action;
+                        });
+                    }
+
+                    if (this.actions['blink']) this.actions['blink'].play();
+
+                    rawModel.traverse(n => {
+                        if (n.isMesh) {
+                            n.material = new THREE.MeshStandardMaterial({
+                                color: 0x0088ff,
+                                emissive: 0x00f3ff,
+                                emissiveIntensity: 2.0,
+                                transparent: true,
+                                opacity: 0.85,
+                                roughness: 0.1,
+                                metalness: 0.8,
+                                emissiveMap: scanlineTex,
+                                blending: THREE.AdditiveBlending,
+                                side: THREE.DoubleSide
+                            });
+
+                            if (n.name.toLowerCase().includes('eye')) {
+                                n.material.emissiveIntensity = 6.0;
+                                n.material.opacity = 1.0;
+                            }
+                        }
+                    });
+                    // this.scene.add(this.model); // Already added rig above
+                    this.scanlineTex = scanlineTex;
+                }, undefined, (err) => console.error("Hologram FBX ERROR", err));
+
+                this.animate();
+            }
+
+            speak() {
+                this.state = 'speaking';
+                this.glow.color.setHex(0xffffff);
+                this.glow.intensity = 6;
+                if (this.actions['speak']) {
+                    this.actions['speak'].reset().fadeIn(0.2).play();
+                }
+            }
+            intensify() {
+                this.state = 'thinking';
+                this.glow.color.setHex(0xff00ff);
+                this.glow.intensity = 8;
+            }
+            calm() {
+                this.state = 'idle';
+                this.glow.color.setHex(0x00f3ff);
+                this.glow.intensity = 4; // Higher idle glow
+                if (this.actions['speak']) {
+                    this.actions['speak'].fadeOut(0.5);
+                }
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                const time = this.clock.getElapsedTime();
+                const delta = this.clock.getDelta();
+
+                if (this.mixer) this.mixer.update(delta);
+                if (this.scanlineTex) this.scanlineTex.offset.y = time * 0.1;
+
+                if (this.model) {
+                    this.model.rotation.y = Math.sin(time * 0.2) * 0.05;
+                    this.model.position.y = (this.baseY || 0) + Math.sin(time * 2) * 0.05;
+
+                    const flicker = 0.95 + Math.random() * 0.05;
+                    this.model.traverse(n => {
+                        if (n.isMesh) {
+                            if (this.state === 'speaking') {
+                                n.material.emissive.setHex(0xffffff);
+                                n.material.emissiveIntensity = 1.2 * flicker;
+                            } else if (this.state === 'thinking') {
+                                n.material.emissive.setHex(0xff00ff);
+                                n.material.emissiveIntensity = 1.5;
+                            } else {
+                                n.material.emissive.setHex(0x00f3ff);
+                                n.material.emissiveIntensity = 0.7 * flicker;
+                            }
+                        }
+                    });
+                }
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        window.addEventListener('load', () => { setTimeout(() => { window.hologram = new PlasmaHologram('hologram-container'); }, 300); });
     </script>
 
     <!-- 

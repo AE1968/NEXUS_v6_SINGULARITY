@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>KELION Hologram Final</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #050510;
+            overflow: hidden;
+        }
+
+        #holo {
+            position: fixed;
+            inset: 0;
+        }
+
+        #info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: #0ff;
+            font: 14px sans-serif;
+            background: rgba(0, 20, 40, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+
+<body>
+    <div id="holo"></div>
+    <div id="info">Loading...</div>
+    <script>
+        const info = document.getElementById('info');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 100);
+        camera.position.set(0, 0.2, 4);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(innerWidth, innerHeight);
+        document.getElementById('holo').appendChild(renderer.domElement);
+
+        // Cyan holographic lighting
+        scene.add(new THREE.AmbientLight(0x00f3ff, 0.8));
+        const p1 = new THREE.PointLight(0x00f3ff, 5, 15); p1.position.set(-3, 3, 5); scene.add(p1);
+        const p2 = new THREE.PointLight(0x00f3ff, 4, 15); p2.position.set(3, 2, 4); scene.add(p2);
+        const p3 = new THREE.PointLight(0x0066ff, 3, 10); p3.position.set(0, -2, 3); scene.add(p3);
+
+        // Load textures
+        const tl = new THREE.TextureLoader();
+        const colorTex = tl.load('assets/kelion_holo/Textures/Textures/MaleHeadHolo_Color.png');
+        const opacityTex = tl.load('assets/kelion_holo/Textures/Textures/MaleHeadHolo_Opacity.png');
+
+        let mixer, clock = new THREE.Clock();
+
+        new THREE.GLTFLoader().load('assets/hologram.glb', (gltf) => {
+            const model = gltf.scene;
+
+            // Center & scale to fit frame
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            model.position.sub(center);
+            model.scale.setScalar(3.5 / Math.max(size.x, size.y, size.z));
+            model.position.y = -0.3; // Center vertically
+
+            // Apply holographic material with textures
+            model.traverse(n => {
+                if (n.isMesh) {
+                    n.material = new THREE.MeshStandardMaterial({
+                        map: colorTex,
+                        alphaMap: opacityTex,
+                        color: 0x00f3ff,
+                        emissive: 0x00aaff,
+                        emissiveIntensity: 2.0,
+                        transparent: true,
+                        opacity: 0.95,
+                        roughness: 0.05,
+                        metalness: 0.3,
+                        side: THREE.DoubleSide
+                    });
+                }
+            });
+
+            scene.add(model);
+
+            if (gltf.animations.length) {
+                mixer = new THREE.AnimationMixer(model);
+                gltf.animations.forEach(c => mixer.clipAction(c).play());
+                info.textContent = '✅ Hologram Active - ' + gltf.animations.length + ' animations';
+            } else {
+                info.textContent = '✅ Hologram Loaded';
+            }
+        }, p => {
+            if (p.total) info.textContent = 'Loading: ' + Math.round(p.loaded / p.total * 100) + '%';
+        }, e => info.textContent = 'Error: ' + e.message);
+
+        addEventListener('resize', () => {
+            camera.aspect = innerWidth / innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(innerWidth, innerHeight);
+        });
+
+        (function animate() {
+            requestAnimationFrame(animate);
+            if (mixer) mixer.update(clock.getDelta());
+            renderer.render(scene, camera);
+        })();
+    </script>
+</body>
+
+</html>

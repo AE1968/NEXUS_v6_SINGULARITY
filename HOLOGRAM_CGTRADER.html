@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>KELION Hologram - CGTrader Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        #hologram-container {
+            position: fixed;
+            inset: 0;
+        }
+
+        /* HIDDEN - Status info for development only */
+        #status {
+            display: none !important;
+        }
+
+        /* HIDDEN - Functions callable by AI via window.hologram API */
+        #controls {
+            display: none !important;
+        }
+
+        .btn {
+            background: rgba(0, 50, 80, 0.8);
+            color: #00f3ff;
+            border: 1px solid #00f3ff;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: rgba(0, 100, 150, 0.9);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+        }
+
+        .btn.active {
+            background: #00f3ff;
+            color: #000;
+        }
+
+        /* HIDDEN - Expressions controlled by AI */
+        #expression-panel {
+            display: none !important;
+        }
+
+        #expression-panel h3 {
+            color: #00f3ff;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+
+        .slider-group {
+            margin-bottom: 8px;
+        }
+
+        .slider-group label {
+            color: #00f3ff;
+            font-size: 10px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .slider-group input[type="range"] {
+            width: 100%;
+            accent-color: #00f3ff;
+        }
+    </style>
+    <!-- Three.js r128 for compatibility -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Post-processing for BLOOM effect like CGTrader -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+</head>
+
+<body>
+    <div id="hologram-container"></div>
+    <div id="status">Loading CGTrader Model...</div>
+
+    <div id="expression-panel">
+        <h3>🎭 Blend Shapes (Expressions)</h3>
+        <div class="slider-group">
+            <label>😊 Smile: <span id="smile-val">0%</span></label>
+            <input type="range" id="smile" min="0" max="100" value="0">
+        </div>
+        <div class="slider-group">
+            <label>😢 Sad: <span id="sad-val">0%</span></label>
+            <input type="range" id="sad" min="0" max="100" value="0">
+        </div>
+        <div class="slider-group">
+            <label>😟 Worried: <span id="worried-val">0%</span></label>
+            <input type="range" id="worried" min="0" max="100" value="0">
+        </div>
+        <div class="slider-group">
+            <label>😠 Angry: <span id="angry-val">0%</span></label>
+            <input type="range" id="angry" min="0" max="100" value="0">
+        </div>
+    </div>
+
+    <div id="controls"></div>
+
+    <script>
+        const status = document.getElementById('status');
+        const container = document.getElementById('hologram-container');
+        const controlsDiv = document.getElementById('controls');
+
+        // Scene setup - BLACK background as per CGTrader preview
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+
+        // Camera - positioned to show full head
+        const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0.3, 4.5);
+
+        // Renderer with MAXIMUM quality settings
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio); // FULL resolution
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        container.appendChild(renderer.domElement);
+
+        // === BLOOM POST-PROCESSING - CGTrader GLOW EFFECT ===
+        const composer = new THREE.EffectComposer(renderer);
+        const renderPass = new THREE.RenderPass(scene, camera);
+        composer.addPass(renderPass);
+
+        // Bloom settings tuned to match CGTrader's soft glow
+        const bloomPass = new THREE.UnrealBloomPass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight),
+            1.5,    // strength - intensity of the glow
+            0.4,    // radius - how far the glow spreads
+            0.35    // threshold - higher = clearer face details
+        );
+        composer.addPass(bloomPass);
+
+        // === LIGHTING - MATCHING CGTRADER EEVEE RENDERING ===
+        // Strong ambient for even base illumination
+        scene.add(new THREE.AmbientLight(0x00ccff, 1.0));
+
+        // Front key light - bright cyan
+        const frontLight = new THREE.DirectionalLight(0x00f3ff, 2.5);
+        frontLight.position.set(0, 0, 5);
+        scene.add(frontLight);
+
+        // Top fill light
+        const topLight = new THREE.PointLight(0x00aaff, 2.0, 20);
+        topLight.position.set(0, 5, 3);
+        scene.add(topLight);
+
+        // Rim lights for edge glow effect
+        const leftRim = new THREE.PointLight(0x00f3ff, 2.0, 15);
+        leftRim.position.set(-4, 1, 2);
+        scene.add(leftRim);
+
+        const rightRim = new THREE.PointLight(0x00f3ff, 2.0, 15);
+        rightRim.position.set(4, 1, 2);
+        scene.add(rightRim);
+
+        // Back light for depth
+        const backLight = new THREE.PointLight(0x0066ff, 1.5, 15);
+        backLight.position.set(0, 0, -5);
+        scene.add(backLight);
+
+        // === LOAD CGTRADER TEXTURES ===
+        const textureLoader = new THREE.TextureLoader();
+
+        // Color texture - the wireframe pattern
+        const colorTexture = textureLoader.load('assets/cgtrader_full/Textures/MaleHeadHolo_Color.png');
+        colorTexture.encoding = THREE.sRGBEncoding;
+
+        // Opacity texture - creates transparency between lines
+        const opacityTexture = textureLoader.load('assets/cgtrader_full/Textures/MaleHeadHolo_Opacity.png');
+
+        let mixer = null;
+        let model = null;
+        let animations = {};
+        let morphMeshes = [];
+        let morphTargetNames = {};
+        const clock = new THREE.Clock();
+
+        // === LOAD CGTRADER GLB MODEL ===
+        const loader = new THREE.GLTFLoader();
+        loader.load('assets/cgtrader_full/uploads_files_4723651_HologramMaleHead3DModelAnimatedWithFacialExpressions.glb',
+            (gltf) => {
+                model = gltf.scene;
+
+                // Calculate bounds for centering
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+
+                // Center model
+                model.position.x = -center.x;
+                model.position.y = -center.y;
+                model.position.z = -center.z;
+
+                // Scale to fit view
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const targetScale = 2.0 / maxDim;
+                model.scale.setScalar(targetScale);
+                model.position.y -= 0.15;
+
+                // === APPLY CGTRADER TEXTURES AS PER THEIR INSTRUCTIONS ===
+                // "Color and Opacity textures mapped to color and transparency channels"
+                model.traverse((node) => {
+                    if (node.isMesh) {
+                        // Store meshes with morph targets for expressions
+                        if (node.morphTargetInfluences && node.morphTargetInfluences.length > 0) {
+                            morphMeshes.push(node);
+                            if (node.morphTargetDictionary) {
+                                Object.assign(morphTargetNames, node.morphTargetDictionary);
+                            }
+                        }
+
+                        // === CGTRADER HOLOGRAM MATERIAL - EMISSIVE FOR BLOOM ===
+                        // Bright emissive cyan that glows with bloom pass
+                        node.material = new THREE.MeshStandardMaterial({
+                            map: colorTexture,              // Color texture
+                            alphaMap: opacityTexture,       // Opacity for transparency
+                            emissive: new THREE.Color(0x00ffff),  // Pure cyan emission
+                            emissiveMap: colorTexture,      // Texture controls emission pattern
+                            emissiveIntensity: 2.0,         // Reduced for better face clarity
+                            transparent: true,
+                            alphaTest: 0.1,                 // Higher = sharper facial features
+                            opacity: 1.0,
+                            side: THREE.DoubleSide,
+                            roughness: 1.0,
+                            metalness: 0.0
+                        });
+
+                        // Keep morph targets working
+                        if (node.morphTargetInfluences) {
+                            node.material.morphTargets = true;
+                        }
+                    }
+                });
+
+                scene.add(model);
+
+                // === SETUP ANIMATIONS (10 total as per CGTrader) ===
+                if (gltf.animations && gltf.animations.length > 0) {
+                    mixer = new THREE.AnimationMixer(model);
+
+                    gltf.animations.forEach((clip) => {
+                        const action = mixer.clipAction(clip);
+                        animations[clip.name] = action;
+
+                        // Create button for each animation
+                        const btn = document.createElement('button');
+                        btn.className = 'btn';
+                        btn.textContent = clip.name;
+                        btn.onclick = () => playAnimation(clip.name);
+                        controlsDiv.appendChild(btn);
+                    });
+
+                    // Control buttons
+                    const stopBtn = document.createElement('button');
+                    stopBtn.className = 'btn';
+                    stopBtn.textContent = '⏹ Stop';
+                    stopBtn.onclick = stopAllAnimations;
+                    controlsDiv.appendChild(stopBtn);
+
+                    const playAllBtn = document.createElement('button');
+                    playAllBtn.className = 'btn';
+                    playAllBtn.textContent = '▶ All';
+                    playAllBtn.onclick = playAllAnimations;
+                    controlsDiv.appendChild(playAllBtn);
+                }
+
+                status.innerHTML = `✓ CGTrader Model Active<br>📽 ${gltf.animations.length} animations<br>🎭 ${Object.keys(morphTargetNames).length} blend shapes`;
+
+                console.log('Morph targets:', morphTargetNames);
+                console.log('Animations:', Object.keys(animations));
+
+                // === START AUTO BEHAVIORS ===
+                startAutoBehaviors();
+            },
+            (progress) => {
+                if (progress.total > 0) {
+                    const pct = Math.round((progress.loaded / progress.total) * 100);
+                    status.textContent = 'Loading: ' + pct + '%';
+                }
+            },
+            (error) => {
+                status.textContent = 'Error: ' + (error.message || 'Load failed');
+                console.error('GLB Load Error:', error);
+            }
+        );
+
+        // Animation functions
+        function playAnimation(name) {
+            if (animations[name]) {
+                animations[name].reset().play();
+                document.querySelectorAll('.btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.textContent === name);
+                });
+            }
+        }
+
+        function stopAllAnimations() {
+            Object.values(animations).forEach(action => action.stop());
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function playAllAnimations() {
+            Object.values(animations).forEach(action => action.reset().play());
+        }
+
+        // === BLEND SHAPES / EXPRESSIONS (as per CGTrader: smile, sad, worried, angry) ===
+        function setupExpressionSlider(id) {
+            const slider = document.getElementById(id);
+            const valSpan = document.getElementById(id + '-val');
+
+            slider.addEventListener('input', () => {
+                const value = slider.value / 100;
+                valSpan.textContent = slider.value + '%';
+
+                morphMeshes.forEach(mesh => {
+                    if (mesh.morphTargetDictionary) {
+                        // Try various naming conventions
+                        const names = [id, id.charAt(0).toUpperCase() + id.slice(1), id.toUpperCase()];
+                        for (const name of names) {
+                            if (mesh.morphTargetDictionary[name] !== undefined) {
+                                mesh.morphTargetInfluences[mesh.morphTargetDictionary[name]] = value;
+                                break;
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        setupExpressionSlider('smile');
+        setupExpressionSlider('sad');
+        setupExpressionSlider('worried');
+        setupExpressionSlider('angry');
+
+        // ===== AI CALLABLE API - ALL FUNCTIONS EXPOSED ON window.hologram =====
+        window.hologram = {
+            // Play specific animation by name
+            playAnimation: function (name) {
+                if (animations[name]) {
+                    animations[name].reset().play();
+                    return true;
+                }
+                return false;
+            },
+
+            // Stop all animations
+            stopAnimations: function () {
+                Object.values(animations).forEach(action => action.stop());
+            },
+
+            // Play all animations
+            playAllAnimations: function () {
+                Object.values(animations).forEach(action => action.reset().play());
+            },
+
+            // Set expression (blend shape) - value 0-1
+            setExpression: function (name, value) {
+                morphMeshes.forEach(mesh => {
+                    if (mesh.morphTargetDictionary) {
+                        const names = [name, name.charAt(0).toUpperCase() + name.slice(1), name.toUpperCase()];
+                        for (const n of names) {
+                            if (mesh.morphTargetDictionary[n] !== undefined) {
+                                mesh.morphTargetInfluences[mesh.morphTargetDictionary[n]] = Math.max(0, Math.min(1, value));
+                                return true;
+                            }
+                        }
+                    }
+                });
+                return false;
+            },
+
+            // Convenience expression functions
+            smile: function (intensity = 1) { return this.setExpression('smile', intensity); },
+            sad: function (intensity = 1) { return this.setExpression('sad', intensity); },
+            worried: function (intensity = 1) { return this.setExpression('worried', intensity); },
+            angry: function (intensity = 1) { return this.setExpression('angry', intensity); },
+            neutral: function () {
+                this.smile(0); this.sad(0); this.worried(0); this.angry(0);
+            },
+
+            // Lipsync speak function
+            speak: function (intensity = 1) {
+                morphMeshes.forEach(mesh => {
+                    if (mesh.morphTargetDictionary) {
+                        const lipNames = ['speak', 'Speak', 'talk', 'Talk', 'mouthOpen'];
+                        for (const name of lipNames) {
+                            if (mesh.morphTargetDictionary[name] !== undefined) {
+                                mesh.morphTargetInfluences[mesh.morphTargetDictionary[name]] = intensity;
+                                break;
+                            }
+                        }
+                    }
+                });
+            },
+
+            // Animation shortcuts (CGTrader animations)
+            turnLeft: function () { return this.playAnimation('TurnLeft'); },
+            turnRight: function () { return this.playAnimation('TurnRight'); },
+            turnUp: function () { return this.playAnimation('TurnUp'); },
+            turnDown: function () { return this.playAnimation('TurnDown'); },
+            lookLeft: function () { return this.playAnimation('LookLeft'); },
+            lookRight: function () { return this.playAnimation('LookRight'); },
+            lookUp: function () { return this.playAnimation('LookUp'); },
+            lookDown: function () { return this.playAnimation('LookDown'); },
+            blink: function () { return this.playAnimation('Blink'); },
+            speakAnim: function () { return this.playAnimation('Speak'); },
+
+            // Get available animations and expressions
+            getAnimations: function () { return Object.keys(animations); },
+            getExpressions: function () { return Object.keys(morphTargetNames); },
+
+            // State
+            isLoaded: function () { return model !== null; }
+        };
+
+        // Legacy support
+        window.hologramSpeak = window.hologram.speak;
+
+        // ===== AUTO BEHAVIORS - HOLOGRAM ACTS ALIVE =====
+        let autoBehaviorActive = true;
+        let lastBlinkTime = 0;
+        let nextBlinkDelay = 3000;
+        let lastLookTime = 0;
+        let nextLookDelay = 5000;
+
+        function startAutoBehaviors() {
+            console.log('Starting auto behaviors...');
+
+            // Auto-blink every 3-5 seconds
+            function checkBlink(currentTime) {
+                if (currentTime - lastBlinkTime > nextBlinkDelay) {
+                    if (animations['Blink'] && autoBehaviorActive) {
+                        animations['Blink'].reset().play();
+                    }
+                    lastBlinkTime = currentTime;
+                    nextBlinkDelay = 3000 + Math.random() * 2000; // 3-5 sec random
+                }
+            }
+
+            // Random subtle looks every 5-10 seconds
+            function checkLook(currentTime) {
+                if (currentTime - lastLookTime > nextLookDelay) {
+                    if (autoBehaviorActive) {
+                        const lookAnims = ['LookLeft', 'LookRight', 'LookUp', 'LookDown'];
+                        const randomLook = lookAnims[Math.floor(Math.random() * lookAnims.length)];
+                        if (animations[randomLook]) {
+                            animations[randomLook].reset().play();
+                        }
+                    }
+                    lastLookTime = currentTime;
+                    nextLookDelay = 5000 + Math.random() * 5000; // 5-10 sec random
+                }
+
+                // === AUTO BRIGHTNESS/BREATHING EFFECT ===
+                // Subtle luminosity pulsing to make hologram look alive
+                let baseEmissive = 2.0;  // Lower for better face clarity
+                let breathingPhase = 0;
+                let clarityPhase = 0;
+
+                function updateBrightness(deltaTime) {
+                    if (!autoBehaviorActive) return;
+
+                    // Slow breathing cycle (about 4 seconds per cycle)
+                    breathingPhase += deltaTime * 0.0015;
+
+                    // Sine wave oscillation between 2.5 and 3.5 intensity
+                    const breathIntensity = baseEmissive + Math.sin(breathingPhase) * 0.5;
+
+                    // Update all mesh materials
+                    morphMeshes.forEach(mesh => {
+                        if (mesh.material && mesh.material.emissiveIntensity !== undefined) {
+                            mesh.material.emissiveIntensity = breathIntensity;
+                        }
+                    });
+
+                    // Also subtly adjust bloom strength
+                    if (bloomPass) {
+                        bloomPass.strength = 1.5 + Math.sin(breathingPhase * 0.5) * 0.2;
+                    }
+                }
+
+                // === AUTO CLARITY ADJUSTMENT ===
+                // Subtle variations in sharpness for dynamic look
+                function updateClarity(deltaTime) {
+                    if (!autoBehaviorActive) return;
+
+                    // Slow clarity cycle (about 6 seconds per cycle)
+                    clarityPhase += deltaTime * 0.001;
+
+                    // Vary bloom threshold for clarity (0.15 to 0.25)
+                    if (bloomPass) {
+                        bloomPass.threshold = 0.2 + Math.sin(clarityPhase) * 0.05;
+                    }
+
+                    // Slight alpha test variation for edge sharpness
+                    const clarityValue = 0.05 + Math.sin(clarityPhase * 0.7) * 0.02;
+                    morphMeshes.forEach(mesh => {
+                        if (mesh.material && mesh.material.alphaTest !== undefined) {
+                            mesh.material.alphaTest = clarityValue;
+                        }
+                    });
+                }
+
+                // Add to animation loop
+                const originalAnimate = animate;
+                window.autoBehaviorTick = function (time) {
+                    checkBlink(time);
+                    checkLook(time);
+                    const delta = time - (window.lastTickTime || 0);
+                    updateBrightness(delta);
+                    updateClarity(delta);
+                    window.lastTickTime = time;
+                };
+            }
+
+            // Control auto behaviors from AI
+            window.hologram.setAutoBehavior = function (enabled) {
+                autoBehaviorActive = enabled;
+            };
+            window.hologram.pauseAuto = function () { autoBehaviorActive = false; };
+            window.hologram.resumeAuto = function () { autoBehaviorActive = true; };
+
+            // === CLARITY CONTROLS FOR AI ===
+            window.hologram.setClarity = function (value) {
+                // value: 0.01 (very soft) to 0.2 (very sharp)
+                morphMeshes.forEach(mesh => {
+                    if (mesh.material) {
+                        mesh.material.alphaTest = value;
+                    }
+                });
+                if (bloomPass) {
+                    bloomPass.threshold = value * 2;  // Higher threshold = sharper
+                }
+            };
+            window.hologram.sharpen = function () { window.hologram.setClarity(0.15); };
+            window.hologram.soften = function () { window.hologram.setClarity(0.02); };
+            window.hologram.normalClarity = function () { window.hologram.setClarity(0.05); };
+
+            // === BRIGHTNESS CONTROLS FOR AI ===
+            window.hologram.setBrightness = function (intensity) {
+                // intensity: 0-5, default 3
+                morphMeshes.forEach(mesh => {
+                    if (mesh.material) {
+                        mesh.material.emissiveIntensity = intensity;
+                    }
+                });
+                if (bloomPass) {
+                    bloomPass.strength = intensity / 2;
+                }
+            };
+            window.hologram.intensify = function () { window.hologram.setBrightness(4.5); };
+            window.hologram.dim = function () { window.hologram.setBrightness(1.5); };
+            window.hologram.normalBrightness = function () { window.hologram.setBrightness(3.0); };
+
+            // Resize handler - update both renderer and composer
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                composer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // Animation loop with auto behaviors and BLOOM
+            let animTime = 0;
+            function animate() {
+                requestAnimationFrame(animate);
+                const delta = clock.getDelta();
+                animTime += delta * 1000;
+                if (mixer) mixer.update(delta);
+                if (window.autoBehaviorTick) window.autoBehaviorTick(animTime);
+                composer.render();  // Use composer for bloom effect
+            }
+            animate();
+    </script>
+</body>
+
+</html>

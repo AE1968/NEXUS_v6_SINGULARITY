@@ -1,6 +1,54 @@
+# 🚀 KELION v142.2 (Project K) - DEPLOYMENT ROADMAP
+Status: **READY FOR DEPLOYMENT**
+Artifacts: `hologram_k.php`, `KELION_v142_2_HOLO_K.html`
+
+## 💎 PHASE 1: CORE DEPLOYMENT (Immediate)
+- [ ] **Backend Setup**:
+  - [ ] Deploy `hologram_k.php` to server root or `/hologram` path.
+  - [ ] Create `uploads/` directory with write permissions (755).
+  - [ ] Verify `php-curl` extension is enabled on server.
+- [ ] **Asset Management**:
+  - [ ] Upload `k.glb` model to `assets/kelion_holo/k.glb`.
+  - [ ] Verify file permissions for the GLB model.
+- [ ] **Security & Environment**:
+  - [ ] Set `OPENAI_API_KEY` in server environment variables (Safe Mode).
+  - [ ] Verify `.htaccess` protects the `uploads/` directory from PHPShell execution.
+
+## 💎 PHASE 2: INTEGRATION & TESTING
+- [ ] **Frontend Integration**:
+  - [ ] Validate `KELION_v142_2_HOLO_K.html` features on live URL.
+  - [ ] Test "OPEN K.GLB" button with the live `k.glb` asset.
+- [ ] **AI Modules Check**:
+  - [ ] **TTS**: Test text-to-speech endpoint `/api/tts` via `hologram_k.php`.
+  - [ ] **STT**: Test microphone input (`/api/stt` or `/api/transcribe`).
+  - [ ] **Chat**: Verify GPT-4o-mini connection.
+  - [ ] **Lip Sync**: Confirm audio analyzer matches visual mouth movement on live server.
+
+---
 # 🚨 KELION v143.0 - URGENT RESOLUTION FLAG
 
 # 🔴 ALERTA: FUNCTIILE NU FUNCTIONEAZA - NU FUNCTIONEAZA NIMIC
+
+## 📦 HOLOGRAM MODEL SPECIFICATIONS (REQUISITES)
+- **Formate incluse**: FBX, OBJ, ABC, DAE, GLB, PLY, STL, BLEND, UnityPackage
+- **Format nativ**: BLEND (Render engine: Eevee)
+- **Geometrie**: 71,971 Poligoane, 72,129 Vertices
+- **Texturi**: Color, Opacity (2k resolution)
+- **Sistem**: Rigged and animated
+- **Animații de implementat**: 
+  - `turn_left`, `turn_right`, `turn_up`, `turn_down`
+  - `look_left`, `look_right`, `look_up`, `look_down`
+  - `speak`, `blink`
+- **Blend Shapes (Expresii)**: Smile, Sad, Worried, Angry
+- **Logica**: Combinare expresii (e.g. 50% sad, 20% worried)
+- **Status**: Doar modelul de bază GLB este încărcat. Animațiile și blend shape-urile necesită activarea Mixer-ului Three.js.
+
+## 🔴 TODO: IMPLEMENTARE HOLOGRAMĂ (URGENT)
+- [ ] Conectarea animației `blink` în timpul stării 'idle'.
+- [ ] Conectarea animației `speak` cu fluxul `/api/tts`.
+- [ ] Implementarea logică a expresiilor: `setEmotion(smile, intensity)`.
+- [ ] Sincronizarea `look_at` cu mișcarea cursorului (opțional).
+- [ ] Migrarea completă a rig-ului din FBX/BLEND în sistemul live.
 
 Următoarele funcționalități sunt în curs de implementare sau necesită atenție imediată:
 
@@ -50,7 +98,7 @@ Următoarele funcționalități sunt în curs de implementare sau necesită aten
 - [x] **Registration Flow**: Accesarea formatului de "User Nou" se face doar prin link-ul dedicat din ecranul de login, păstrând fluxul principal curat.
 
 ### 4. Visuals & AI (Source: 'Hologram Visuals', 'Lip Sync')
-- [ ] **Hologram**: "Force & Calm" visual style (Male Head) - *Requires external 3D asset (GLB).*
+- [ ] **Hologram K**: "Force & Calm" visual style (Name: K) - *Requires external 3D asset (GLB).*
 - [x] **Animation**: Lip Sync implementation (Frame Swapping/Visemes) - Module `js/3d-systems.js` deployed.
 - [x] **3D Globe**: Interactive IP Map - Module `js/3d-systems.js` deployed.
 - [x] **Energy Sphere**: Visual asset generation - Module `js/3d-systems.js` deployed.

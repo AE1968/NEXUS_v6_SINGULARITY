@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>KELION v142.3 - Hologram Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050505;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            color: #00f3ff;
+        }
+
+        #hologram-container {
+            position: fixed;
+            inset: 0;
+        }
+
+        #status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 20, 40, 0.9);
+            padding: 15px 25px;
+            border: 1px solid #00f3ff;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        #open-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 20, 40, 0.9);
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        #open-btn:hover {
+            background: #ff00ff;
+            color: #000;
+        }
+    </style>
+    <!-- Three.js + GLTFLoader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+
+<body>
+    <div id="hologram-container"></div>
+    <div id="status">Initializing...</div>
+    <button id="open-btn">OPEN LOCAL GLB</button>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const log = (msg) => {
+            console.log(msg);
+            statusEl.textContent = msg;
+        };
+
+        class HologramViewer {
+            constructor(containerId) {
+                log("Creating scene...");
+                this.container = document.getElementById(containerId);
+
+                // Scene
+                this.scene = new THREE.Scene();
+
+                // Camera
+                this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+                this.camera.position.set(0, 0.5, 4);
+
+                // Renderer
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.container.appendChild(this.renderer.domElement);
+
+                // Lights
+                this.scene.add(new THREE.AmbientLight(0x00f3ff, 0.5));
+
+                const light1 = new THREE.PointLight(0x00f3ff, 3, 15);
+                light1.position.set(-3, 2, 3);
+                this.scene.add(light1);
+
+                const light2 = new THREE.PointLight(0xff00ff, 2, 15);
+                light2.position.set(3, 1, -2);
+                this.scene.add(light2);
+
+                const light3 = new THREE.DirectionalLight(0xffffff, 1);
+                light3.position.set(0, 5, 5);
+                this.scene.add(light3);
+
+                // State
+                this.model = null;
+                this.mixer = null;
+                this.clock = new THREE.Clock();
+
+                // Resize
+                window.addEventListener('resize', () => this.onResize());
+
+                // Start rendering
+                this.animate();
+
+                // Load model
+                log("Loading model...");
+                this.loadModel('assets/hologram.glb');
+            }
+
+            onResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            loadModel(url) {
+                const loader = new THREE.GLTFLoader();
+
+                loader.load(url,
+                    (gltf) => {
+                        log("Model loaded!");
+
+                        if (this.model) {
+                            this.scene.remove(this.model);
+                        }
+
+                        this.model = gltf.scene;
+
+                        // Center and scale
+                        const box = new THREE.Box3().setFromObject(this.model);
+                        const center = box.getCenter(new THREE.Vector3());
+                        const size = box.getSize(new THREE.Vector3());
+
+                        this.model.position.sub(center);
+                        const scale = 3 / Math.max(size.x, size.y, size.z);
+                        this.model.scale.setScalar(scale);
+
+                        // Hologram WIREFRAME material - exact ca in poza
+                        this.model.traverse((child) => {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({
+                                    color: 0x00f3ff,
+                                    wireframe: true,
+                                    transparent: true,
+                                    opacity: 0.9
+                                });
+                            }
+                        });
+
+                        this.scene.add(this.model);
+
+                        // Animations
+                        if (gltf.animations && gltf.animations.length > 0) {
+                            this.mixer = new THREE.AnimationMixer(this.model);
+                            gltf.animations.forEach((clip) => {
+                                this.mixer.clipAction(clip).play();
+                            });
+                            log("Playing " + gltf.animations.length + " animations");
+                        } else {
+                            log("Model loaded (no animations)");
+                        }
+                    },
+                    (progress) => {
+                        if (progress.total > 0) {
+                            const pct = Math.round(progress.loaded / progress.total * 100);
+                            log("Loading: " + pct + "%");
+                        }
+                    },
+                    (error) => {
+                        log("Error: " + (error.message || "Could not load model"));
+                        console.error(error);
+                    }
+                );
+            }
+
+            openLocal() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.glb,.gltf';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        log("Loading: " + file.name);
+                        this.loadModel(URL.createObjectURL(file));
+                    }
+                };
+                input.click();
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+
+                const delta = this.clock.getDelta();
+                if (this.mixer) this.mixer.update(delta);
+
+                // Slow rotation if no animations
+                if (this.model && !this.mixer) {
+                    this.model.rotation.y += 0.005;
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // Init
+        let viewer;
+        window.addEventListener('DOMContentLoaded', () => {
+            viewer = new HologramViewer('hologram-container');
+            window.hologram = viewer;
+
+            document.getElementById('open-btn').onclick = () => viewer.openLocal();
+        });
+    </script>
+</body>
+
+</html>

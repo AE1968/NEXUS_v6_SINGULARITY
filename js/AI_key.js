@@ -256,10 +256,263 @@ class AI_key {
         this.renderer.render(this.scene, this.camera);
     }
 
-    // API Interface
-    listen() { /* Logic */ }
-    speak(t) { /* Logic */ }
-    calm() { /* Logic */ }
+    // =====================================================
+    // API INTERFACE - Full Implementation
+    // =====================================================
+
+    /**
+     * SPEAK - Animează gura și schimbă culoarea în speaking mode
+     * @param {string} text - Textul care va fi "spus"
+     * @param {number} duration - Durata animației în ms (default 3000)
+     */
+    speak(text, duration = 3000) {
+        console.log(`🔊 AI_key speaking: "${text}"`);
+        this.isSpeaking = true;
+
+        // Schimbă culoarea streamers în cyan intens
+        this.streamers.forEach(s => {
+            s.material.color.setHex(0x00ffff);
+        });
+
+        // Animație gură
+        const speakInterval = setInterval(() => {
+            if (!this.coreModel) return;
+            this.coreModel.traverse(child => {
+                if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
+                    const mouthOpen = child.morphTargetDictionary['mouthOpen'] ||
+                        child.morphTargetDictionary['jawOpen'] || 0;
+                    if (mouthOpen !== undefined) {
+                        // Simulare vorbire cu variație
+                        child.morphTargetInfluences[mouthOpen] = Math.random() * 0.5 + 0.1;
+                    }
+                }
+            });
+        }, 80);
+
+        // Oprire după durată
+        setTimeout(() => {
+            clearInterval(speakInterval);
+            this.isSpeaking = false;
+
+            // Reset gură
+            if (this.coreModel) {
+                this.coreModel.traverse(child => {
+                    if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
+                        const mouthOpen = child.morphTargetDictionary['mouthOpen'] ||
+                            child.morphTargetDictionary['jawOpen'] || 0;
+                        if (mouthOpen !== undefined) {
+                            child.morphTargetInfluences[mouthOpen] = 0;
+                        }
+                    }
+                });
+            }
+
+            // Reset culori streameri
+            this.streamers.forEach((s, i) => {
+                s.material.color = i % 2 === 0 ? this.colors.cyan.clone() : this.colors.magenta.clone();
+            });
+
+            console.log('🔇 AI_key finished speaking');
+        }, duration);
+    }
+
+    /**
+     * LISTEN - Mod de ascultare (microfon activ)
+     */
+    listen() {
+        console.log('👂 AI_key listening...');
+        this.isListening = true;
+
+        // Pulsație subtilă pe sferă
+        if (this.glassSphere) {
+            this.glassSphere.material.emissive = new THREE.Color(0x00ff00);
+            this.glassSphere.material.emissiveIntensity = 0.3;
+        }
+
+        // Streameri verzi pentru listening
+        this.streamers.forEach(s => {
+            s.material.color.setHex(0x00ff88);
+        });
+    }
+
+    /**
+     * STOP LISTENING - Oprește modul de ascultare
+     */
+    stopListening() {
+        console.log('🔇 AI_key stopped listening');
+        this.isListening = false;
+
+        if (this.glassSphere) {
+            this.glassSphere.material.emissive = new THREE.Color(0x000000);
+            this.glassSphere.material.emissiveIntensity = 0;
+        }
+
+        // Reset culori
+        this.streamers.forEach((s, i) => {
+            s.material.color = i % 2 === 0 ? this.colors.cyan.clone() : this.colors.magenta.clone();
+        });
+    }
+
+    /**
+     * CALM - Stare de repaus, culori normale, animații subtile
+     */
+    calm() {
+        console.log('😌 AI_key calm mode');
+        this.isProcessing = false;
+        this.isSpeaking = false;
+        this.isListening = false;
+
+        // Reset glass sphere
+        if (this.glassSphere) {
+            this.glassSphere.material.opacity = 0.3;
+            this.glassSphere.material.emissive = new THREE.Color(0x000000);
+        }
+
+        // Reset streameri la culori originale
+        this.streamers.forEach((s, i) => {
+            s.material.color = i % 2 === 0 ? this.colors.cyan.clone() : this.colors.magenta.clone();
+            s.material.opacity = 0.9;
+        });
+
+        // Reset cap la alb
+        if (this.coreModel) {
+            this.coreModel.traverse(child => {
+                if (child.isMesh) {
+                    child.material.color.setHex(0xffffff);
+                }
+            });
+        }
+    }
+
+    /**
+     * INTENSIFY - Mod intens de procesare (culori magenta, pulsație rapidă)
+     */
+    intensify() {
+        console.log('⚡ AI_key INTENSIFY mode');
+        this.isProcessing = true;
+
+        // Sferă cu opacity mai mare și emissive
+        if (this.glassSphere) {
+            this.glassSphere.material.opacity = 0.5;
+            this.glassSphere.material.emissive = new THREE.Color(0xff00ff);
+            this.glassSphere.material.emissiveIntensity = 0.5;
+        }
+
+        // Toți streamerii devin magenta intens
+        this.streamers.forEach(s => {
+            s.material.color.setHex(0xff00ff);
+            s.material.opacity = 1.0;
+        });
+
+        // Capul devine magenta/roz
+        if (this.coreModel) {
+            this.coreModel.traverse(child => {
+                if (child.isMesh) {
+                    child.material.color.setHex(0xff88ff);
+                }
+            });
+        }
+    }
+
+    /**
+     * PROCESS - Indicator de procesare (pentru "thinking" state)
+     */
+    process() {
+        console.log('🤔 AI_key processing...');
+        this.isProcessing = true;
+
+        // Alternare culori pe streameri
+        let colorToggle = true;
+        const processInterval = setInterval(() => {
+            this.streamers.forEach(s => {
+                s.material.color.setHex(colorToggle ? 0x00f3ff : 0xff00ff);
+            });
+            colorToggle = !colorToggle;
+        }, 200);
+
+        // Salvăm intervalul pentru a-l putea opri
+        this.processInterval = processInterval;
+    }
+
+    /**
+     * STOP PROCESSING - Oprește animația de procesare
+     */
+    stopProcessing() {
+        console.log('✅ AI_key stop processing');
+        this.isProcessing = false;
+
+        if (this.processInterval) {
+            clearInterval(this.processInterval);
+            this.processInterval = null;
+        }
+
+        // Reset la calm
+        this.calm();
+    }
+
+    /**
+     * SET EMOTION - Setează emoția capului (happy, sad, angry, surprised, thinking)
+     */
+    setEmotion(emotion) {
+        if (!this.coreModel) return;
+        console.log(`🎭 AI_key emotion: ${emotion}`);
+
+        const emotionMorphs = {
+            happy: ['smile', 'mouthSmile', 'eyeWideLeft', 'eyeWideRight'],
+            sad: ['mouthFrown', 'browDownLeft', 'browDownRight'],
+            angry: ['browDownLeft', 'browDownRight', 'mouthFrown'],
+            surprised: ['eyeWideLeft', 'eyeWideRight', 'browUpLeft', 'browUpRight', 'mouthOpen'],
+            thinking: ['eyeSquintLeft', 'browUpRight'],
+            neutral: []
+        };
+
+        const targetMorphs = emotionMorphs[emotion] || emotionMorphs.neutral;
+
+        this.coreModel.traverse(child => {
+            if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
+                // Reset all
+                child.morphTargetInfluences.fill(0);
+
+                // Apply emotion morphs
+                targetMorphs.forEach(morphName => {
+                    const index = child.morphTargetDictionary[morphName];
+                    if (index !== undefined) {
+                        child.morphTargetInfluences[index] = 0.7;
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * DESTROY - Cleanup pentru când entitatea nu mai e necesară
+     */
+    destroy() {
+        console.log('💀 AI_key destroyed');
+
+        // Stop all intervals
+        if (this.processInterval) clearInterval(this.processInterval);
+
+        // Dispose geometries și materials
+        this.streamers.forEach(s => {
+            s.geometry.dispose();
+            s.material.dispose();
+            this.scene.remove(s);
+        });
+
+        if (this.glassSphere) {
+            this.glassSphere.geometry.dispose();
+            this.glassSphere.material.dispose();
+        }
+
+        if (this.coreModel) {
+            this.scene.remove(this.coreModel);
+        }
+
+        if (this.renderer) {
+            this.renderer.dispose();
+        }
+    }
 }
 
 window.AI_key = AI_key;
