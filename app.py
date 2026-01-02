@@ -2429,6 +2429,46 @@ def get_active_broadcasts():
         return jsonify({"success": False, "broadcasts": []})
 
 
+# ==============================================================================
+# CONTACT SYSTEM
+# ==============================================================================
+
+@app.route('/api/contact', methods=['POST'])
+def submit_contact_form():
+    """Handle contact form submissions"""
+    try:
+        data = request.json or {}
+        name = data.get('name', '').strip()
+        email = data.get('email', '').strip()
+        subject = data.get('subject', '').strip()
+        message = data.get('message', '').strip()
+        
+        if not name or not email or not message:
+            return jsonify({"success": False, "error": "Missing required fields"}), 400
+            
+        # Log the contact request
+        logger.info(f"CONTACT FORM: From {name} ({email}) - [{subject}]: {message}")
+        
+        # Try sending email notification to admin
+        try:
+            if SMTP_EMAIL and SMTP_PASSWORD:
+                send_email(
+                    to_email=SMTP_EMAIL,
+                    subject=f"KELION Contact: {subject}",
+                    body=f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}"
+                )
+        except Exception as mail_err:
+            logger.error(f"Failed to send contact email: {mail_err}")
+            # Continue even if email fails, we logged it
+            
+        return jsonify({"success": True, "message": "Message received"})
+        
+    except Exception as e:
+        logger.error(f"Contact form error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+
 #
 # APPLICATION STARTUP
 # ==============================================================================

@@ -187,6 +187,12 @@
 
         <div class="header-actions" role="navigation" aria-label="Main actions">
 
+            <button id="manual-btn" style="display:none;" title="User Manual" aria-label="View user manual"><i
+                    class="fas fa-book"></i> MANUAL</button>
+
+            <button id="contact-btn" title="Contact Support" aria-label="Contact support"><i
+                    class="fas fa-envelope"></i> CONTACT</button>
+
             <button id="export-btn" title="Download Conversation History"
                 aria-label="Export conversation to file">EXPORT</button>
 
@@ -1187,6 +1193,70 @@
     LICENSE: UNLIMITED (Admin Override)
 
 -->
+
+        <!-- ===== USER MANUAL MODAL ===== -->
+        <div id="manual-modal" class="modal" style="display:none;">
+            <div class="modal-content" style="max-width:700px; max-height:85vh; overflow-y:auto;">
+                <span class="modal-close" id="manual-close">&times;</span>
+                <h2 style="color:var(--cyan); margin-bottom:20px; text-align:center;">
+                    <i class="fas fa-book"></i> <span id="manual-title">User Manual</span>
+                </h2>
+
+                <!-- Language Selector -->
+                <div style="text-align:center; margin-bottom:20px;">
+                    <select id="manual-lang-select"
+                        style="padding:10px 20px; background:rgba(0,0,0,0.5); border:1px solid var(--cyan); border-radius:5px; color:var(--cyan); font-size:1rem;">
+                        <option value="en">🇬🇧 English</option>
+                        <option value="ro">🇷🇴 Română</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="it">🇮🇹 Italiano</option>
+                    </select>
+                </div>
+
+                <div id="manual-content" style="line-height:1.8; color:#ccc;">
+                    <!-- Content will be loaded by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CONTACT MODAL ===== -->
+        <div id="contact-modal" class="modal" style="display:none;">
+            <div class="modal-content" style="max-width:500px;">
+                <span class="modal-close" id="contact-close">&times;</span>
+                <h2 style="color:var(--cyan); margin-bottom:20px; text-align:center;">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </h2>
+
+                <form id="contact-form" style="display:grid; gap:15px;">
+                    <input type="text" id="contact-name" placeholder="Your Name" required
+                        style="padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:5px; color:#fff;">
+
+                    <input type="email" id="contact-email" placeholder="Your Email" required
+                        style="padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:5px; color:#fff;">
+
+                    <select id="contact-subject" required
+                        style="padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:5px; color:#fff;">
+                        <option value="">Select Subject...</option>
+                        <option value="technical">Technical Issue</option>
+                        <option value="billing">Billing Question</option>
+                        <option value="feature">Feature Request</option>
+                        <option value="other">Other</option>
+                    </select>
+
+                    <textarea id="contact-message" rows="5" placeholder="Your Message..." required
+                        style="padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:5px; color:#fff; resize:vertical;"></textarea>
+
+                    <button type="submit" id="contact-submit"
+                        style="padding:15px; background:var(--cyan); color:#000; border:none; border-radius:5px; cursor:pointer; font-weight:bold; font-size:1rem;">
+                        <i class="fas fa-paper-plane"></i> SEND MESSAGE
+                    </button>
+
+                    <p id="contact-status" style="text-align:center; margin:0;"></p>
+                </form>
+            </div>
+        </div>
 
 </body>
 

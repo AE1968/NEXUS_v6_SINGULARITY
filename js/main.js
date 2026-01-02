@@ -1565,20 +1565,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
                 if (state.isAdmin) {
-
                     const tb = $('traffic-btn');
-
                     if (tb) {
-
                         tb.style.display = 'inline-block';
-
                         tb.style.opacity = '1';
-
                         tb.style.pointerEvents = 'auto';
-
                     }
-
                 }
+
+                // Show Manual Button for logged users
+                const manualBtn = $('manual-btn');
+                if (manualBtn) manualBtn.style.display = 'inline-block';
+
+                // Check for Admin Broadcasts
+                checkBroadcasts();
 
 
 
@@ -2512,6 +2512,275 @@ document.addEventListener('DOMContentLoaded', () => {
 
             sendBroadcastBtn.innerHTML = '<i class="fas fa-paper-plane"></i> SEND BROADCAST';
             sendBroadcastBtn.disabled = false;
+        };
+    }
+
+
+    // =========================================================================
+    // 📖 USER MANUAL SYSTEM - Multi-language
+    // =========================================================================
+
+    const MANUAL_TRANSLATIONS = {
+        en: {
+            title: "User Manual - KELION AI",
+            content: `
+                <h3 style="color:var(--pink); margin-top:0;">🎯 Getting Started</h3>
+                <p>Welcome to KELION AI, your intelligent holographic assistant. This guide will help you use all features effectively.</p>
+                
+                <h3 style="color:var(--cyan);">💬 Chat Interface</h3>
+                <ul>
+                    <li><strong>Text Input:</strong> Type your message in the input field and press ENTER or click SEND</li>
+                    <li><strong>Voice Input:</strong> Hold the microphone button and speak, release to send</li>
+                    <li><strong>The AI responds in your language automatically</strong></li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔮 Hologram Features</h3>
+                <ul>
+                    <li><strong>Speaking Mode:</strong> The hologram animates when AI is speaking</li>
+                    <li><strong>Listening Mode:</strong> Activates when you use voice input</li>
+                    <li><strong>Processing Mode:</strong> Shows when AI is thinking</li>
+                    <li><strong>Emotion Detection:</strong> Changes based on conversation mood</li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔍 Special Commands</h3>
+                <ul>
+                    <li><strong>Web Search:</strong> Ask "search for..." to get real-time internet results</li>
+                    <li><strong>Memory:</strong> Say "remember that..." to save personal info</li>
+                    <li><strong>Multi-language:</strong> Speak in any language - AI adapts automatically</li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">⌨️ Keyboard Shortcuts</h3>
+                <ul>
+                    <li><strong>ENTER:</strong> Send message</li>
+                    <li><strong>ESC:</strong> Close modals</li>
+                </ul>
+            `
+        },
+        ro: {
+            title: "Manual Utilizator - KELION AI",
+            content: `
+                <h3 style="color:var(--pink); margin-top:0;">🎯 Început Rapid</h3>
+                <p>Bun venit la KELION AI, asistentul tău holografic inteligent. Acest ghid te ajută să folosești toate funcțiile eficient.</p>
+                
+                <h3 style="color:var(--cyan);">💬 Interfața de Chat</h3>
+                <ul>
+                    <li><strong>Introducere Text:</strong> Scrie mesajul în câmpul de input și apasă ENTER sau click pe SEND</li>
+                    <li><strong>Introducere Vocală:</strong> Ține apăsat butonul microfon și vorbește, eliberează pentru a trimite</li>
+                    <li><strong>AI răspunde automat în limba ta</strong></li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔮 Funcții Hologramă</h3>
+                <ul>
+                    <li><strong>Mod Vorbire:</strong> Holograma se animează când AI vorbește</li>
+                    <li><strong>Mod Ascultare:</strong> Se activează când folosești input vocal</li>
+                    <li><strong>Mod Procesare:</strong> Apare când AI gândește</li>
+                    <li><strong>Detectare Emoții:</strong> Se schimbă în funcție de tonul conversației</li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔍 Comenzi Speciale</h3>
+                <ul>
+                    <li><strong>Căutare Web:</strong> Întreabă "caută..." pentru rezultate în timp real</li>
+                    <li><strong>Memorie:</strong> Spune "ține minte că..." pentru a salva informații personale</li>
+                    <li><strong>Multi-limbă:</strong> Vorbește în orice limbă - AI se adaptează automat</li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">⌨️ Scurtături Tastatură</h3>
+                <ul>
+                    <li><strong>ENTER:</strong> Trimite mesaj</li>
+                    <li><strong>ESC:</strong> Închide ferestrele</li>
+                </ul>
+            `
+        },
+        de: {
+            title: "Benutzerhandbuch - KELION AI",
+            content: `
+                <h3 style="color:var(--pink); margin-top:0;">🎯 Erste Schritte</h3>
+                <p>Willkommen bei KELION AI, Ihrem intelligenten holografischen Assistenten.</p>
+                
+                <h3 style="color:var(--cyan);">💬 Chat-Oberfläche</h3>
+                <ul>
+                    <li><strong>Texteingabe:</strong> Nachricht eingeben und ENTER drücken</li>
+                    <li><strong>Spracheingabe:</strong> Mikrofon-Taste gedrückt halten und sprechen</li>
+                    <li><strong>KI antwortet automatisch in Ihrer Sprache</strong></li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔮 Hologramm-Funktionen</h3>
+                <ul>
+                    <li><strong>Sprechmodus:</strong> Hologramm animiert während KI spricht</li>
+                    <li><strong>Hörmodus:</strong> Aktiviert bei Spracheingabe</li>
+                    <li><strong>Verarbeitungsmodus:</strong> Zeigt KI-Denkprozess</li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔍 Spezielle Befehle</h3>
+                <ul>
+                    <li><strong>Websuche:</strong> "Suche nach..." für Echtzeitergebnisse</li>
+                    <li><strong>Gedächtnis:</strong> "Merke dir..." um Infos zu speichern</li>
+                </ul>
+            `
+        },
+        fr: {
+            title: "Manuel Utilisateur - KELION AI",
+            content: `
+                <h3 style="color:var(--pink); margin-top:0;">🎯 Démarrage</h3>
+                <p>Bienvenue sur KELION AI, votre assistant holographique intelligent.</p>
+                
+                <h3 style="color:var(--cyan);">💬 Interface de Chat</h3>
+                <ul>
+                    <li><strong>Saisie texte:</strong> Tapez votre message et appuyez sur ENTRÉE</li>
+                    <li><strong>Saisie vocale:</strong> Maintenez le bouton micro et parlez</li>
+                    <li><strong>L'IA répond automatiquement dans votre langue</strong></li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔮 Fonctions Hologramme</h3>
+                <ul>
+                    <li><strong>Mode Parole:</strong> L'hologramme s'anime quand l'IA parle</li>
+                    <li><strong>Mode Écoute:</strong> Activé lors de la saisie vocale</li>
+                    <li><strong>Mode Traitement:</strong> Affiché pendant la réflexion de l'IA</li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔍 Commandes Spéciales</h3>
+                <ul>
+                    <li><strong>Recherche Web:</strong> "Recherche..." pour résultats en temps réel</li>
+                    <li><strong>Mémoire:</strong> "Retiens que..." pour sauvegarder des infos</li>
+                </ul>
+            `
+        },
+        es: {
+            title: "Manual de Usuario - KELION AI",
+            content: `
+                <h3 style="color:var(--pink); margin-top:0;">🎯 Inicio Rápido</h3>
+                <p>Bienvenido a KELION AI, tu asistente holográfico inteligente.</p>
+                
+                <h3 style="color:var(--cyan);">💬 Interfaz de Chat</h3>
+                <ul>
+                    <li><strong>Entrada de texto:</strong> Escribe tu mensaje y presiona ENTER</li>
+                    <li><strong>Entrada de voz:</strong> Mantén el botón del micrófono y habla</li>
+                    <li><strong>La IA responde automáticamente en tu idioma</strong></li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔮 Funciones del Holograma</h3>
+                <ul>
+                    <li><strong>Modo Habla:</strong> El holograma se anima cuando la IA habla</li>
+                    <li><strong>Modo Escucha:</strong> Se activa con entrada de voz</li>
+                    <li><strong>Modo Procesamiento:</strong> Muestra cuando la IA piensa</li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔍 Comandos Especiales</h3>
+                <ul>
+                    <li><strong>Búsqueda Web:</strong> "Busca..." para resultados en tiempo real</li>
+                    <li><strong>Memoria:</strong> "Recuerda que..." para guardar información</li>
+                </ul>
+            `
+        },
+        it: {
+            title: "Manuale Utente - KELION AI",
+            content: `
+                <h3 style="color:var(--pink); margin-top:0;">🎯 Guida Rapida</h3>
+                <p>Benvenuto in KELION AI, il tuo assistente olografico intelligente.</p>
+                
+                <h3 style="color:var(--cyan);">💬 Interfaccia Chat</h3>
+                <ul>
+                    <li><strong>Input testo:</strong> Scrivi il messaggio e premi INVIO</li>
+                    <li><strong>Input vocale:</strong> Tieni premuto il pulsante microfono e parla</li>
+                    <li><strong>L'IA risponde automaticamente nella tua lingua</strong></li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔮 Funzioni Ologramma</h3>
+                <ul>
+                    <li><strong>Modalità Parlato:</strong> L'ologramma si anima quando l'IA parla</li>
+                    <li><strong>Modalità Ascolto:</strong> Si attiva con input vocale</li>
+                    <li><strong>Modalità Elaborazione:</strong> Mostra quando l'IA pensa</li>
+                </ul>
+                
+                <h3 style="color:var(--cyan);">🔍 Comandi Speciali</h3>
+                <ul>
+                    <li><strong>Ricerca Web:</strong> "Cerca..." per risultati in tempo reale</li>
+                    <li><strong>Memoria:</strong> "Ricorda che..." per salvare informazioni</li>
+                </ul>
+            `
+        }
+    };
+
+    function loadManualContent(lang) {
+        const manual = MANUAL_TRANSLATIONS[lang] || MANUAL_TRANSLATIONS['en'];
+        $('manual-title').textContent = manual.title;
+        $('manual-content').innerHTML = manual.content;
+    }
+
+    // Manual button handler
+    const manualBtn = $('manual-btn');
+    const manualModal = $('manual-modal');
+    const manualClose = $('manual-close');
+    const manualLangSelect = $('manual-lang-select');
+
+    if (manualBtn && manualModal) {
+        manualBtn.onclick = () => {
+            manualModal.style.display = 'flex';
+            loadManualContent(state.language || 'en');
+            if (manualLangSelect) manualLangSelect.value = state.language || 'en';
+        };
+
+        manualClose.onclick = () => manualModal.style.display = 'none';
+        manualModal.onclick = (e) => { if (e.target === manualModal) manualModal.style.display = 'none'; };
+
+        if (manualLangSelect) {
+            manualLangSelect.onchange = () => {
+                loadManualContent(manualLangSelect.value);
+                setLanguage(manualLangSelect.value);
+            };
+        }
+    }
+
+    // Contact button handler
+    const contactBtn = $('contact-btn');
+    const contactModal = $('contact-modal');
+    const contactClose = $('contact-close');
+    const contactForm = $('contact-form');
+
+    if (contactBtn && contactModal) {
+        contactBtn.onclick = () => contactModal.style.display = 'flex';
+        contactClose.onclick = () => contactModal.style.display = 'none';
+        contactModal.onclick = (e) => { if (e.target === contactModal) contactModal.style.display = 'none'; };
+    }
+
+    if (contactForm) {
+        contactForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const submitBtn = $('contact-submit');
+            const status = $('contact-status');
+
+            submitBtn.textContent = 'SENDING...';
+            submitBtn.disabled = true;
+
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: $('contact-name').value,
+                        email: $('contact-email').value,
+                        subject: $('contact-subject').value,
+                        message: $('contact-message').value
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    status.style.color = '#00ff00';
+                    status.textContent = '✅ Message sent successfully!';
+                    contactForm.reset();
+                    setTimeout(() => contactModal.style.display = 'none', 2000);
+                } else {
+                    status.style.color = '#ff4444';
+                    status.textContent = '❌ ' + (data.error || 'Failed to send');
+                }
+            } catch (err) {
+                status.style.color = '#ff4444';
+                status.textContent = '❌ Connection error';
+            }
+
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> SEND MESSAGE';
+            submitBtn.disabled = false;
         };
     }
 
