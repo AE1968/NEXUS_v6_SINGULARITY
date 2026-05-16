@@ -450,18 +450,6 @@ class VisitorLog(db.Model):
     username = db.Column(db.String(80), nullable=True)
 
 
-class UserMemory(db.Model):
-    """Persistent memory for personalized interactions"""
-    __tablename__ = 'user_memories'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), nullable=False)
-    memory_key = db.Column(db.String(100), nullable=False)
-    memory_value = db.Column(db.Text, nullable=False)
-    memory_type = db.Column(db.String(30), default='fact')  # fact, preference, event, personal
-    importance = db.Column(db.Integer, default=5)  # 1-10
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    last_accessed = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 
 class AdminBroadcast(db.Model):
